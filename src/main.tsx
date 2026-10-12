@@ -75,6 +75,21 @@ if ('serviceWorker' in navigator) {
       .then(reg => {
         console.log('OrderPoint Pro SW Registered successfully!');
         
+        // Force immediate update check on every load
+        reg.update();
+
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New version found, activate immediately
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          }
+        });
+
         const sendIcons = () => {
           if (reg.active) {
             try {
@@ -100,6 +115,15 @@ if ('serviceWorker' in navigator) {
         }
       })
       .catch(err => console.error('OrderPoint Pro SW Registration failed: ', err));
+
+    // Reload window when new service worker takes over to guarantee freshest assets
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
   });
 }
 
