@@ -63,7 +63,7 @@ export default function ScanGo({
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-4 items-start select-none">
         
         {/* LEFT COLUMN: SELF ORDER QR CODE CARD */}
-        <div className="md:col-span-4 bg-[#0F172A] text-white p-8 rounded-[32px] text-center shadow-xl border border-white/5 space-y-6 flex flex-col justify-between min-h-[450px]">
+        <div className="md:col-span-4 bg-[#07132B] text-white p-8 rounded-[32px] text-center shadow-xl border border-blue-900/50 space-y-6 flex flex-col justify-between min-h-[450px]">
           
           <div className="bg-white p-4 rounded-2xl w-48 h-48 flex items-center justify-center mx-auto shadow-md">
             {tableQRDataUrl ? (
@@ -73,7 +73,7 @@ export default function ScanGo({
                 className="w-full h-full object-contain rounded-lg block"
               />
             ) : (
-              <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
             )}
           </div>
 
@@ -82,7 +82,7 @@ export default function ScanGo({
               <h3 className="text-white font-extrabold text-base tracking-tight leading-none uppercase">
                 SELF ORDER
               </h3>
-              <p className="text-slate-400 text-xs font-semibold leading-relaxed max-w-[245px] mx-auto">
+              <p className="text-blue-200/60 text-xs font-semibold leading-relaxed max-w-[245px] mx-auto">
                 Customers can scan this to view menu and order instantly.
               </p>
             </div>
@@ -96,7 +96,7 @@ export default function ScanGo({
               window.open(universalUrl, '_blank');
               onShowToast('Opened self-ordering link in a new tab!');
             }}
-            className="w-full h-11 bg-white hover:bg-slate-100 text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider transition-colors border-none cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+            className="w-full h-11 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black rounded-xl text-xs uppercase tracking-wider transition-all border-none cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-blue-950/50"
           >
             <span>Open Ordering Link</span>
           </button>
@@ -104,15 +104,15 @@ export default function ScanGo({
 
         {/* RIGHT COLUMN: ACTIVE SELF-ORDERS */}
         <div className="md:col-span-8 space-y-4">
-          <div className="flex items-center gap-2 text-slate-500 font-extrabold uppercase tracking-wider text-[11px] select-none pl-1">
-            <Clock size={14} className="text-slate-400 stroke-[2.5]" />
+          <div className="flex items-center gap-2 text-blue-300 font-extrabold uppercase tracking-wider text-[11px] select-none pl-1">
+            <Clock size={14} className="text-blue-400 stroke-[2.5]" />
             <span>Active Self-Orders</span>
           </div>
 
-          <div className="min-h-[450px] flex flex-col justify-center select-none w-full bg-white border border-slate-200 rounded-[32px] p-6 shadow-xs">
+          <div className="min-h-[450px] flex flex-col justify-center select-none w-full bg-[#07132B]/95 border border-blue-900/50 rounded-[32px] p-6 shadow-lg shadow-blue-950/40">
             {activeSelfOrders.length === 0 ? (
               <div className="text-center py-24">
-                <p className="font-sans text-xs text-slate-400 font-semibold italic">
+                <p className="font-sans text-xs text-blue-200/50 font-semibold italic">
                   No active self-orders at the moment.
                 </p>
               </div>
@@ -121,42 +121,42 @@ export default function ScanGo({
                 {activeSelfOrders.map(so => (
                   <div 
                     key={so.id} 
-                    className="p-4 bg-slate-50 border border-slate-150 hover:border-indigo-400 rounded-2xl flex flex-col gap-3.5 transition-all text-left shadow-xs justify-between"
+                    className="p-4 bg-[#040E24] border border-blue-900/60 hover:border-blue-500/80 rounded-2xl flex flex-col gap-3.5 transition-all text-left shadow-md justify-between"
                   >
                     <div className="space-y-1 font-sans">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="font-black text-slate-900 text-xs truncate max-w-[130px]">{so.customerName}</span>
+                          <span className="font-black text-white text-xs truncate max-w-[130px]">{so.customerName}</span>
                           <span className="text-[8.5px] font-black bg-amber-500 text-white px-2 py-0.5 rounded leading-none uppercase">
                             {so.tableNo || so.tableNumber || 'Table 1'}
                           </span>
                         </div>
-                        <span className="text-xs font-black text-slate-900 font-mono font-extrabold">₹{so.total || 0}</span>
+                        <span className="text-xs font-black text-blue-300 font-mono font-extrabold">₹{so.total || 0}</span>
                       </div>
-                      <span className="text-[9.5px] text-slate-400 block font-semibold leading-none">
+                      <span className="text-[9.5px] text-blue-200/60 block font-semibold leading-none">
                         Contact: {so.customerPhone || 'N/A'} • {so.items ? so.items.length : 0} item(s) logged
                       </span>
                       
                       {/* Items row */}
                       <div className="flex flex-wrap gap-1 mt-1">
                         {so.items?.map((item, id) => (
-                          <span key={id} className="text-[9px] font-black bg-white border border-slate-200 text-slate-700 px-2 py-0.5 rounded">
+                          <span key={id} className="text-[9px] font-black bg-[#0A1E45] border border-blue-800 text-blue-200 px-2 py-0.5 rounded">
                             {item.menuItem.name} x{item.quantity}
                           </span>
                         ))}
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-slate-150">
+                    <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-blue-900/50">
                       <button
                         onClick={() => onDeclineSelfOrder(so.id)}
-                        className="bg-white border border-slate-200 text-slate-500 hover:bg-rose-50 hover:text-rose-600 h-7 p-0.5 px-3 text-[10px] font-black uppercase rounded-lg transition-colors cursor-pointer"
+                        className="bg-[#0B214F] border border-blue-800/80 text-blue-300 hover:bg-rose-950/40 hover:text-rose-400 hover:border-rose-900/50 h-7 p-0.5 px-3 text-[10px] font-black uppercase rounded-lg transition-colors cursor-pointer"
                       >
                         Decline
                       </button>
                       <button
                         onClick={() => onApproveSelfOrder(so.id)}
-                        className="bg-[#0F172A] text-white hover:bg-black h-7 p-0.5 px-3 text-[10px] font-black uppercase rounded-lg transition-all cursor-pointer border-none shadow-sm"
+                        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white h-7 p-0.5 px-3 text-[10px] font-black uppercase rounded-lg transition-all cursor-pointer border-none shadow-sm"
                       >
                         Accept &amp; Kitchen Send
                       </button>

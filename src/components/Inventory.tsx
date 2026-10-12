@@ -216,19 +216,20 @@ export default function Inventory({
         <button
           id="btn_open_add_inventory"
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-[#111111] text-white hover:bg-[#222222] h-[52px] px-6 rounded-2xl text-xs font-black tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm uppercase active:scale-[0.98] cursor-pointer"
+          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white h-8.5 px-4.5 rounded-full text-[11px] font-black tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-md shadow-blue-950/40 uppercase active:scale-95 cursor-pointer border-none"
         >
-          + Add Inventory Item
+          <Plus size={14} className="stroke-[3]" />
+          <span>Add Inventory</span>
         </button>
       }
     >
 
-      {/* Main Stock Table inside high-contrast elegant 32px Card matching Screenshot */}
-      <div className="bg-white border border-[#F0F2F5] rounded-[32px] overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.02)]">
+      {/* Main Stock Table inside deep dark blue 32px Card */}
+      <div className="bg-[#07132B]/95 border border-blue-900/50 rounded-[32px] overflow-hidden shadow-lg shadow-blue-950/40">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#F0F2F5]/80 bg-[#FAFCFB]/60 text-[10px] font-bold text-[#A5A5A5] uppercase tracking-widest h-16">
+              <tr className="border-b border-blue-900/50 bg-[#040E24]/80 text-[10px] font-bold text-blue-200/60 uppercase tracking-widest h-16">
                 <th className="py-5 pl-12 text-left">ITEM NAME</th>
                 <th className="py-5 text-center w-48">QUANTITY</th>
                 <th className="py-5 text-center w-56">LOW STOCK LIMIT</th>
@@ -236,10 +237,10 @@ export default function Inventory({
                 <th className="py-5 pr-12 text-right w-36">ACTIONS</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F0F2F5]/80 text-xs">
+            <tbody className="divide-y divide-blue-900/30 text-xs">
               {filteredItems.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-16 text-center text-gray-400 font-bold">
+                  <td colSpan={5} className="py-16 text-center text-blue-200/50 font-bold">
                     No matching items in warehouse registers
                   </td>
                 </tr>
@@ -252,20 +253,20 @@ export default function Inventory({
                     <tr
                       id={`inventory_row_${item.id}`}
                       key={item.id}
-                      className="hover:bg-[#F8FAF9]/30 transition-colors h-20"
+                      className="hover:bg-[#0A1E45]/40 transition-colors h-20"
                     >
                       {/* Material Name */}
-                      <td className="py-5 pl-12 text-[#111111] font-[800] text-sm text-left">
+                      <td className="py-5 pl-12 text-white font-[800] text-sm text-left">
                         {item.name}
                       </td>
 
                       {/* Quantity: dynamic red if low limit reached */}
-                      <td className={`py-5 text-center text-sm font-bold ${isOutOfStock || isLow ? 'text-[#E11D48] font-[900]' : 'text-[#111111]'}`}>
+                      <td className={`py-5 text-center text-sm font-bold ${isOutOfStock || isLow ? 'text-rose-400 font-[900]' : 'text-white'}`}>
                         {item.quantity}
                       </td>
 
                       {/* Low Stock Limit */}
-                      <td className="py-5 text-center text-[#111111] font-[800] text-sm">
+                      <td className="py-5 text-center text-blue-100 font-[800] text-sm">
                         {item.lowLimit}
                       </td>
 
@@ -274,8 +275,8 @@ export default function Inventory({
                         <span
                           className={`inline-flex items-center px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
                             isOutOfStock || isLow
-                              ? 'bg-[#FFF1F2] text-[#E11D48]'
-                              : 'bg-emerald-50 text-[#22C55E]'
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                              : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                           }`}
                         >
                           {isOutOfStock ? 'OUT OF STOCK' : isLow ? 'LOW STOCK' : 'IN STOCK'}
@@ -284,11 +285,11 @@ export default function Inventory({
 
                       {/* Standard actions icon styling */}
                       <td className="py-5 pr-12 text-right">
-                        <div className="flex items-center justify-end gap-5 text-gray-300">
+                        <div className="flex items-center justify-end gap-5 text-blue-300">
                           <button
                             id={`btn_adj_stock_${item.id}`}
                             onClick={() => handleAdjustQuantity(item)}
-                            className="hover:text-[#111111] transition-colors cursor-pointer p-1"
+                            className="hover:text-white transition-colors cursor-pointer p-1"
                             title="Adjust Stock Quantity"
                           >
                             <Edit2 size={15} className="stroke-[1.5]" />
@@ -300,7 +301,7 @@ export default function Inventory({
                                 onShowToast(`Deleted ${item.name} list reference`);
                               }
                             }}
-                            className="hover:text-rose-600 transition-colors cursor-pointer p-1"
+                            className="hover:text-rose-400 transition-colors cursor-pointer p-1"
                             title="Delete Warehousing record"
                           >
                             <Trash2 size={15} className="stroke-[1.5]" />
@@ -316,20 +317,18 @@ export default function Inventory({
         </div>
       </div>
 
-
-
       {/* Add Inventory Drawer overlay modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[28px] max-w-sm w-full p-6 shadow-xl border border-[#EEEEEE] animate-fade-in space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-[#07132B] rounded-[28px] max-w-sm w-full p-6 shadow-2xl border border-blue-900/60 animate-fade-in space-y-6 text-white">
+            <div className="flex items-center justify-between pb-3 border-b border-blue-900/50">
               <div className="flex items-center gap-2">
-                <Package className="text-[#111111]" size={18} />
-                <h3 className="text-lg font-bold text-[#111111]">Add Inventory Stock</h3>
+                <Package className="text-blue-400" size={18} />
+                <h3 className="text-lg font-bold text-white">Add Inventory Stock</h3>
               </div>
               <button
                 onClick={() => setIsAddModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-slate-400 hover:text-white cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -337,39 +336,39 @@ export default function Inventory({
 
             <form onSubmit={handleAddNewItem} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-[#8A8A8A] uppercase block">Material/Item Name</label>
+                <label className="text-xs font-bold text-blue-200/70 uppercase block">Material/Item Name</label>
                 <input
                   id="modal_stock_name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Wheat flour / Sugar"
-                  className="w-full h-11 px-4 bg-[#F8F8F8] border border-[#EEEEEE] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#111111] focus:bg-white"
+                  className="w-full h-11 px-4 bg-[#040E24] border border-blue-900/60 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500 placeholder:text-blue-300/40"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#8A8A8A] uppercase block">Quantity</label>
+                  <label className="text-xs font-bold text-blue-200/70 uppercase block">Quantity</label>
                   <input
                     id="modal_stock_qty"
                     type="number"
                     value={qty}
                     onChange={(e) => setQty(e.target.value)}
-                    className="w-full h-11 px-4 bg-[#F8F8F8] border border-[#EEEEEE] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#111111] focus:bg-white"
+                    className="w-full h-11 px-4 bg-[#040E24] border border-blue-900/60 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
                     required
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#8A8A8A] uppercase block">Low Stock Limit</label>
+                  <label className="text-xs font-bold text-blue-200/70 uppercase block">Low Stock Limit</label>
                   <input
                     id="modal_stock_limit"
                     type="number"
                     value={limit}
                     onChange={(e) => setLimit(e.target.value)}
-                    className="w-full h-11 px-4 bg-[#F8F8F8] border border-[#EEEEEE] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#111111] focus:bg-white"
+                    className="w-full h-11 px-4 bg-[#040E24] border border-blue-900/60 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
                     required
                   />
                 </div>
@@ -377,26 +376,26 @@ export default function Inventory({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#8A8A8A] uppercase block">Unit (e.g. kg, L)</label>
+                  <label className="text-xs font-bold text-blue-200/70 uppercase block">Unit (e.g. kg, L)</label>
                   <input
                     id="modal_stock_unit"
                     type="text"
                     value={unit}
                     onChange={(e) => setUnit(e.target.value)}
-                    className="w-full h-11 px-4 bg-[#F8F8F8] border border-[#EEEEEE] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
+                    className="w-full h-11 px-4 bg-[#040E24] border border-blue-900/60 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500"
                     required
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-[#8A8A8A] uppercase block">Supplier Partner</label>
+                  <label className="text-xs font-bold text-blue-200/70 uppercase block">Supplier Partner</label>
                   <input
                     id="modal_stock_supplier"
                     type="text"
                     value={supplier}
                     onChange={(e) => setSupplier(e.target.value)}
                     placeholder="e.g. Amul Corp"
-                    className="w-full h-11 px-4 bg-[#F8F8F8] border border-[#EEEEEE] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#111111]"
+                    className="w-full h-11 px-4 bg-[#040E24] border border-blue-900/60 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500 placeholder:text-blue-300/40"
                   />
                 </div>
               </div>
@@ -404,9 +403,10 @@ export default function Inventory({
               <button
                 id="modal_save_stock_btn"
                 type="submit"
-                className="w-full h-[52px] bg-[#111111] hover:bg-[#222222] text-white rounded-[16px] text-xs font-bold uppercase tracking-wider shadow-sm transition-all active:scale-[0.99]"
+                className="w-full h-10 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-md transition-all active:scale-[0.98] border-none cursor-pointer flex items-center justify-center gap-1.5"
               >
-                Record Stock Material
+                <Plus size={14} className="stroke-[2.5]" />
+                <span>Add Inventory</span>
               </button>
             </form>
           </div>

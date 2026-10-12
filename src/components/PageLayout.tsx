@@ -67,29 +67,31 @@ export default function PageLayout({
     { id: 'Settings', label: 'System Settings', icon: Settings },
   ];
 
+  const isLight = id === 'dashboard_view' || id === 'settings_view' || activeTab === 'Dashboard' || activeTab === 'Settings';
+
   return (
-    <div id={id} className="w-full flex-1 flex flex-col min-h-0 bg-[#f9fafb] animate-fade-in font-sans">
+    <div id={id} className={`w-full flex-1 flex flex-col min-h-0 ${isLight ? 'bg-[#f9fafb] text-gray-900' : 'bg-[#020B1D] text-slate-100'} animate-fade-in font-sans`}>
       {/* Reusable left-aligned Page Header */}
-      <div className="w-full bg-white border-b border-gray-100 py-4 px-4 sm:px-6 shrink-0 z-30 shadow-2xs">
+      <div className={`w-full ${isLight ? 'bg-white border-b border-gray-100 shadow-2xs' : 'bg-[#030B1C] border-b border-blue-950/70 shadow-sm'} py-4 px-4 sm:px-6 shrink-0 z-30`}>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="space-y-1 text-left flex-1 min-w-0">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-black text-gray-950 tracking-tight leading-none uppercase truncate">
+              <h1 className={`text-xl font-black ${isLight ? 'text-gray-950' : 'text-white'} tracking-tight leading-none uppercase truncate`}>
                 {title}
               </h1>
               {/* Cloud Sync Pulse Indicator */}
               <div 
                 onClick={handleSyncClick}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200/80 rounded-full text-[9px] font-black text-emerald-700 uppercase tracking-widest leading-none cursor-pointer hover:bg-emerald-100 transition-all select-none shadow-xs"
+                className={`flex items-center gap-1.5 px-2.5 py-1 ${isLight ? 'bg-emerald-50 border border-emerald-200/80 text-emerald-700 hover:bg-emerald-100' : 'bg-blue-500/15 border border-blue-400/30 text-blue-300 hover:bg-blue-500/25 shadow-xs shadow-blue-950/50'} rounded-full text-[9px] font-black uppercase tracking-widest leading-none cursor-pointer transition-all select-none`}
                 title="System real-time synchronized. Click to force check."
               >
-                <span className={`w-1.5 h-1.5 rounded-full bg-emerald-500 ${isSyncing ? 'animate-spin' : 'animate-pulse'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full ${isLight ? 'bg-emerald-500' : 'bg-blue-400'} ${isSyncing ? 'animate-spin' : 'animate-pulse'}`} />
                 <RefreshCw size={8} className={`stroke-[3] ${isSyncing ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">LIVE SYNCED</span>
               </div>
             </div>
             {subtitle && (
-              <p className="text-xs font-semibold text-gray-500 mt-1 leading-normal truncate">
+              <p className={`text-xs font-semibold ${isLight ? 'text-gray-500' : 'text-blue-200/70'} mt-1 leading-normal truncate`}>
                 {subtitle}
               </p>
             )}

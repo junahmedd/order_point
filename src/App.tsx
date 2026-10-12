@@ -1020,7 +1020,7 @@ export default function App() {
         }}
       />
 
-      <main className="flex-1 min-w-0 relative h-screen overflow-hidden flex flex-col bg-[#f9fafb]">
+      <main className={`flex-1 min-w-0 relative h-screen overflow-hidden flex flex-col ${activeTab === 'Dashboard' || activeTab === 'Settings' ? 'bg-[#f9fafb]' : 'bg-[#020B1D]'}`}>
         {/* Offline Banner Indicator */}
         {!isOnline && (
           <div className="bg-amber-600 text-white px-4 py-2.5 flex items-center justify-center gap-2 shadow-md shrink-0 border-b border-amber-700 font-sans z-30 animate-pulse text-xs font-bold">
@@ -1072,29 +1072,29 @@ export default function App() {
           </div>
         )}
 
-        {/* Mobile Header (Clean Original Theme with Notch Support) */}
-        <div className="lg:hidden flex items-center justify-between bg-white border-b border-gray-200 px-4 py-2.5 sticky top-0 z-30 shadow-xs shrink-0 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
+        {/* Mobile Header (Deep Dark Blue Theme with Sapphire Accents & iOS/Android Notch Support) */}
+        <div className="lg:hidden flex items-center justify-between bg-[#030B1C] border-b border-blue-950/70 px-4 py-2.5 sticky top-0 z-30 shadow-md shrink-0 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
           <button 
             onClick={() => setIsSidebarOpen(true)} 
-            className="p-2 -ml-1 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 active:scale-95 flex items-center justify-center focus:outline-none bg-transparent border-none cursor-pointer transition-all"
+            className="p-2 -ml-1 rounded-xl text-blue-200 hover:text-white hover:bg-blue-900/30 active:scale-95 flex items-center justify-center focus:outline-none bg-transparent border-none cursor-pointer transition-all"
             aria-label="Open Navigation Menu"
           >
             {/* SVG Menu Icon */}
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-800">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-300">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
           <div className="flex flex-col items-center">
-            <div className="font-black text-[14px] tracking-tight text-gray-900 leading-none mb-1 mt-0.5">ORDERPOINT PRO</div>
+            <div className="font-black text-[14px] tracking-tight text-white leading-none mb-1 mt-0.5">ORDERPOINT PRO</div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[8px] font-black text-white bg-gray-900 px-1.5 py-0.5 rounded leading-none uppercase tracking-widest">POS SYSTEM</span>
-              <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider leading-none truncate max-w-[150px]">{!settingsLoading && settingsData?.restaurantInfo?.name ? settingsData.restaurantInfo.name : ''}</span>
+              <span className="text-[8px] font-black text-blue-200 bg-blue-500/20 border border-blue-400/20 px-1.5 py-0.5 rounded leading-none uppercase tracking-widest">POS SYSTEM</span>
+              <span className="text-[10px] font-bold text-blue-300 uppercase tracking-wider leading-none truncate max-w-[150px]">{!settingsLoading && settingsData?.restaurantInfo?.name ? settingsData.restaurantInfo.name : ''}</span>
             </div>
           </div>
           <div className="w-8 flex justify-end">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50 animate-pulse" title="System Live" />
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-400 shadow-sm shadow-blue-400/50 animate-pulse" title="System Live" />
           </div>
         </div>
 
@@ -1102,8 +1102,8 @@ export default function App() {
           {renderContent()}
         </div>
 
-        {/* Mobile Bottom Navigation Bar (Original Dark with Emerald Accents & Safe-Area Inset) */}
-        <div className="lg:hidden fixed bottom-0 inset-x-0 bg-black/95 backdrop-blur-md border-t border-neutral-900 z-30 shadow-[0_-4px_25px_rgba(0,0,0,0.5)] select-none pb-[env(safe-area-inset-bottom,0px)]">
+        {/* Mobile Bottom Navigation Bar (Deep Dark Blue Theme with Safe-Area Inset) */}
+        <div className="lg:hidden fixed bottom-0 inset-x-0 bg-[#030B1C]/95 backdrop-blur-md border-t border-blue-950/80 z-30 shadow-[0_-4px_25px_rgba(2,11,29,0.8)] select-none pb-[env(safe-area-inset-bottom,0px)]">
           <div className="h-16 flex items-center justify-around px-1">
             {[
               { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -1126,10 +1126,10 @@ export default function App() {
                     }
                   }}
                   className={`flex flex-col items-center justify-center gap-1 flex-1 h-full bg-transparent border-none cursor-pointer transition-all active:scale-95 touch-manipulation ${
-                    isActive ? 'text-emerald-400 font-extrabold' : 'text-gray-400 hover:text-white'
+                    isActive ? 'text-blue-400 font-extrabold' : 'text-slate-400 hover:text-blue-200'
                   }`}
                 >
-                  <div className={`p-1 rounded-xl transition-all ${isActive ? 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30' : ''}`}>
+                  <div className={`p-1 rounded-xl transition-all ${isActive ? 'bg-blue-600/20 text-blue-400 ring-1 ring-blue-500/30' : ''}`}>
                     <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
                   </div>
                   <span className="text-[9px] font-black uppercase tracking-wider leading-none">{tab.label}</span>
