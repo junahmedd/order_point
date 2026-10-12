@@ -762,15 +762,15 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#064E3B] via-[#043427] to-[#022018] flex flex-col items-center justify-center font-sans relative overflow-hidden text-white">
+      <div className="min-h-screen bg-gradient-to-br from-[#020B1D] via-[#06183B] to-[#010814] flex flex-col items-center justify-center font-sans relative overflow-hidden text-white">
         <div className="relative z-10 flex flex-col items-center gap-6 text-center">
           {/* Beautiful Inline SVG Logo */}
-          <div className="w-24 h-24 drop-shadow-xl animate-[pulse_2s_infinite_ease-in-out]">
+          <div className="w-24 h-24 drop-shadow-2xl animate-[pulse_2s_infinite_ease-in-out]">
             <svg viewBox="0 0 512 512" width="100%" height="100%">
               <defs>
                 <linearGradient id="splashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style={{stopColor:'#10B981',stopOpacity:1}} />
-                  <stop offset="100%" style={{stopColor:'#059669',stopOpacity:1}} />
+                  <stop offset="0%" style={{stopColor:'#2563EB',stopOpacity:1}} />
+                  <stop offset="100%" style={{stopColor:'#1D4ED8',stopOpacity:1}} />
                 </linearGradient>
               </defs>
               <rect x="32" y="32" width="448" height="448" rx="112" fill="url(#splashGrad)" />
@@ -779,15 +779,15 @@ export default function App() {
               <rect x="251" y="196" width="10" height="12" rx="4" fill="#FFFFFF" />
               <path d="M128 316 L384 316 C396 316, 400 324, 384 328 L128 328 C112 324, 116 316, 128 316 Z" fill="#FFFFFF" />
               <rect x="112" y="324" width="288" height="8" rx="4" fill="#FFFFFF" opacity="0.9" />
-              <path d="M220 285 L245 310 L300 250" stroke="#064E3B" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+              <path d="M220 285 L245 310 L300 250" stroke="#1D4ED8" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round" fill="none" />
             </svg>
           </div>
           <div className="space-y-2">
             <h2 className="text-2xl font-black tracking-tight text-white leading-none">OrderPoint Pro</h2>
-            <p className="text-emerald-300 text-[10px] font-black tracking-widest uppercase font-mono">POS &amp; Restaurant OS</p>
+            <p className="text-blue-300 text-[10px] font-black tracking-widest uppercase font-mono">POS &amp; Restaurant OS</p>
           </div>
-          <div className="w-24 h-1.5 bg-emerald-950/80 rounded-full overflow-hidden relative shadow-inner border border-emerald-500/20">
-            <div className="absolute inset-y-0 bg-emerald-400 rounded-full animate-[loading_1.5s_infinite_ease-in-out]" />
+          <div className="w-24 h-1.5 bg-blue-950/80 rounded-full overflow-hidden relative shadow-inner border border-blue-500/20">
+            <div className="absolute inset-y-0 bg-blue-400 rounded-full animate-[loading_1.5s_infinite_ease-in-out]" />
           </div>
         </div>
         <style dangerouslySetInnerHTML={{__html: `
@@ -1072,15 +1072,15 @@ export default function App() {
           </div>
         )}
 
-        {/* Mobile Header (Sleek Black with Emerald Accents & iOS/Android Notch Support) */}
-        <div className="lg:hidden flex items-center justify-between bg-neutral-950 border-b border-neutral-850 px-4 py-2.5 sticky top-0 z-30 shadow-md shrink-0 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
+        {/* Mobile Header (Deep Dark Blue with Sapphire Accents & iOS/Android Notch Support) */}
+        <div className="lg:hidden flex items-center justify-between bg-[#030B1C] border-b border-blue-950/70 px-4 py-2.5 sticky top-0 z-30 shadow-md shrink-0 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
           <button 
             onClick={() => setIsSidebarOpen(true)} 
-            className="p-2 -ml-1 rounded-xl text-neutral-300 hover:text-white hover:bg-neutral-800/80 active:scale-95 flex items-center justify-center focus:outline-none bg-transparent border-none cursor-pointer transition-all"
+            className="p-2 -ml-1 rounded-xl text-blue-200 hover:text-white hover:bg-blue-900/30 active:scale-95 flex items-center justify-center focus:outline-none bg-transparent border-none cursor-pointer transition-all"
             aria-label="Open Navigation Menu"
           >
             {/* SVG Menu Icon */}
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-200">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-300">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -1089,12 +1089,12 @@ export default function App() {
           <div className="flex flex-col items-center">
             <div className="font-black text-[14px] tracking-tight text-white leading-none mb-1 mt-0.5">ORDERPOINT PRO</div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[8px] font-black text-black bg-emerald-400 px-1.5 py-0.5 rounded leading-none uppercase tracking-widest">POS SYSTEM</span>
-              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider leading-none truncate max-w-[150px]">{!settingsLoading && settingsData?.restaurantInfo?.name ? settingsData.restaurantInfo.name : ''}</span>
+              <span className="text-[8px] font-black text-blue-200 bg-blue-500/20 border border-blue-400/20 px-1.5 py-0.5 rounded leading-none uppercase tracking-widest">POS SYSTEM</span>
+              <span className="text-[10px] font-bold text-blue-300 uppercase tracking-wider leading-none truncate max-w-[150px]">{!settingsLoading && settingsData?.restaurantInfo?.name ? settingsData.restaurantInfo.name : ''}</span>
             </div>
           </div>
           <div className="w-8 flex justify-end">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="System Live" />
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-400 shadow-sm shadow-blue-400/50 animate-pulse" title="System Live" />
           </div>
         </div>
 
@@ -1102,8 +1102,8 @@ export default function App() {
           {renderContent()}
         </div>
 
-        {/* Mobile Bottom Navigation Bar (Black Theme with Safe-Area Inset for iOS Home Bar & Android Nav) */}
-        <div className="lg:hidden fixed bottom-0 inset-x-0 bg-neutral-950 border-t border-neutral-900 z-30 shadow-[0_-4px_25px_rgba(0,0,0,0.6)] select-none pb-[env(safe-area-inset-bottom,0px)]">
+        {/* Mobile Bottom Navigation Bar (Deep Dark Blue Theme with Safe-Area Inset for iOS Home Bar & Android Nav) */}
+        <div className="lg:hidden fixed bottom-0 inset-x-0 bg-[#030B1C]/95 backdrop-blur-md border-t border-blue-950/80 z-30 shadow-[0_-4px_25px_rgba(2,11,29,0.8)] select-none pb-[env(safe-area-inset-bottom,0px)]">
           <div className="h-16 flex items-center justify-around px-1">
             {[
               { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -1126,10 +1126,10 @@ export default function App() {
                     }
                   }}
                   className={`flex flex-col items-center justify-center gap-1 flex-1 h-full bg-transparent border-none cursor-pointer transition-all active:scale-95 touch-manipulation ${
-                    isActive ? 'text-emerald-400 font-extrabold' : 'text-neutral-400 hover:text-white'
+                    isActive ? 'text-blue-400 font-extrabold' : 'text-slate-400 hover:text-blue-200'
                   }`}
                 >
-                  <div className={`p-1 rounded-xl transition-all ${isActive ? 'bg-emerald-500/15' : ''}`}>
+                  <div className={`p-1 rounded-xl transition-all ${isActive ? 'bg-blue-600/20 text-blue-400 ring-1 ring-blue-500/30' : ''}`}>
                     <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
                   </div>
                   <span className="text-[9px] font-black uppercase tracking-wider leading-none">{tab.label}</span>

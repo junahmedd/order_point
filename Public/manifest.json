@@ -4,8 +4,8 @@
   "description": "OrderPoint Pro Restaurant POS & Management System",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#064E3B",
-  "theme_color": "#000000",
+  "background_color": "#030B1C",
+  "theme_color": "#030B1C",
   "orientation": "any",
   "icons": [
     {

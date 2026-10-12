@@ -469,26 +469,26 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   return (
     <div 
       id="auth_container" 
-      className="min-h-screen bg-gradient-to-br from-[#060D1F] via-[#0A1633] to-[#040814] flex flex-col justify-between font-sans selection:bg-blue-500 selection:text-white relative overflow-x-hidden"
+      className="min-h-screen bg-gradient-to-br from-[#020B1D] via-[#06183B] to-[#010814] flex flex-col justify-between font-sans selection:bg-blue-500 selection:text-white relative overflow-x-hidden"
     >
-      {/* Ambient Radial Lighting Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(59,130,246,0.18),rgba(255,255,255,0))] pointer-events-none" />
+      {/* Ambient Rich Blue Radial Glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-15%,rgba(30,64,175,0.35),rgba(255,255,255,0))] pointer-events-none" />
 
       {/* Main Split Screen Container */}
       <main className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex-1 flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-14 relative z-10">
         
         {/* ================================================================= */}
-        {/* LEFT SECTION: BRANDING & 4 RESTAURANT FEATURE CARDS (Dark Blue) */}
+        {/* LEFT SECTION: BRANDING & 4 RESTAURANT FEATURE CARDS (Deep Dark Blue) */}
         {/* ================================================================= */}
         <div className="w-full lg:w-[56%] text-white space-y-7 lg:space-y-9 order-2 lg:order-1">
           
           {/* Logo & Platform Tag */}
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-xl shadow-blue-500/30 ring-2 ring-blue-400/25">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-xl shadow-blue-600/35 ring-2 ring-blue-400/30">
               <Layers size={22} className="stroke-[2.5]" />
             </div>
             <div>
-              <div className="font-black text-xl tracking-tight text-white leading-none uppercase">
+              <div className="font-black text-xl tracking-tight text-white leading-none uppercase drop-shadow-sm">
                 ORDERPOINT PRO
               </div>
               <div className="text-[10px] font-extrabold text-blue-300 tracking-widest uppercase mt-1 opacity-90">
@@ -499,7 +499,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
           {/* Live Status Pill */}
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[11px] font-black tracking-wider uppercase select-none">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-[11px] font-black tracking-wider uppercase select-none shadow-sm shadow-blue-950/40">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>LIVE RESTAURANT POS • REAL-TIME FIREBASE SYNC</span>
             </div>
@@ -507,10 +507,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
           {/* Main Headline & Description */}
           <div className="space-y-3.5">
-            <h1 className="text-3xl sm:text-4xl lg:text-[46px] font-[900] text-white tracking-tight leading-[1.12]">
+            <h1 className="text-3xl sm:text-4xl lg:text-[46px] font-[900] text-white tracking-tight leading-[1.12] drop-shadow-md">
               {mode === 'signup' ? 'Start Managing Smarter.' : 'The Modern Operating System for Restaurants.'}
             </h1>
-            <p className="text-blue-100/80 text-sm sm:text-base leading-relaxed max-w-xl font-normal">
+            <p className="text-blue-100/85 text-sm sm:text-base leading-relaxed max-w-xl font-normal">
               Connect POS Billing, Live Kitchen Orders, Real-Time Inventory Control, and Automated Invoicing in one unified, real-time command center.
             </p>
           </div>
@@ -519,45 +519,45 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
             
             {/* Card 1: Smart POS & Billing */}
-            <div className="bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-blue-400/30 rounded-2xl p-4 sm:p-5 transition-all duration-200 backdrop-blur-md">
-              <div className="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center mb-3 border border-blue-500/20">
+            <div className="bg-[#091C3E]/60 hover:bg-[#0D244F]/80 border border-blue-500/25 hover:border-blue-400/55 rounded-2xl p-4 sm:p-5 transition-all duration-200 backdrop-blur-md shadow-lg shadow-blue-950/50">
+              <div className="w-9 h-9 rounded-xl bg-blue-500/25 text-blue-300 flex items-center justify-center mb-3 border border-blue-400/35">
                 <Receipt size={18} />
               </div>
               <h3 className="text-sm font-bold text-white mb-1">Smart POS &amp; Invoicing</h3>
-              <p className="text-xs text-blue-200/70 leading-relaxed font-normal">
+              <p className="text-xs text-blue-100/70 leading-relaxed font-normal">
                 Fast checkout with instant UPI QR, split tender, and automated WhatsApp receipts.
               </p>
             </div>
 
             {/* Card 2: Live Kitchen Queue */}
-            <div className="bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-cyan-400/30 rounded-2xl p-4 sm:p-5 transition-all duration-200 backdrop-blur-md">
-              <div className="w-9 h-9 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center mb-3 border border-cyan-500/20">
+            <div className="bg-[#091C3E]/60 hover:bg-[#0D244F]/80 border border-blue-500/25 hover:border-cyan-400/55 rounded-2xl p-4 sm:p-5 transition-all duration-200 backdrop-blur-md shadow-lg shadow-blue-950/50">
+              <div className="w-9 h-9 rounded-xl bg-cyan-500/25 text-cyan-300 flex items-center justify-center mb-3 border border-cyan-400/35">
                 <ChefHat size={18} />
               </div>
               <h3 className="text-sm font-bold text-white mb-1">Live Kitchen Queue (KDS)</h3>
-              <p className="text-xs text-blue-200/70 leading-relaxed font-normal">
+              <p className="text-xs text-blue-100/70 leading-relaxed font-normal">
                 Real-time ticket routing with preparation timers and 1-click order dispatch.
               </p>
             </div>
 
             {/* Card 3: Inventory & Recipe Control */}
-            <div className="bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-emerald-400/30 rounded-2xl p-4 sm:p-5 transition-all duration-200 backdrop-blur-md">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center mb-3 border border-emerald-500/20">
+            <div className="bg-[#091C3E]/60 hover:bg-[#0D244F]/80 border border-blue-500/25 hover:border-emerald-400/55 rounded-2xl p-4 sm:p-5 transition-all duration-200 backdrop-blur-md shadow-lg shadow-blue-950/50">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/25 text-emerald-300 flex items-center justify-center mb-3 border border-emerald-400/35">
                 <Package size={18} />
               </div>
               <h3 className="text-sm font-bold text-white mb-1">Inventory Control</h3>
-              <p className="text-xs text-blue-200/70 leading-relaxed font-normal">
+              <p className="text-xs text-blue-100/70 leading-relaxed font-normal">
                 Track ingredients, automated consumption logs &amp; low-stock alerts.
               </p>
             </div>
 
             {/* Card 4: Strict Tenant Isolation */}
-            <div className="bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-indigo-400/30 rounded-2xl p-4 sm:p-5 transition-all duration-200 backdrop-blur-md">
-              <div className="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center mb-3 border border-indigo-500/20">
+            <div className="bg-[#091C3E]/60 hover:bg-[#0D244F]/80 border border-blue-500/25 hover:border-indigo-400/55 rounded-2xl p-4 sm:p-5 transition-all duration-200 backdrop-blur-md shadow-lg shadow-blue-950/50">
+              <div className="w-9 h-9 rounded-xl bg-indigo-500/25 text-indigo-300 flex items-center justify-center mb-3 border border-indigo-400/35">
                 <ShieldCheck size={18} />
               </div>
               <h3 className="text-sm font-bold text-white mb-1">Strict Tenant Isolation</h3>
-              <p className="text-xs text-blue-200/70 leading-relaxed font-normal">
+              <p className="text-xs text-blue-100/70 leading-relaxed font-normal">
                 Multi-outlet restaurant mapping with deny-by-default Firestore Security Rules.
               </p>
             </div>

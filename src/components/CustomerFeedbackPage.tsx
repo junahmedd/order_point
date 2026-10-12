@@ -452,8 +452,8 @@ export default function CustomerFeedbackPage({ invoiceNo, restaurantId, onClose 
           )}
           
           {/* Top Banner */}
-          <div className="bg-[#0b0c10] p-6 text-center border-b border-gray-800">
-            <span className="text-[#22C55E] text-[10px] font-black tracking-widest uppercase block mb-1">
+          <div className="bg-[#030B1C] p-6 text-center border-b border-blue-950/70">
+            <span className="text-blue-400 text-[10px] font-black tracking-widest uppercase block mb-1">
               {restaurantName}
             </span>
             <h1 className="text-white text-lg font-black tracking-tight">Feedback Saved Successfully</h1>
@@ -546,8 +546,8 @@ export default function CustomerFeedbackPage({ invoiceNo, restaurantId, onClose 
           )}
           
           {/* Top Banner */}
-          <div className="bg-[#0b0c10] p-6 text-center border-b border-gray-800">
-            <span className="text-[#22C55E] text-[10px] font-black tracking-widest uppercase block mb-1">
+          <div className="bg-[#030B1C] p-6 text-center border-b border-blue-950/70">
+            <span className="text-blue-400 text-[10px] font-black tracking-widest uppercase block mb-1">
               {restaurantName}
             </span>
             <h1 className="text-white text-lg font-black tracking-tight">Feedback Submitted!</h1>
@@ -634,13 +634,13 @@ export default function CustomerFeedbackPage({ invoiceNo, restaurantId, onClose 
         )}
         
         {/* Header with visual accents */}
-        <div className="bg-[#0b0c10] p-6 text-center relative border-b border-gray-800">
-          <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-[#22C55E] animate-ping" />
-          <span className="text-[#22C55E] text-[10px] font-black tracking-widest uppercase block mb-1">
+        <div className="bg-[#030B1C] p-6 text-center relative border-b border-blue-950/70">
+          <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-blue-400 animate-ping" />
+          <span className="text-blue-400 text-[10px] font-black tracking-widest uppercase block mb-1">
             {restaurantName}
           </span>
           <h1 className="text-white text-xl font-black tracking-tight font-display">Customer Feedback Hub</h1>
-          <p className="text-gray-400 text-[11px] mt-1 font-mono">Secure Invoice Ref: #{invoiceNo}</p>
+          <p className="text-blue-200/60 text-[11px] mt-1 font-mono">Secure Invoice Ref: #{invoiceNo}</p>
         </div>
 
         {/* Guest greetings and details */}
