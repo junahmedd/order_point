@@ -234,11 +234,7 @@ export default function App() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        if (user.emailVerified === false) {
-          setCurrentUser(null);
-        } else {
-          setCurrentUser(user);
-        }
+        setCurrentUser(user);
       } else {
         setCurrentUser(null);
       }
