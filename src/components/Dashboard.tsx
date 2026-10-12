@@ -361,7 +361,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Swiggy channel card */}
           <div 
-            onClick={() => onNavigateToTab('OnlineDelivery')}
+            onClick={() => onNavigateToTab('Orders')}
             className="p-4 rounded-[16px] border border-orange-100 bg-orange-50/15 hover:shadow-md hover:border-orange-350 hover:scale-[1.01] transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-center gap-2 mb-2">
@@ -378,7 +378,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
 
           {/* Zomato channel card */}
           <div 
-            onClick={() => onNavigateToTab('OnlineDelivery')}
+            onClick={() => onNavigateToTab('Orders')}
             className="p-4 rounded-[16px] border border-red-100 bg-red-50/15 hover:shadow-md hover:border-red-350 hover:scale-[1.01] transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-center gap-2 mb-2">

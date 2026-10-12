@@ -13,8 +13,6 @@ import Customers from './components/Customers';
 import Reports from './components/Reports';
 import ScanGo from './components/ScanGo';
 import SettingsView from './components/Settings';
-import SubscriptionPlans from './components/SubscriptionPlans';
-import OnlineDelivery from './components/OnlineDelivery';
 import SuperAdmin from './components/SuperAdmin';
 import toast from 'react-hot-toast';
 import Login from './components/Login';
@@ -603,17 +601,16 @@ export default function App() {
             onUpdateInventoryItem={async (item: InventoryItem) => await updateInventoryItem(item.id, item)} 
             onDeleteInventoryItem={deleteInventoryItem} 
             onShowToast={handleShowToast} 
-            subscriptionPlan={currentSubPlan} 
-            isExpired={isSubExpired} 
-            onUpgradeToPro={handleUpgradeToSettings} 
+            subscriptionPlan="pro" 
+            isExpired={false} 
           />
         );
       case 'Staff':
-        return <Staff staffMembers={staffMembers} onNavigateToTab={setActiveTab} onAddStaff={addStaffMember} onUpdateStaff={async (item: StaffMember) => await updateStaffMember(item.id, item)} onShowToast={handleShowToast} subscriptionPlan={currentSubPlan} isExpired={isSubExpired} onUpgradeToPro={handleUpgradeToSettings} />;
+        return <Staff staffMembers={staffMembers} onNavigateToTab={setActiveTab} onAddStaff={addStaffMember} onUpdateStaff={async (item: StaffMember) => await updateStaffMember(item.id, item)} onShowToast={handleShowToast} subscriptionPlan="pro" isExpired={false} />;
       case 'Customers':
         return <Customers customers={customers} onNavigateToTab={setActiveTab} onAddCustomer={addCustomer} onDeleteCustomer={deleteCustomer} onShowToast={handleShowToast} />;
       case 'Reports':
-        return <Reports orders={orders} inventoryItems={inventoryItems} onNavigateToTab={setActiveTab} subscriptionPlan={currentSubPlan} isExpired={isSubExpired} onUpgradeToPro={handleUpgradeToSettings} onUpgradeToBusiness={handleUpgradeToSettings} />;
+        return <Reports orders={orders} inventoryItems={inventoryItems} onNavigateToTab={setActiveTab} subscriptionPlan="pro" isExpired={false} />;
       case 'ScanGo':
         return (
           <ScanGo
@@ -678,26 +675,6 @@ export default function App() {
               await deleteSelfOrder(id);
               toast.success('Self-order declined.');
             }}
-            onShowToast={handleShowToast}
-          />
-        );
-      case 'OnlineDelivery':
-        return (
-          <OnlineDelivery 
-            orders={orders} 
-            menuItems={menuItems} 
-            onNavigateToTab={setActiveTab}
-            onShowToast={handleShowToast} 
-          />
-        );
-      case 'Subscription':
-        return (
-          <SubscriptionPlans
-            subscriptionInfo={settingsData?.subscription || subInfo}
-            restaurantInfo={settingsData?.restaurantInfo}
-            userEmail={currentUser?.email || ''}
-            userId={currentUser?.uid || 'default_rest_id'}
-            onGoToDashboard={() => setActiveTab('Dashboard')}
             onShowToast={handleShowToast}
           />
         );
@@ -1095,22 +1072,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Expired License Alert Banner */}
-        {isSubExpired && (
-          <div className="bg-rose-600 text-white px-4 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md shrink-0 border-b border-rose-700 font-sans z-30">
-            <div className="flex items-center gap-2.5 text-xs sm:text-sm font-bold">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-amber-300 animate-bounce" />
-              <span>⚠️ Subscription License Expired — Please renew your OrderPoint Pro subscription to continue uninterrupted POS operations.</span>
-            </div>
-            <button
-              onClick={handleUpgradeToSettings}
-              className="bg-white text-rose-700 hover:bg-rose-50 px-3.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider shadow-sm transition-all shrink-0 cursor-pointer"
-            >
-              Renew License
-            </button>
-          </div>
-        )}
-
         {/* Mobile Header (Sleek Black with Emerald Accents & iOS/Android Notch Support) */}
         <div className="lg:hidden flex items-center justify-between bg-neutral-950 border-b border-neutral-850 px-4 py-2.5 sticky top-0 z-30 shadow-md shrink-0 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
           <button 
@@ -1137,7 +1098,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className={`w-full relative flex-1 h-full min-w-0 flex flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 ${activeTab === 'Settings' || activeTab === 'OnlineDelivery' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+        <div className={`w-full relative flex-1 h-full min-w-0 flex flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 ${activeTab === 'Settings' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           {renderContent()}
         </div>
 

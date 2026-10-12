@@ -23,11 +23,9 @@ import {
   ChevronRight,
   User,
   Star,
-  Truck,
   Lock,
   Sparkles,
   Zap,
-  Crown,
   AlertTriangle,
   Shield
 } from 'lucide-react';
@@ -38,15 +36,13 @@ export type SidebarTab =
   | 'Orders'
   | 'Kitchen'
   | 'Billing'
-  | 'Subscription'
   | 'Menu'
   | 'Inventory'
   | 'Staff'
   | 'Customers'
   | 'Reports'
-  | 'ScanGo'
-  | 'OnlineDelivery'
   | 'Feedback'
+  | 'ScanGo'
   | 'Settings'
   | 'SuperAdmin';
 
@@ -91,23 +87,17 @@ export default function Sidebar({
 }: SidebarProps) {
   const [settingsExpanded, setSettingsExpanded] = useState(true);
 
-  const planId = subscription?.subscription_plan || 'pro';
-  const endDate = subscription?.subscription_end ? new Date(subscription.subscription_end) : null;
-  const isExpired = endDate ? Date.now() > endDate.getTime() : false;
-
-  // Navigation list with specific icons corresponding to restaurant tools
+  // Clean, simple navigation list: Scan & Go positioned right above Settings
   const navigationItems: { id: SidebarTab; label: string; icon: any; isLocked?: boolean }[] = [
     { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'Orders', label: 'Orders', icon: ShoppingCart },
     { id: 'Kitchen', label: 'Kitchen', icon: ChefHat },
     { id: 'Billing', label: 'Billing', icon: Receipt },
-    { id: 'ScanGo', label: 'Scan & Go', icon: QrCode },
     { id: 'Menu', label: 'Menu', icon: UtensilsCrossed },
-    { id: 'Inventory', label: 'Inventory', icon: Package, isLocked: planId === 'basic' || isExpired },
+    { id: 'Inventory', label: 'Inventory', icon: Package },
     { id: 'Reports', label: 'Reports', icon: LineChart },
     { id: 'Feedback', label: 'Feedback', icon: Star },
-    { id: 'OnlineDelivery', label: 'Online Delivery', icon: Truck },
-    { id: 'Subscription', label: 'Subscription Plans', icon: Crown },
+    { id: 'ScanGo', label: 'Scan & Go', icon: QrCode },
     { id: 'Settings', label: 'Settings', icon: Settings },
   ];
 

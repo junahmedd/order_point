@@ -6,7 +6,6 @@ import { Store, Receipt, CreditCard, LayoutDashboard, QrCode, MonitorDot, Utensi
 import { TableConfig, Order, MenuItem } from '../types';
 import toast from 'react-hot-toast';
 import { motion } from 'motion/react';
-import SubscriptionPlans from './SubscriptionPlans';
 
 type SettingsTab = 'profile' | 'billing' | 'payment' | 'tables' | 'qr' | 'system';
 
