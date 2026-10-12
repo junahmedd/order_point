@@ -189,9 +189,10 @@ export default function MenuCatalog({
         <button
           id="btn_open_add_dish"
           onClick={openAddModal}
-          className="bg-[#111111] text-white hover:bg-[#222222] h-[52px] px-6 rounded-2xl text-xs font-black tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm uppercase active:scale-[0.98] cursor-pointer"
+          className="bg-[#111111] hover:bg-black text-white h-8.5 px-4.5 rounded-full text-[11px] font-black tracking-wider flex items-center justify-center gap-1.5 shadow-sm uppercase active:scale-95 cursor-pointer border-none"
         >
-          + Add Menu Item
+          <Plus size={14} className="stroke-[3]" />
+          <span>Add Menu</span>
         </button>
       }
     >

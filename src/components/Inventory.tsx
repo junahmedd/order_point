@@ -216,7 +216,7 @@ export default function Inventory({
         <button
           id="btn_open_add_inventory"
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-sky-500 hover:bg-sky-600 text-white h-8.5 px-4.5 rounded-full text-[11px] font-black tracking-wider flex items-center justify-center gap-1.5 shadow-sm uppercase active:scale-95 cursor-pointer border-none"
+          className="bg-[#111111] hover:bg-black text-white h-8.5 px-4.5 rounded-full text-[11px] font-black tracking-wider flex items-center justify-center gap-1.5 shadow-sm uppercase active:scale-95 cursor-pointer border-none"
         >
           <Plus size={14} className="stroke-[3]" />
           <span>Add Inventory</span>
@@ -403,7 +403,7 @@ export default function Inventory({
               <button
                 id="modal_save_stock_btn"
                 type="submit"
-                className="w-full h-10 bg-sky-500 hover:bg-sky-600 text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-sm transition-all active:scale-[0.98] border-none cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full h-10 bg-[#111111] hover:bg-black text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-sm transition-all active:scale-[0.98] border-none cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Plus size={14} className="stroke-[2.5]" />
                 <span>Add Inventory</span>
