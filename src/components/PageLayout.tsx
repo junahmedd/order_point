@@ -68,28 +68,28 @@ export default function PageLayout({
   ];
 
   return (
-    <div id={id} className="w-full flex-1 flex flex-col min-h-0 bg-[#f9fafb] animate-fade-in font-sans">
+    <div id={id} className="w-full flex-1 flex flex-col min-h-0 bg-[#020B1D] text-slate-100 animate-fade-in font-sans">
       {/* Reusable left-aligned Page Header */}
-      <div className="w-full bg-white border-b border-[#EDEDED] py-4 px-4 sm:px-6 shrink-0 z-30">
+      <div className="w-full bg-[#030B1C] border-b border-blue-950/70 py-4 px-4 sm:px-6 shrink-0 z-30 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="space-y-1 text-left flex-1 min-w-0">
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-black text-[#111111] tracking-tight leading-none uppercase truncate">
+              <h1 className="text-2xl font-black text-white tracking-tight leading-none uppercase truncate">
                 {title}
               </h1>
               {/* Cloud Sync Pulse Indicator */}
               <div 
                 onClick={handleSyncClick}
-                className="flex items-center gap-1.5 px-2 py-1 bg-emerald-50 border border-emerald-100/50 rounded-full text-[9px] font-black text-emerald-600 uppercase tracking-widest leading-none cursor-pointer hover:bg-emerald-100/60 transition-all select-none"
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-500/15 border border-blue-400/30 rounded-full text-[9px] font-black text-blue-300 uppercase tracking-widest leading-none cursor-pointer hover:bg-blue-500/25 transition-all select-none shadow-xs shadow-blue-950/50"
                 title="System real-time synchronized. Click to force check."
               >
-                <span className={`w-1.5 h-1.5 rounded-full bg-emerald-500 ${isSyncing ? 'animate-spin' : 'animate-pulse'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full bg-blue-400 ${isSyncing ? 'animate-spin' : 'animate-pulse'}`} />
                 <RefreshCw size={8} className={`stroke-[3] ${isSyncing ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">LIVE SYNCED</span>
               </div>
             </div>
             {subtitle && (
-              <p className="text-xs font-semibold text-[#8B8B8B] mt-1 leading-normal truncate">
+              <p className="text-xs font-semibold text-blue-200/70 mt-1 leading-normal truncate">
                 {subtitle}
               </p>
             )}

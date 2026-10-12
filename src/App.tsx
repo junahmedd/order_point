@@ -1020,7 +1020,7 @@ export default function App() {
         }}
       />
 
-      <main className="flex-1 min-w-0 relative h-screen overflow-hidden flex flex-col bg-[#f9fafb]">
+      <main className="flex-1 min-w-0 relative h-screen overflow-hidden flex flex-col bg-[#020B1D] text-slate-100">
         {/* Offline Banner Indicator */}
         {!isOnline && (
           <div className="bg-amber-600 text-white px-4 py-2.5 flex items-center justify-center gap-2 shadow-md shrink-0 border-b border-amber-700 font-sans z-30 animate-pulse text-xs font-bold">
