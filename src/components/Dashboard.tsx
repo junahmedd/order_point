@@ -187,9 +187,9 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
           label="Total Sales"
           value={`${currencySymbol}${stats.todayRevenue.toLocaleString('en-IN')}`}
           icon={DollarSign}
-          iconBg="bg-blue-500/20"
-          iconColor="text-blue-300"
-          iconBorder="border-blue-400/30"
+          iconBg="bg-emerald-50"
+          iconColor="text-emerald-500"
+          iconBorder="border-emerald-100"
           currencySymbol={currencySymbol}
           onClick={() => onNavigateToTab('Reports')}
         />
@@ -197,9 +197,9 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
           label="Today's Cash Sales"
           value={`${currencySymbol}${stats.cashSales.toLocaleString('en-IN')}`}
           icon={DollarSign}
-          iconBg="bg-amber-500/20"
-          iconColor="text-amber-300"
-          iconBorder="border-amber-400/30"
+          iconBg="bg-amber-50"
+          iconColor="text-amber-500"
+          iconBorder="border-amber-100"
           currencySymbol={currencySymbol}
           onClick={() => onNavigateToTab('Reports')}
         />
@@ -207,9 +207,9 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
           label="Today's UPI Sales"
           value={`${currencySymbol}${stats.upiSales.toLocaleString('en-IN')}`}
           icon={TrendingUp}
-          iconBg="bg-cyan-500/20"
-          iconColor="text-cyan-300"
-          iconBorder="border-cyan-400/30"
+          iconBg="bg-cyan-50"
+          iconColor="text-cyan-500"
+          iconBorder="border-cyan-100"
           currencySymbol={currencySymbol}
           onClick={() => onNavigateToTab('Reports')}
         />
@@ -217,9 +217,9 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
           label="Orders Today"
           value={stats.ordersToday}
           icon={CheckCircle}
-          iconBg="bg-indigo-500/20"
-          iconColor="text-indigo-300"
-          iconBorder="border-indigo-400/30"
+          iconBg="bg-blue-50"
+          iconColor="text-blue-500"
+          iconBorder="border-blue-100"
           currencySymbol={currencySymbol}
           onClick={() => onNavigateToTab('Orders')}
         />
@@ -227,9 +227,9 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
           label="Active Tables"
           value={stats.activeTables}
           icon={Flame}
-          iconBg="bg-emerald-500/20"
-          iconColor="text-emerald-300"
-          iconBorder="border-emerald-400/30"
+          iconBg="bg-rose-50"
+          iconColor="text-rose-500"
+          iconBorder="border-rose-100"
           currencySymbol={currencySymbol}
           onClick={() => onNavigateToTab('Billing')}
         />
@@ -238,17 +238,17 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
       {/* Main Grid: Charts & Top Items */}
       <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4 mb-5">
         {/* Revenue Chart */}
-        <div className="bg-[#07132B]/95 rounded-[20px] border border-blue-900/50 p-4 shadow-lg shadow-blue-950/40 h-[220px] flex flex-col">
+        <div className="bg-white rounded-[20px] border border-[#EDEDED] p-4 shadow-[0_8px_30px_rgba(0,0,0,0.03)] h-[220px] flex flex-col">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h3 className="text-[13px] font-[900] text-white uppercase tracking-wider leading-none mb-1">
+              <h3 className="text-[13px] font-[900] text-[#111111] uppercase tracking-wider leading-none mb-1">
                 Sales Revenue Trend
               </h3>
-              <p className="text-blue-200/60 text-[11px] font-semibold mt-1">
+              <p className="text-[#8B8B8B] text-[11px] font-semibold mt-1">
                 Daily sales transactions trend
               </p>
             </div>
-            <div className="bg-blue-500/20 px-2.5 py-1 rounded-[6px] text-[10px] text-blue-300 font-extrabold flex items-center gap-1 border border-blue-400/30 uppercase tracking-widest leading-none">
+            <div className="bg-emerald-50 px-2.5 py-1 rounded-[6px] text-[10px] text-emerald-600 font-extrabold flex items-center gap-1 border border-emerald-100 uppercase tracking-widest leading-none">
               <TrendingUp size={12} strokeWidth={3} /> +5.4% Up
             </div>
           </div>
@@ -257,30 +257,30 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
               <AreaChart data={trendsData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#1D4ED8" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.2} />
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#93C5FD', fontSize: 10, fontWeight: 600 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#93C5FD', fontSize: 10, fontWeight: 600 }} dx={-10} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#8B8B8B', fontSize: 10, fontWeight: 600 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#8B8B8B', fontSize: 10, fontWeight: 600 }} dx={-10} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#020B1D', border: '1px solid #1E40AF', borderRadius: '8px', color: '#fff', fontSize: '11px', fontWeight: 600 }}
+                  contentStyle={{ backgroundColor: '#111111', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '11px', fontWeight: 600 }}
                   itemStyle={{ color: '#fff' }}
                   formatter={(value) => [`${currencySymbol}${value}`, 'Revenue']}
                 />
-                <Area type="monotone" dataKey="revenue" stroke="#3B82F6" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                <Area type="monotone" dataKey="revenue" stroke="#10B981" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Top Items List */}
-        <div className="bg-[#07132B]/95 rounded-[20px] border border-blue-900/50 p-4 shadow-lg shadow-blue-950/40 h-[220px] flex flex-col">
+        <div className="bg-white rounded-[20px] border border-[#EDEDED] p-4 shadow-[0_8px_30px_rgba(0,0,0,0.03)] h-[220px] flex flex-col">
           <div className="mb-4">
-            <h3 className="text-[13px] font-[900] text-white uppercase tracking-wider leading-none mb-1">
+            <h3 className="text-[13px] font-[900] text-[#111111] uppercase tracking-wider leading-none mb-1">
               Best Selling Items
             </h3>
-            <p className="text-blue-200/60 text-[11px] font-semibold mt-1">
+            <p className="text-[#8B8B8B] text-[11px] font-semibold mt-1">
               Total quantity sold
             </p>
           </div>
@@ -302,7 +302,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#020B1D', border: '1px solid #1E40AF', borderRadius: '8px', color: '#fff', fontSize: '11px', fontWeight: 600 }}
+                  contentStyle={{ backgroundColor: '#111111', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '11px', fontWeight: 600 }}
                   itemStyle={{ color: '#fff' }}
                   formatter={(value: any, name: string) => [`${value} units`, name]}
                 />
@@ -312,7 +312,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
                   layout="vertical"
                   iconType="circle"
                   iconSize={8}
-                  wrapperStyle={{ fontSize: '11px', fontWeight: 700, color: '#FFFFFF', right: 0 }}
+                  wrapperStyle={{ fontSize: '11px', fontWeight: 700, color: '#111111', right: 0 }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -321,19 +321,19 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
       </div>
 
       {/* Sales Channels Cockpit */}
-      <div className="bg-[#07132B]/95 rounded-[24px] border border-blue-900/50 p-5 shadow-lg shadow-blue-950/40 mb-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-blue-900/50">
+      <div className="bg-white rounded-[24px] border border-[#EDEDED] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] mb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
           <div>
-            <h3 className="text-[13px] font-[900] text-white uppercase tracking-wider leading-none mb-1">
+            <h3 className="text-[13px] font-[900] text-[#111111] uppercase tracking-wider leading-none mb-1">
               Sales Channel Performance Cockpit
             </h3>
-            <p className="text-blue-200/60 text-[11px] font-semibold mt-1">
+            <p className="text-[#8B8B8B] text-[11px] font-semibold mt-1">
               Real-time synchronization across dine-in POS desk, takeaway counter, and Scan &amp; Go QR. Click to open channels.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-            <span className="text-[10px] font-black text-blue-300 uppercase tracking-widest leading-none">All Channels Synced</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none">All Channels Synced</span>
           </div>
         </div>
 
@@ -341,51 +341,51 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
           {/* Dine-in channel card */}
           <div 
             onClick={() => onNavigateToTab('Orders')}
-            className="p-4 rounded-[16px] border border-blue-800/40 bg-[#0A1E45]/70 hover:shadow-lg hover:border-blue-400 hover:bg-[#0D295C] hover:scale-[1.01] transition-all duration-300 cursor-pointer"
+            className="p-4 rounded-[16px] border border-blue-100 bg-blue-50/15 hover:shadow-md hover:border-blue-350 hover:scale-[1.01] transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-blue-400" />
-              <span className="text-[10px] font-black tracking-widest text-blue-300 uppercase">DINE-IN SERVICE</span>
+              <span className="w-2 h-2 rounded-full bg-blue-500" />
+              <span className="text-[10px] font-black tracking-widest text-blue-600 uppercase">DINE-IN SERVICE</span>
             </div>
             <div className="space-y-1 mt-3">
               <div className="flex justify-between items-baseline">
-                <span className="text-2xl font-[900] text-white">{currencySymbol}{stats.dineInRevenue.toLocaleString('en-IN')}</span>
+                <span className="text-2xl font-[900] text-gray-900">{currencySymbol}{stats.dineInRevenue.toLocaleString('en-IN')}</span>
               </div>
-              <p className="text-[11px] text-blue-200/60 font-semibold">{stats.dineInOrders} orders at tables</p>
+              <p className="text-[11px] text-gray-400 font-semibold">{stats.dineInOrders} orders at tables</p>
             </div>
           </div>
 
           {/* Takeaway channel card */}
           <div 
             onClick={() => onNavigateToTab('Orders')}
-            className="p-4 rounded-[16px] border border-emerald-800/40 bg-[#0A1E45]/70 hover:shadow-lg hover:border-emerald-400 hover:bg-[#0D295C] hover:scale-[1.01] transition-all duration-300 cursor-pointer"
+            className="p-4 rounded-[16px] border border-emerald-100 bg-emerald-50/15 hover:shadow-md hover:border-emerald-350 hover:scale-[1.01] transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span className="text-[10px] font-black tracking-widest text-emerald-300 uppercase">TAKEAWAY COUNTER</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="text-[10px] font-black tracking-widest text-emerald-600 uppercase">TAKEAWAY COUNTER</span>
             </div>
             <div className="space-y-1 mt-3">
               <div className="flex justify-between items-baseline">
-                <span className="text-2xl font-[900] text-white">{currencySymbol}{stats.takeawayRevenue.toLocaleString('en-IN')}</span>
+                <span className="text-2xl font-[900] text-gray-900">{currencySymbol}{stats.takeawayRevenue.toLocaleString('en-IN')}</span>
               </div>
-              <p className="text-[11px] text-blue-200/60 font-semibold">{stats.takeawayOrders} counter orders</p>
+              <p className="text-[11px] text-gray-400 font-semibold">{stats.takeawayOrders} counter orders</p>
             </div>
           </div>
 
           {/* Scan & Go channel card */}
           <div 
             onClick={() => onNavigateToTab('ScanGo')}
-            className="p-4 rounded-[16px] border border-purple-800/40 bg-[#0A1E45]/70 hover:shadow-lg hover:border-purple-400 hover:bg-[#0D295C] hover:scale-[1.01] transition-all duration-300 cursor-pointer"
+            className="p-4 rounded-[16px] border border-purple-100 bg-purple-50/15 hover:shadow-md hover:border-purple-350 hover:scale-[1.01] transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-              <span className="text-[10px] font-black tracking-widest text-purple-300 uppercase">SCAN NOW QR</span>
+              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
+              <span className="text-[10px] font-black tracking-widest text-purple-600 uppercase">SCAN NOW QR</span>
             </div>
             <div className="space-y-1 mt-3">
               <div className="flex justify-between items-baseline">
-                <span className="text-2xl font-[900] text-white">{currencySymbol}{stats.scangoRevenue.toLocaleString('en-IN')}</span>
+                <span className="text-2xl font-[900] text-gray-900">{currencySymbol}{stats.scangoRevenue.toLocaleString('en-IN')}</span>
               </div>
-              <p className="text-[11px] text-blue-200/60 font-semibold">{stats.scangoOrders} self-service sessions</p>
+              <p className="text-[11px] text-gray-400 font-semibold">{stats.scangoOrders} self-service sessions</p>
             </div>
           </div>
         </div>
@@ -416,7 +416,7 @@ function KpiCard({
   return (
     <div 
       onClick={onClick}
-      className={`bg-[#07132B]/95 rounded-[20px] p-4 shadow-lg shadow-blue-950/40 border border-blue-900/50 flex flex-col justify-between h-[115px] hover:translate-y-[-2px] hover:border-blue-500/50 hover:bg-[#0B214F] transition-all duration-300 w-full xl:max-w-[280px] ${onClick ? 'cursor-pointer' : ''}`}
+      className={`bg-white rounded-[20px] p-4 shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-[#F0F2F5] flex flex-col justify-between h-[115px] hover:translate-y-[-2px] transition-all duration-300 w-full xl:max-w-[280px] ${onClick ? 'cursor-pointer hover:border-emerald-350 hover:shadow-md' : ''}`}
     >
       <div className={`w-[32px] h-[32px] rounded-[8px] flex items-center justify-center border ${iconBg} ${iconColor} ${iconBorder}`}>
         {label === "Today's Revenue" ? (
@@ -426,10 +426,10 @@ function KpiCard({
         )}
       </div>
       <div>
-        <span className="text-blue-300/75 text-[10px] font-black tracking-widest uppercase block mb-1">
+        <span className="text-gray-400 text-[11px] font-black tracking-widest uppercase block mb-0.5">
           {label}
         </span>
-        <h3 className="text-[24px] font-[900] text-white leading-none tracking-tight">
+        <h3 className="text-[24px] font-[900] text-[#111111] leading-none tracking-tight">
           {value}
         </h3>
       </div>

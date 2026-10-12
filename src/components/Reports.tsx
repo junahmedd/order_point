@@ -540,8 +540,8 @@ export default function Reports({
       onTabChange={onNavigateToTab}
     >
       {/* Controls Filter Row */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-[#07132B]/95 p-4 rounded-2xl border border-blue-900/50">
-        <div className="bg-[#040E24] border border-blue-900/60 rounded-[14px] p-0.5 flex">
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-gray-100">
+        <div className="bg-gray-50 border border-gray-150 rounded-[14px] p-0.5 flex">
           {(['TODAY', 'WEEK', 'MONTH', 'YEAR'] as const).map((tab) => (
             <button
               id={`btn_report_filter_${tab}`}
@@ -549,8 +549,8 @@ export default function Reports({
               onClick={() => setFilter(tab)}
               className={`px-4 py-1.5 text-[10px] font-extrabold rounded-[11px] tracking-wider transition-all uppercase ${
                 filter === tab
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
-                  : 'text-blue-300/60 hover:text-white'
+                  ? 'bg-[#111111] text-white shadow-sm'
+                  : 'text-gray-400 hover:text-gray-900'
               }`}
             >
               {tab}
@@ -562,61 +562,61 @@ export default function Reports({
       {/* Top row: 4 Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* TOTAL SALES */}
-        <div className="bg-[#07132B]/95 rounded-[16px] p-4 shadow-sm h-[90px] flex flex-col justify-between border border-blue-900/50 hover:border-blue-700/60 transition-colors">
+        <div className="bg-white rounded-[16px] p-4 shadow-sm h-[90px] flex flex-col justify-between border border-[#EDEDED] hover:border-black/5 transition-colors">
           <div className="flex items-center gap-3">
-            <div className="w-[30px] h-[30px] rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <div className="w-[30px] h-[30px] rounded-lg bg-[#E8F5E9] text-[#22C55E] flex items-center justify-center">
               <DollarSign size={16} />
             </div>
-            <span className="text-[9px] font-extrabold tracking-[1px] text-blue-200/60 uppercase">
+            <span className="text-[9px] font-extrabold tracking-[1px] text-[#8B8B8B] uppercase">
               TOTAL SALES
             </span>
           </div>
-          <h3 className="text-xl font-black text-white leading-none tracking-tight">
+          <h3 className="text-xl font-black text-[#111111] leading-none tracking-tight">
             ₹{stats.totalRevenue.toLocaleString('en-IN')}
           </h3>
         </div>
 
         {/* TOTAL ORDERS */}
-        <div className="bg-[#07132B]/95 rounded-[16px] p-4 shadow-sm h-[90px] flex flex-col justify-between border border-blue-900/50 hover:border-blue-700/60 transition-colors">
+        <div className="bg-white rounded-[16px] p-4 shadow-sm h-[90px] flex flex-col justify-between border border-[#EDEDED] hover:border-black/5 transition-colors">
           <div className="flex items-center gap-3">
-            <div className="w-[30px] h-[30px] rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center">
+            <div className="w-[30px] h-[30px] rounded-lg bg-[#E0F2FE] text-[#0284C7] flex items-center justify-center">
               <Box size={16} />
             </div>
-            <span className="text-[9px] font-extrabold tracking-[1px] text-blue-200/60 uppercase">
+            <span className="text-[9px] font-extrabold tracking-[1px] text-[#8B8B8B] uppercase">
               TOTAL ORDERS
             </span>
           </div>
-          <h3 className="text-xl font-black text-white leading-none tracking-tight">
+          <h3 className="text-xl font-black text-[#111111] leading-none tracking-tight">
             {stats.totalOrdersCount}
           </h3>
         </div>
 
         {/* CASH FLOWS */}
-        <div className="bg-[#07132B]/95 rounded-[16px] p-4 shadow-sm h-[90px] flex flex-col justify-between border border-blue-900/50 hover:border-blue-700/60 transition-colors">
+        <div className="bg-white rounded-[16px] p-4 shadow-sm h-[90px] flex flex-col justify-between border border-[#EDEDED] hover:border-black/5 transition-colors">
           <div className="flex items-center gap-3">
-            <div className="w-[30px] h-[30px] rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+            <div className="w-[30px] h-[30px] rounded-lg bg-[#FEF3C7] text-[#F59E0B] flex items-center justify-center">
               <CreditCard size={16} />
             </div>
-            <span className="text-[9px] font-extrabold tracking-[1px] text-blue-200/60 uppercase">
+            <span className="text-[9px] font-extrabold tracking-[1px] text-[#8B8B8B] uppercase">
               CASH FLOWS
             </span>
           </div>
-          <h3 className="text-xl font-black text-white leading-none tracking-tight">
+          <h3 className="text-xl font-black text-[#111111] leading-none tracking-tight">
             ₹{stats.cashRevenue.toLocaleString('en-IN')}
           </h3>
         </div>
 
         {/* UPI DIGITAL */}
-        <div className="bg-[#07132B]/95 rounded-[16px] p-4 shadow-sm h-[90px] flex flex-col justify-between border border-blue-900/50 hover:border-blue-700/60 transition-colors">
+        <div className="bg-white rounded-[16px] p-4 shadow-sm h-[90px] flex flex-col justify-between border border-[#EDEDED] hover:border-black/5 transition-colors">
           <div className="flex items-center gap-3">
-            <div className="w-[30px] h-[30px] rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center">
+            <div className="w-[30px] h-[30px] rounded-lg bg-[#F3E8FF] text-[#A855F7] flex items-center justify-center">
               <TrendingUp size={16} />
             </div>
-            <span className="text-[9px] font-extrabold tracking-[1px] text-blue-200/60 uppercase">
+            <span className="text-[9px] font-extrabold tracking-[1px] text-[#8B8B8B] uppercase">
               UPI DIGITAL
             </span>
           </div>
-          <h3 className="text-xl font-black text-white leading-none tracking-tight">
+          <h3 className="text-xl font-black text-[#111111] leading-none tracking-tight">
             ₹{stats.upiRevenue.toLocaleString('en-IN')}
           </h3>
         </div>
@@ -625,30 +625,30 @@ export default function Reports({
       {/* Grid: Revenue Breakdown Graph & Top Selling list */}
       <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
         {/* Left Card: REVENUE BREAKDOWN */}
-        <div className="bg-[#07132B]/95 rounded-[24px] p-6 shadow-sm border border-blue-900/50">
-          <h3 className="text-[14px] font-black text-white tracking-wider uppercase mb-6">
+        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-150">
+          <h3 className="text-[14px] font-black text-[#111111] tracking-wider uppercase mb-6">
             REVENUE BREAKDOWN
           </h3>
 
           <div className="h-[220px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={breakdownSource} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1E293B" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ECECEC" />
                 <XAxis
                   dataKey="label"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#93C5FD', fontSize: 11 }}
+                  tick={{ fill: '#8B8B8B', fontSize: 11 }}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: '#93C5FD', fontSize: 11 }}
+                  tick={{ fill: '#8B8B8B', fontSize: 11 }}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#040E24',
-                    border: '1px solid #1E3A8A',
+                    backgroundColor: '#111111',
+                    border: 'none',
                     borderRadius: '12px',
                     color: '#fff',
                     fontFamily: 'sans-serif',
@@ -658,25 +658,25 @@ export default function Reports({
                 />
                 <Bar dataKey="revenue" radius={[8, 8, 0, 0]} barSize={36}>
                   {breakdownSource.map((_entry, index) => (
-                    <Cell key={`cell-${index}`} fill={['#22C55E', '#3B82F6', '#F59E0B', '#8B5CF6', '#EF4444', '#06B6D4', '#A855F7'][index % 7]} />
+                    <Cell key={`cell-${index}`} fill={['#22C55E', '#0284C7', '#F59E0B', '#8B5CF6', '#EF4444', '#111111', '#A855F7'][index % 7]} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="mt-8 border-t border-blue-900/50 pt-8">
+          <div className="mt-8 border-t border-[#EEEEEE] pt-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
-              <h3 className="text-[13px] font-black text-white uppercase tracking-wider">
+              <h3 className="text-[13px] font-black text-[#111111] uppercase tracking-wider">
                 INVENTORY STOCK DEPLETION LOGS
               </h3>
-              <span className="px-3 py-1 bg-rose-500/20 text-rose-300 text-[9px] font-black rounded-full uppercase tracking-wider self-start sm:self-center border border-rose-500/30">
+              <span className="px-3 py-1 bg-rose-50 text-[#EF4444] text-[9px] font-black rounded-full uppercase tracking-wider self-start sm:self-center">
                 {stockDepleted.length} Alerting
               </span>
             </div>
 
             {stockDepleted.length === 0 ? (
-              <div className="text-center py-4 bg-[#040E24] rounded-[16px] text-blue-200/60 font-medium text-xs border border-blue-900/40">
+              <div className="text-center py-4 bg-[#F8F8F8] rounded-[16px] text-gray-400 font-medium text-xs">
                 ✔ All warehouse ingredients are safely above critical safety depletion levels.
               </div>
             ) : (
@@ -688,15 +688,15 @@ export default function Reports({
                   return (
                     <div 
                       key={item.id} 
-                      className={`p-4 rounded-[16px] border ${isOut ? 'bg-red-950/20 border-red-900/50' : 'bg-amber-950/20 border-amber-900/50'}`}
+                      className={`p-4 rounded-[16px] border ${isOut ? 'bg-red-50/50 border-red-100' : 'bg-amber-50/50 border-amber-100'}`}
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <span className="text-xs font-bold text-white truncate">{item.name}</span>
-                        <span className={`px-2 py-0.5 rounded-[10px] text-[8px] font-black uppercase tracking-wider ${isOut ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}`}>
+                        <span className="text-xs font-bold text-gray-900 truncate">{item.name}</span>
+                        <span className={`px-2 py-0.5 rounded-[10px] text-[8px] font-black uppercase tracking-wider ${isOut ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>
                           {isOut ? 'Depleted' : 'Low'}
                         </span>
                       </div>
-                      <div className="w-full bg-[#040E24] h-1.5 rounded-full overflow-hidden">
+                      <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
                         <div 
                           className={`h-full rounded-full transition-all duration-500 ${isOut ? 'bg-rose-500' : 'bg-amber-500'}`} 
                           style={{ width: `${Math.min(100, depletionRatio)}%` }} 
@@ -711,15 +711,15 @@ export default function Reports({
         </div>
 
         {/* Right Card: TOP SELLING ITEMS */}
-        <div className="bg-[#07132B]/95 rounded-[24px] p-6 shadow-sm border border-blue-900/50 flex flex-col justify-between">
+        <div className="bg-white rounded-[24px] p-6 shadow-sm border border-[#EDEDED] flex flex-col justify-between">
           <div>
-            <h3 className="text-[14px] font-black text-white tracking-wider uppercase mb-6">
+            <h3 className="text-[14px] font-black text-[#111111] tracking-wider uppercase mb-6">
               TOP SELLING ITEMS
             </h3>
 
             {sellingItems.length === 0 ? (
-              <div className="text-center py-20 text-blue-200/50">
-                <span className="font-sans tracking-tight italic block mb-2 text-sm text-blue-200/50">
+              <div className="text-center py-20 text-[#8B8B8B]">
+                <span className="font-sans tracking-tight italic block mb-2 text-sm text-[#8B8B8B]">
                   No data available
                 </span>
                 <span className="text-xs">
@@ -731,26 +731,26 @@ export default function Reports({
                 {sellingItems.map((it, idx) => {
                   const percentage = Math.round((it.qty / maxQty) * 100);
                   return (
-                    <div key={idx} className="p-4 bg-[#040E24] border border-blue-900/50 rounded-[20px] transition-all hover:border-blue-700/60">
+                    <div key={idx} className="p-4 bg-[#F8F8F8] border border-[#EEEEEE] rounded-[20px] transition-all hover:bg-white hover:border-black/10">
                       <div className="flex items-center justify-between">
                         <div>
-                          <span className="text-sm font-bold text-white block truncate max-w-[150px]">
+                          <span className="text-sm font-bold text-[#111111] block truncate max-w-[150px]">
                             {it.name}
                           </span>
-                          <span className="text-xs text-blue-200/60 font-semibold">
+                          <span className="text-xs text-[#8B8B8B] font-semibold">
                             {it.qty} items ordered
                           </span>
                         </div>
                         <div className="text-right">
-                          <span className="text-sm font-extrabold text-blue-300">
+                          <span className="text-sm font-extrabold text-[#111111]">
                             ₹{it.value}
                           </span>
                         </div>
                       </div>
                       
-                      <div className="w-full bg-[#0A1E45] h-1.5 rounded-full overflow-hidden mt-3">
+                      <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mt-3">
                         <div 
-                          className="bg-blue-500 h-full rounded-full transition-all duration-500" 
+                          className="bg-[#111111] h-full rounded-full transition-all duration-500" 
                           style={{ width: `${percentage}%` }} 
                         />
                       </div>
@@ -761,35 +761,35 @@ export default function Reports({
             )}
           </div>
 
-          <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/30 mt-6 flex items-center gap-3">
-            <CheckCircle2 className="text-emerald-400 shrink-0" size={18} />
+          <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 mt-6 flex items-center gap-3">
+            <CheckCircle2 className="text-[#22C55E] shrink-0" size={18} />
             <div>
-              <span className="text-xs font-bold text-emerald-400 block">SECURED LEDGER</span>
-              <span className="text-[10px] text-blue-200/60">Audit trail synced perfectly</span>
+              <span className="text-xs font-bold text-[#22C55E] block">SECURED LEDGER</span>
+              <span className="text-[10px] text-[#8B8B8B]">Audit trail synced perfectly</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Portion & Variant Performance Analysis */}
-      <div className="bg-[#07132B]/95 rounded-[24px] p-6 shadow-sm border border-blue-900/50 mt-6 text-left">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-blue-900/50 pb-4">
+      <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-150 mt-6 text-left">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-gray-100 pb-4">
           <div>
-            <h3 className="text-[14px] font-black text-white tracking-wider uppercase mb-1">
+            <h3 className="text-[14px] font-black text-[#111111] tracking-wider uppercase mb-1">
               PORTION &amp; VARIANT PERFORMANCE ANALYSIS
             </h3>
-            <p className="text-[11px] font-semibold text-blue-200/60">
+            <p className="text-[11px] font-semibold text-gray-400">
               Granular sales breakdown comparing Single, Half, and Full portion performance metrics
             </p>
           </div>
-          <div className="bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-indigo-500/30 flex items-center gap-1.5 self-start sm:self-auto">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+          <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-indigo-100 flex items-center gap-1.5 self-start sm:self-auto">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
             <span>Portion Breakdown</span>
           </div>
         </div>
 
         {portionAnalytics.length === 0 ? (
-          <div className="text-center py-12 text-blue-200/50">
+          <div className="text-center py-12 text-slate-400">
             <span className="italic block text-sm">No transaction ledger records found.</span>
             <span className="text-[11px] block mt-1">Complete a tabletop checkout to display variant analytics.</span>
           </div>
@@ -797,50 +797,50 @@ export default function Reports({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-blue-900/50 text-[10px] font-black text-blue-200/60 uppercase tracking-widest">
+                <tr className="border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">
                   <th className="pb-3 pl-4">Dish Item</th>
                   <th className="pb-3 text-center">Portion</th>
                   <th className="pb-3 text-center">Qty Sold</th>
                   <th className="pb-3 text-right pr-4">Revenue</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-blue-900/30">
+              <tbody className="divide-y divide-gray-50">
                 {portionAnalytics.map((item, idx) => {
                   const portionKeys = Object.keys(item.portions);
                   return portionKeys.map((portKey, pIdx) => {
                     const portData = item.portions[portKey];
                     const revPercentage = item.totalRevenue > 0 ? Math.round((portData.revenue / item.totalRevenue) * 100) : 0;
                     return (
-                      <tr key={`${idx}-${portKey}`} className="text-xs hover:bg-[#0A1E45]/40 transition-colors">
+                      <tr key={`${idx}-${portKey}`} className="text-xs hover:bg-slate-50/50 transition-colors">
                         {pIdx === 0 ? (
-                          <td className="py-3.5 pl-4 font-bold text-white font-sans" rowSpan={portionKeys.length}>
+                          <td className="py-3.5 pl-4 font-bold text-slate-900 font-sans" rowSpan={portionKeys.length}>
                             {item.parentName}
-                            <span className="text-[10px] text-blue-200/60 font-semibold block mt-0.5">
+                            <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">
                               Total Rev: ₹{item.totalRevenue}
                             </span>
                           </td>
                         ) : null}
-                        <td className="py-3.5 text-center font-extrabold text-blue-100">
+                        <td className="py-3.5 text-center font-extrabold text-slate-650">
                           <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                            portKey === 'Half' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
-                            portKey === 'Full' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' :
-                            'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                            portKey === 'Half' ? 'bg-amber-50 text-amber-700 border border-amber-100' :
+                            portKey === 'Full' ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' :
+                            'bg-slate-100 text-slate-600 border border-slate-200'
                           }`}>
                             {portKey}
                           </span>
                         </td>
-                        <td className="py-3.5 text-center font-bold text-blue-200">
+                        <td className="py-3.5 text-center font-bold text-slate-800">
                           {portData.qty}
                         </td>
                         <td className="py-3.5 text-right pr-4">
                           <div className="flex flex-col items-end">
-                            <span className="font-extrabold text-white font-mono">₹{portData.revenue}</span>
-                            <div className="w-16 bg-[#040E24] h-1 rounded-full overflow-hidden mt-1 flex">
+                            <span className="font-extrabold text-slate-950 font-mono">₹{portData.revenue}</span>
+                            <div className="w-16 bg-gray-150 h-1 rounded-full overflow-hidden mt-1 flex">
                               <div 
                                 className={`h-full rounded-full ${
                                   portKey === 'Half' ? 'bg-amber-500' :
                                   portKey === 'Full' ? 'bg-indigo-500' :
-                                  'bg-blue-500'
+                                  'bg-slate-400'
                                 }`}
                                 style={{ width: `${revPercentage}%` }}
                               />

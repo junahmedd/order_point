@@ -81,7 +81,7 @@ export default function SettingsView({
       actions={
         <button
           onClick={() => onNavigateToTab?.('Dashboard')}
-          className="h-10 px-4 bg-[#0B214F] text-blue-200 hover:bg-[#0E2C6B] hover:text-white font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer border border-blue-800/40 select-none"
+          className="h-10 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer border border-gray-200 select-none"
         >
           <LayoutDashboard size={14} className="stroke-[2.5]" />
           <span>Dashboard</span>
@@ -92,7 +92,7 @@ export default function SettingsView({
       <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0 overflow-hidden">
         
         {/* Navigation Panel */}
-        <div className="w-full lg:w-[280px] lg:flex-shrink-0 bg-[#07132B]/95 rounded-[20px] shadow-lg shadow-blue-950/40 border border-blue-900/50 overflow-y-auto">
+        <div className="w-full lg:w-[280px] lg:flex-shrink-0 bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-y-auto">
           <nav className="p-3 space-y-1">
             {tabs.map(tab => {
               const Icon = tab.icon;
@@ -103,11 +103,11 @@ export default function SettingsView({
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer
                     ${isActive 
-                      ? 'bg-[#0A1E45] text-blue-300 border-l-[3px] border-blue-500 shadow-sm font-bold' 
-                      : 'text-slate-300 hover:bg-[#0B214F]/60 hover:text-white'
+                      ? 'bg-emerald-50 text-emerald-800 border-l-[3px] border-emerald-500 shadow-xs font-semibold' 
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-emerald-600' : 'text-gray-400'}`} />
                   {tab.label}
                 </button>
               );
@@ -116,7 +116,7 @@ export default function SettingsView({
         </div>
 
         {/* Configuration Panel */}
-        <div className="flex-1 bg-[#07132B]/95 rounded-[20px] shadow-lg shadow-blue-950/40 border border-blue-900/50 p-6 sm:p-8 overflow-y-auto hidden-scrollbar text-white">
+        <div className="flex-1 bg-white rounded-[20px] shadow-sm border border-gray-100 p-6 sm:p-8 overflow-y-auto hidden-scrollbar">
           
           {activeTab === 'profile' && (
             <motion.div
@@ -125,7 +125,7 @@ export default function SettingsView({
               transition={{ duration: 0.15 }}
               className="space-y-6 max-w-2xl"
             >
-              <h2 className="font-bold text-lg border-b border-blue-900/50 pb-2 text-white">General Settings</h2>
+              <h2 className="font-semibold text-lg border-b border-gray-100 pb-2 text-gray-900">General Settings</h2>
               <div className="grid grid-cols-2 gap-4">
                 <Input 
                   label="Restaurant Name" 
@@ -169,8 +169,6 @@ export default function SettingsView({
             </motion.div>
           )}
 
-
-
           {activeTab === 'tables' && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -178,11 +176,11 @@ export default function SettingsView({
               transition={{ duration: 0.15 }}
               className="space-y-6 max-w-2xl"
             >
-              <h2 className="font-bold text-lg border-b border-blue-900/50 pb-2 text-white">Table Management</h2>
+              <h2 className="font-semibold text-lg border-b border-gray-100 pb-2 text-gray-900">Table Management</h2>
               
               <div className="flex justify-between items-end mb-4">
                 <div>
-                  <label className="text-sm font-semibold text-blue-200/80 block mb-1">Total Tables: {data.tables?.length || 0}</label>
+                  <label className="text-sm font-medium text-gray-700 block mb-1">Total Tables: {data.tables?.length || 0}</label>
                 </div>
                 <Button 
                   variant="secondary" 
@@ -199,10 +197,10 @@ export default function SettingsView({
               {/* Direct handling of tables state */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {data.tables?.map((table: TableConfig, index: number) => (
-                  <div key={table.id} className="bg-[#040E24] flex items-center justify-between p-2.5 rounded-xl border border-blue-900/60">
+                  <div key={table.id} className="bg-gray-50 flex items-center justify-between p-2.5 rounded-xl border border-gray-200">
                     <div className="flex-1 mr-2">
                        <input 
-                         className="bg-transparent text-sm font-semibold text-white w-full outline-none focus:border-b focus:border-blue-500"
+                         className="bg-transparent text-sm font-medium text-gray-900 w-full outline-none focus:border-b focus:border-emerald-500"
                          value={table.name}
                          onChange={(e) => {
                            const newTables = [...data.tables];
@@ -212,12 +210,12 @@ export default function SettingsView({
                        />
                     </div>
                     <button 
-                      className="text-slate-400 hover:text-rose-400 p-1 cursor-pointer transition-colors" 
-                      title="Delete Table"
-                      onClick={() => {
-                        const newTables = data.tables.filter((_, i) => i !== index);
-                        updateData('tables' as any, '', newTables);
-                      }}
+                       className="text-gray-400 hover:text-rose-500 p-1 cursor-pointer transition-colors" 
+                       title="Delete Table"
+                       onClick={() => {
+                         const newTables = data.tables.filter((_, i) => i !== index);
+                         updateData('tables' as any, '', newTables);
+                       }}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -236,8 +234,6 @@ export default function SettingsView({
             </motion.div>
           )}
 
-
-
           {activeTab === 'system' && (
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -245,7 +241,7 @@ export default function SettingsView({
               transition={{ duration: 0.15 }}
               className="space-y-6 max-w-2xl"
             >
-              <h2 className="font-bold text-lg border-b border-blue-900/50 pb-2 text-white">System Preferences</h2>
+              <h2 className="font-semibold text-lg border-b border-gray-100 pb-2 text-gray-900">System Preferences</h2>
               <div className="space-y-3">
                    <div className="flex items-center gap-2">
                       <input 
@@ -253,9 +249,9 @@ export default function SettingsView({
                         id="pref_autoprint"
                         checked={data.preferences.autoPrint}
                         onChange={(e) => updateData('preferences', 'autoPrint', e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-blue-900/60 bg-[#040E24] rounded focus:ring-blue-500"
+                        className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
                       />
-                      <label htmlFor="pref_autoprint" className="text-sm font-medium text-blue-100 select-none">Automatically Print Bill on Settlement</label>
+                      <label htmlFor="pref_autoprint" className="text-sm font-medium text-gray-700 select-none">Automatically Print Bill on Settlement</label>
                    </div>
                    <div className="flex items-center gap-2">
                       <input 
@@ -263,9 +259,9 @@ export default function SettingsView({
                         id="pref_compact"
                         checked={data.preferences.compactMode}
                         onChange={(e) => updateData('preferences', 'compactMode', e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-blue-900/60 bg-[#040E24] rounded focus:ring-blue-500"
+                        className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
                       />
-                      <label htmlFor="pref_compact" className="text-sm font-medium text-blue-100 select-none">Compact Layout Mode</label>
+                      <label htmlFor="pref_compact" className="text-sm font-medium text-gray-700 select-none">Compact Layout Mode</label>
                    </div>
                    <div className="flex items-center gap-2">
                       <input 
@@ -273,13 +269,13 @@ export default function SettingsView({
                         id="pref_dark"
                         checked={data.preferences.darkMode}
                         onChange={(e) => updateData('preferences', 'darkMode', e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-blue-900/60 bg-[#040E24] rounded focus:ring-blue-500"
+                        className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
                       />
-                      <label htmlFor="pref_dark" className="text-sm font-medium text-blue-100 select-none">Dark Mode (Experimental)</label>
+                      <label htmlFor="pref_dark" className="text-sm font-medium text-gray-700 select-none">Dark Mode (Experimental)</label>
                    </div>
               </div>
 
-              <h2 className="font-bold text-lg border-b border-blue-900/50 pb-2 pt-4 text-white">WhatsApp Integration</h2>
+              <h2 className="font-semibold text-lg border-b border-gray-100 pb-2 pt-4 text-gray-900">WhatsApp Integration</h2>
               <div className="grid grid-cols-2 gap-4">
                 <Input 
                   label="WhatsApp Business Phone" 
@@ -298,9 +294,9 @@ export default function SettingsView({
                   id="wa_autobill"
                   checked={data.whatsapp?.autoSendBills || false}
                   onChange={(e) => updateData('whatsapp', 'autoSendBills', e.target.checked)}
-                  className="w-4 h-4 text-blue-600 border-blue-900/60 bg-[#040E24] rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
                 />
-                <label htmlFor="wa_autobill" className="text-sm font-medium text-blue-100 select-none">Automatically Send WhatsApp Receipts to Customers</label>
+                <label htmlFor="wa_autobill" className="text-sm font-medium text-gray-700 select-none">Automatically Send WhatsApp Receipts to Customers</label>
               </div>
 
               <div className="pt-4 flex gap-3">
@@ -317,28 +313,26 @@ export default function SettingsView({
         </div>
       </div>
 
-
-
       {/* Premium Success Popup Modal */}
       {showSuccessPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/70 backdrop-blur-xs z-[9999] animate-fade-in">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-xs z-[9999] animate-fade-in">
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 15 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 15 }}
-            className="bg-[#07132B] border border-blue-500/40 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center max-w-xs w-full mx-4 text-center border-t-4 border-t-blue-500"
+            className="bg-white border border-emerald-100 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center max-w-xs w-full mx-4 text-center border-t-4 border-t-emerald-500"
           >
-            <div className="w-14 h-14 bg-blue-500/20 rounded-full flex items-center justify-center mb-4 text-blue-400 animate-bounce">
+            <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center mb-4 text-emerald-500 animate-bounce">
               <CheckCircle size={32} className="stroke-[2.5]" />
             </div>
-            <h3 className="text-white font-black text-lg tracking-tight mb-1">
+            <h3 className="text-gray-950 font-black text-lg tracking-tight mb-1">
               Changes Saved!
             </h3>
-            <p className="text-blue-200/70 text-xs font-semibold px-2 leading-relaxed">
+            <p className="text-gray-500 text-xs font-semibold px-2 leading-relaxed">
               {successMessage}
             </p>
-            <div className="mt-4 w-full bg-blue-950 h-1 rounded-full overflow-hidden">
-              <div className="bg-blue-500 h-1 rounded-full w-full animate-pulse" />
+            <div className="mt-4 w-full bg-gray-100 h-1 rounded-full overflow-hidden">
+              <div className="bg-emerald-500 h-1 rounded-full w-full animate-pulse" />
             </div>
           </motion.div>
         </div>
