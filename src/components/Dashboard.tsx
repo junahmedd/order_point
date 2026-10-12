@@ -7,20 +7,9 @@ import { useMemo } from 'react';
 import PageLayout from './PageLayout';
 import {
   DollarSign,
-  CheckCircle2,
-  Clock,
   Flame,
   CheckCircle,
-  ShoppingCart,
-  ArrowUpRight,
-  TrendingUp,
-  Receipt,
-  CreditCard,
-  QrCode,
-  Utensils,
-  Users,
-  Settings,
-  Package
+  TrendingUp
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { Order, MenuItem, InventoryItem } from '../types';
@@ -192,8 +181,8 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
       onTabChange={onNavigateToTab}
     >
 
-      {/* KPI Cards Row (6-Column Grid) */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-5">
+      {/* KPI Cards Row (5-Column Grid) */}
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-5">
         <KpiCard
           label="Total Sales"
           value={`${currencySymbol}${stats.todayRevenue.toLocaleString('en-IN')}`}
@@ -221,16 +210,6 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
           iconBg="bg-sky-50/60"
           iconColor="text-sky-600"
           iconBorder="border-sky-100/20"
-          currencySymbol={currencySymbol}
-          onClick={() => onNavigateToTab('Reports')}
-        />
-        <KpiCard
-          label="Today's Card Sales"
-          value={`${currencySymbol}${stats.cardSales.toLocaleString('en-IN')}`}
-          icon={CreditCard}
-          iconBg="bg-purple-50/60"
-          iconColor="text-purple-600"
-          iconBorder="border-purple-100/20"
           currencySymbol={currencySymbol}
           onClick={() => onNavigateToTab('Reports')}
         />
@@ -341,7 +320,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
         </div>
       </div>
 
-      {/* NEW SECTION: Sales Channels & Live Integrations Cockpit */}
+      {/* Sales Channels Cockpit */}
       <div className="bg-white rounded-[24px] border border-[#EDEDED] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] mb-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
           <div>
@@ -349,7 +328,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
               Sales Channel Performance Cockpit
             </h3>
             <p className="text-[#8B8B8B] text-[11px] font-semibold mt-1">
-              Real-time synchronization across POS desk, online delivery platforms, and Scan & Go QR. Click to open channels.
+              Real-time synchronization across dine-in POS desk, takeaway counter, and Scan &amp; Go QR. Click to open channels.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -358,41 +337,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {/* Swiggy channel card */}
-          <div 
-            onClick={() => onNavigateToTab('Orders')}
-            className="p-4 rounded-[16px] border border-orange-100 bg-orange-50/15 hover:shadow-md hover:border-orange-350 hover:scale-[1.01] transition-all duration-300 cursor-pointer"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-              <span className="text-[10px] font-black tracking-widest text-orange-600 uppercase">SWIGGY PLATFORM</span>
-            </div>
-            <div className="space-y-1 mt-3">
-              <div className="flex justify-between items-baseline">
-                <span className="text-2xl font-[900] text-gray-900">{currencySymbol}{stats.swiggyRevenue.toLocaleString('en-IN')}</span>
-              </div>
-              <p className="text-[11px] text-gray-400 font-semibold">{stats.swiggyOrders} active orders processed</p>
-            </div>
-          </div>
-
-          {/* Zomato channel card */}
-          <div 
-            onClick={() => onNavigateToTab('Orders')}
-            className="p-4 rounded-[16px] border border-red-100 bg-red-50/15 hover:shadow-md hover:border-red-350 hover:scale-[1.01] transition-all duration-300 cursor-pointer"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-[10px] font-black tracking-widest text-red-600 uppercase">ZOMATO PLATFORM</span>
-            </div>
-            <div className="space-y-1 mt-3">
-              <div className="flex justify-between items-baseline">
-                <span className="text-2xl font-[900] text-gray-900">{currencySymbol}{stats.zomatoRevenue.toLocaleString('en-IN')}</span>
-              </div>
-              <p className="text-[11px] text-gray-400 font-semibold">{stats.zomatoOrders} active orders processed</p>
-            </div>
-          </div>
-
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Dine-in channel card */}
           <div 
             onClick={() => onNavigateToTab('Orders')}
@@ -434,7 +379,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
           >
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-              <span className="text-[10px] font-black tracking-widest text-purple-600 uppercase">SCAN & GO QR</span>
+              <span className="text-[10px] font-black tracking-widest text-purple-600 uppercase">SCAN &amp; GO QR</span>
             </div>
             <div className="space-y-1 mt-3">
               <div className="flex justify-between items-baseline">
@@ -443,71 +388,6 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
               <p className="text-[11px] text-gray-400 font-semibold">{stats.scangoOrders} self-service sessions</p>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Quick Actions & Sync Hub Widget */}
-      <div className="bg-white rounded-[24px] border border-[#EDEDED] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.02)] mb-5">
-        <div className="mb-4">
-          <h3 className="text-[13px] font-[900] text-[#111111] uppercase tracking-wider leading-none mb-1">
-            System Operations &amp; Configuration Hub
-          </h3>
-          <p className="text-[#8B8B8B] text-[11px] font-semibold mt-1">
-            Quickly access and configure system entities, preferences, inventory logs, and staff shifts.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button 
-            onClick={() => onNavigateToTab('Settings')}
-            className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-emerald-50/40 border border-gray-150 hover:border-emerald-250 rounded-xl transition-all group cursor-pointer text-left border-solid"
-          >
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
-              <Settings size={18} />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-gray-800 block">System Settings</span>
-              <span className="text-[10px] text-gray-400 font-medium">Configure profile &amp; taxes</span>
-            </div>
-          </button>
-
-          <button 
-            onClick={() => onNavigateToTab('Menu')}
-            className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-indigo-50/40 border border-gray-150 hover:border-indigo-250 rounded-xl transition-all group cursor-pointer text-left border-solid"
-          >
-            <div className="w-10 h-10 rounded-lg bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
-              <Utensils size={18} />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-gray-800 block">Menu Management</span>
-              <span className="text-[10px] text-gray-400 font-medium">Edit dishes &amp; portion prices</span>
-            </div>
-          </button>
-
-          <button 
-            onClick={() => onNavigateToTab('Inventory')}
-            className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-amber-50/40 border border-gray-150 hover:border-amber-250 rounded-xl transition-all group cursor-pointer text-left border-solid"
-          >
-            <div className="w-10 h-10 rounded-lg bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
-              <Package size={18} />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-gray-800 block">Inventory Logs</span>
-              <span className="text-[10px] text-gray-400 font-medium">Stock levels &amp; low limits</span>
-            </div>
-          </button>
-
-          <button 
-            onClick={() => onNavigateToTab('Staff')}
-            className="flex items-center gap-3 p-4 bg-gray-50 hover:bg-purple-50/40 border border-gray-150 hover:border-purple-250 rounded-xl transition-all group cursor-pointer text-left border-solid"
-          >
-            <div className="w-10 h-10 rounded-lg bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center text-purple-600 shrink-0">
-              <Users size={18} />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-gray-800 block">Staff Directory</span>
-              <span className="text-[10px] text-gray-400 font-medium">Manage permissions &amp; roles</span>
-            </div>
-          </button>
         </div>
       </div>
     </PageLayout>
