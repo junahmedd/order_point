@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import PageLayout from './PageLayout';
 import { useSettings } from '../hooks/useSettings';
 import { Button, Input } from './UI';
-import { Store, Receipt, CreditCard, LayoutDashboard, QrCode, MonitorDot, Utensils, Trash2, Plus, CheckCircle, Sparkles, ShoppingCart, LineChart, ChefHat } from 'lucide-react';
+import { Store, LayoutDashboard, MonitorDot, Trash2, Plus, CheckCircle } from 'lucide-react';
 import { TableConfig, Order, MenuItem } from '../types';
 import toast from 'react-hot-toast';
 import { motion } from 'motion/react';
 
-type SettingsTab = 'profile' | 'billing' | 'payment' | 'tables' | 'qr' | 'system';
+type SettingsTab = 'profile' | 'tables' | 'system';
 
 interface SettingsViewProps {
   orders?: Order[];
@@ -67,17 +67,14 @@ export default function SettingsView({
 
   const tabs: { id: SettingsTab; label: string; icon: React.FC<any> }[] = [
     { id: 'profile', label: 'General Settings', icon: Store },
-    { id: 'billing', label: 'Billing & Tax', icon: Receipt },
-    { id: 'payment', label: 'Payment Methods', icon: CreditCard },
     { id: 'tables', label: 'Table Management', icon: LayoutDashboard },
-    { id: 'qr', label: 'QR Ordering', icon: QrCode },
     { id: 'system', label: 'System Preferences', icon: MonitorDot },
   ];
 
   return (
     <PageLayout
       title="Settings"
-      subtitle="Manage your restaurant profile, billing, payment options, and table layouts."
+      subtitle="Manage your restaurant profile, table layouts, and system preferences."
       customPadding="p-3 sm:p-6 flex-1 flex flex-col min-h-0 overflow-hidden"
       activeTab="Settings"
       onTabChange={onNavigateToTab}
@@ -172,115 +169,7 @@ export default function SettingsView({
             </motion.div>
           )}
 
-          {activeTab === 'billing' && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.15 }}
-              className="space-y-6 max-w-2xl"
-            >
-              <h2 className="font-bold text-lg border-b border-blue-900/50 pb-2 text-white">Billing &amp; Tax</h2>
-              
-              <div className="flex items-center gap-2 mb-2 mt-4">
-                <input 
-                  type="checkbox" 
-                  id="taxEnabled"
-                  checked={data.gstTax.taxEnabled}
-                  onChange={(e) => updateData('gstTax', 'taxEnabled', e.target.checked)}
-                  className="w-4 h-4 text-blue-600 border-blue-900/60 bg-[#040E24] rounded focus:ring-blue-500"
-                />
-                <label htmlFor="taxEnabled" className="text-sm font-medium text-blue-100 select-none">Enable Tax</label>
-              </div>
 
-              {data.gstTax.taxEnabled && (
-                <div className="grid grid-cols-2 gap-4">
-                  <Input 
-                    label="Tax Registration Number" 
-                    value={data.gstTax.gstNumber} 
-                    onChange={(e: any) => updateData('gstTax', 'gstNumber', e.target.value)} 
-                  />
-                  <Input 
-                    label="Tax Rate (%)" 
-                    type="number"
-                    value={data.gstTax.gstRate} 
-                    onChange={(e: any) => updateData('gstTax', 'gstRate', parseInt(e.target.value) || 0)} 
-                  />
-                </div>
-              )}
-              
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                 <Input 
-                    label="Currency (e.g., ₹, $, €)" 
-                    value={data.preferences.currency} 
-                    onChange={(e: any) => updateData('preferences', 'currency', e.target.value)} 
-                  />
-              </div>
-
-              <div className="pt-4 flex gap-3">
-                <Button 
-                  disabled={!!savingSection} 
-                  onClick={() => handleSaveMultiple(['gstTax', 'preferences'], 'Billing and tax settings')}
-                >
-                  {savingSection === 'gstTax_preferences' ? 'Saving...' : 'Save Billing Settings'}
-                </Button>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'payment' && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.15 }}
-              className="space-y-6 max-w-2xl"
-            >
-              <h2 className="font-bold text-lg border-b border-blue-900/50 pb-2 text-white">Payment Methods</h2>
-
-              <div className="space-y-3">
-                 {[
-                   { id: 'cash', label: 'Cash' },
-                   { id: 'upi', label: 'UPI' },
-                   { id: 'creditCard', label: 'Credit Card' },
-                   { id: 'debitCard', label: 'Debit Card' }
-                 ].map(method => (
-                   <div key={method.id} className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        id={method.id}
-                        checked={(data.payment as any)[method.id]}
-                        onChange={(e) => updateData('payment', method.id, e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-blue-900/60 bg-[#040E24] rounded focus:ring-blue-500"
-                      />
-                      <label htmlFor={method.id} className="text-sm font-medium text-blue-100 select-none">{method.label}</label>
-                   </div>
-                 ))}
-              </div>
-
-              {data.payment.upi && (
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-blue-900/50">
-                  <Input 
-                    label="Merchant UPI ID" 
-                    value={data.payment.upiId} 
-                    onChange={(e: any) => updateData('payment', 'upiId', e.target.value)} 
-                  />
-                  <Input 
-                    label="Merchant Name" 
-                    value={data.payment.merchantName} 
-                    onChange={(e: any) => updateData('payment', 'merchantName', e.target.value)} 
-                  />
-                </div>
-              )}
-
-              <div className="pt-4 flex gap-3">
-                <Button 
-                  disabled={!!savingSection} 
-                  onClick={() => handleSave('payment', 'Payment methods')}
-                >
-                  {savingSection === 'payment' ? 'Saving...' : 'Save Payment Methods'}
-                </Button>
-              </div>
-            </motion.div>
-          )}
 
           {activeTab === 'tables' && (
             <motion.div
@@ -347,68 +236,7 @@ export default function SettingsView({
             </motion.div>
           )}
 
-          {activeTab === 'qr' && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.15 }}
-              className="space-y-6 max-w-2xl"
-            >
-              <h2 className="font-bold text-lg border-b border-blue-900/50 pb-2 text-white">QR Ordering</h2>
-              <div className="space-y-3">
-                   <div className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        id="qr_enabled"
-                        checked={data.qrOrdering.enabled}
-                        onChange={(e) => updateData('qrOrdering', 'enabled', e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-blue-900/60 bg-[#040E24] rounded focus:ring-blue-500"
-                      />
-                      <label htmlFor="qr_enabled" className="text-sm font-medium text-blue-100 select-none">Enable QR Scan &amp; Go</label>
-                   </div>
-                   <div className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        id="qr_self"
-                        checked={data.qrOrdering.selfOrdering}
-                        onChange={(e) => updateData('qrOrdering', 'selfOrdering', e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-blue-900/60 bg-[#040E24] rounded focus:ring-blue-500"
-                      />
-                      <label htmlFor="qr_self" className="text-sm font-medium text-blue-100 select-none">Allow Customer Self-Ordering (via phone)</label>
-                   </div>
-                   <div className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        id="qr_table"
-                        checked={data.qrOrdering.perTable}
-                        onChange={(e) => updateData('qrOrdering', 'perTable', e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-blue-900/60 bg-[#040E24] rounded focus:ring-blue-500"
-                      />
-                      <label htmlFor="qr_table" className="text-sm font-medium text-blue-100 select-none">Generate QR Codes Per Table</label>
-                   </div>
-              </div>
 
-              <div className="pt-4 flex gap-3 pb-6 border-b border-blue-900/50">
-                <Button 
-                  disabled={!!savingSection} 
-                  onClick={() => handleSave('qrOrdering', 'QR Ordering configurations')}
-                >
-                  {savingSection === 'qrOrdering' ? 'Saving...' : 'Save QR Settings'}
-                </Button>
-              </div>
-
-              {data.qrOrdering.perTable && data.qrOrdering.enabled && (
-                <div className="pt-2">
-                  <h3 className="text-sm font-bold text-white mb-2">QR Code Generation</h3>
-                  <p className="text-sm text-blue-200/70 mb-4">Print unique QR codes customized for each table. Guests can scan to view the menu and place orders.</p>
-                  <Button variant="secondary" onClick={() => toast.success("Generating PDFs for all tables...")}>
-                    <QrCode className="w-4 h-4 mr-2" />
-                    Download QR Codes
-                  </Button>
-                </div>
-              )}
-            </motion.div>
-          )}
 
           {activeTab === 'system' && (
             <motion.div

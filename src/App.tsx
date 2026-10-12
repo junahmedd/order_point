@@ -35,7 +35,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<SidebarTab>('Dashboard');
-  const [settingsSection, setSettingsSection] = useState<'profile' | 'billing' | 'payment' | 'tables' | 'qr' | 'system'>('profile');
+  const [settingsSection, setSettingsSection] = useState<'profile' | 'tables' | 'system'>('profile');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 

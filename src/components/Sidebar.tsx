@@ -87,7 +87,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const [settingsExpanded, setSettingsExpanded] = useState(true);
 
-  // Clean, simple navigation list: Scan & Go positioned right above Settings
+  // Clean, simple navigation list: Scan Now positioned right above Settings
   const navigationItems: { id: SidebarTab; label: string; icon: any; isLocked?: boolean }[] = [
     { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'Orders', label: 'Orders', icon: ShoppingCart },
@@ -96,8 +96,7 @@ export default function Sidebar({
     { id: 'Menu', label: 'Menu', icon: UtensilsCrossed },
     { id: 'Inventory', label: 'Inventory', icon: Package },
     { id: 'Reports', label: 'Reports', icon: LineChart },
-    { id: 'Feedback', label: 'Feedback', icon: Star },
-    { id: 'ScanGo', label: 'Scan & Go', icon: QrCode },
+    { id: 'ScanGo', label: 'Scan Now', icon: QrCode },
     { id: 'Settings', label: 'Settings', icon: Settings },
   ];
 

@@ -379,7 +379,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
           >
             <div className="flex items-center gap-2 mb-2">
               <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
-              <span className="text-[10px] font-black tracking-widest text-purple-300 uppercase">SCAN &amp; GO QR</span>
+              <span className="text-[10px] font-black tracking-widest text-purple-300 uppercase">SCAN NOW QR</span>
             </div>
             <div className="space-y-1 mt-3">
               <div className="flex justify-between items-baseline">
