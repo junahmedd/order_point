@@ -28,6 +28,7 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   sendPasswordResetEmail, 
+  signOut,
   signInWithPopup, 
   signInWithRedirect,
   getRedirectResult,
@@ -81,15 +82,21 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [authErrorType, setAuthErrorType] = useState<string | null>(null);
   const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
 
+  const isSigningUpRef = useRef(false);
   const successCallbackRef = useRef(onLoginSuccess);
   useEffect(() => {
     successCallbackRef.current = onLoginSuccess;
   }, [onLoginSuccess]);
 
-  // Auth state listener: immediately forward authenticated users
+  // Auth state listener: immediately forward authenticated users (unless actively signing up)
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
+      if (
+        currentUser && 
+        !currentUser.isAnonymous && 
+        !isSigningUpRef.current && 
+        sessionStorage.getItem('orderpoint_signing_up') !== 'true'
+      ) {
         successCallbackRef.current(currentUser);
       }
     });
@@ -166,7 +173,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   // =========================================================================
-  // LOGIN SUBMISSION (Fast login without blocking email verification link)
+  // LOGIN SUBMISSION (Fast verification & clean dashboard redirection)
   // =========================================================================
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,11 +195,43 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
       const user = userCredential.user;
 
-      // Update lastLogin timestamp asynchronously without blocking
-      const userDocRef = doc(db, 'users', user.uid);
-      updateDoc(userDocRef, {
-        lastLogin: new Date().toISOString()
-      }).catch(() => {});
+      // Verify Firestore profile
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userDocRef);
+
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          if (userData.status === 'suspended' || userData.status === 'inactive') {
+            await signOut(auth);
+            const inactiveMsg = 'Your account is inactive. Please contact support.';
+            toast.error(inactiveMsg);
+            setErrors({ form: inactiveMsg });
+            setLoading(false);
+            return;
+          }
+          await updateDoc(userDocRef, {
+            lastLogin: new Date().toISOString()
+          }).catch(() => {});
+        } else {
+          // Provision default profile if missing
+          const defaultStoreId = calculateStoreId(user.email || email, 'My Restaurant');
+          await setDoc(userDocRef, {
+            uid: user.uid,
+            fullName: user.displayName || 'Restaurant Owner',
+            restaurantName: 'My Restaurant',
+            businessName: 'My Restaurant',
+            email: (user.email || email).toLowerCase().trim(),
+            role: 'RestaurantOwner',
+            restaurantId: defaultStoreId,
+            createdAt: new Date().toISOString(),
+            emailVerified: true,
+            subscriptionPlan: 'pro'
+          }, { merge: true });
+        }
+      } catch (profileErr) {
+        console.warn('Profile verification non-blocking notice:', profileErr);
+      }
 
       toast.success('Signed in successfully!');
       onLoginSuccess(user);
@@ -214,7 +253,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   // =========================================================================
-  // SIGN UP SUBMISSION (Direct onboarding with immediate dashboard redirect)
+  // SIGN UP SUBMISSION (Strict flow: Create -> Profile -> Sign Out -> Login)
   // =========================================================================
   const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -255,16 +294,19 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     }
 
     setLoading(true);
+    isSigningUpRef.current = true;
+    sessionStorage.setItem('orderpoint_signing_up', 'true');
+
     try {
       const storeId = calculateStoreId(email, businessName);
 
-      // Attempt creating new user directly
+      // Attempt creating new user via Firebase Auth
       let user: any = null;
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
         user = userCredential.user;
 
-        // Case 1: Brand new email + new store
+        // 1. Create user profile in Firestore
         const userDocRef = doc(db, 'users', user.uid);
         await setDoc(userDocRef, {
           uid: user.uid,
@@ -281,7 +323,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           trialEnds: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
         });
 
-        // Create store registry document
+        // 2. Create store registry document
         await setDoc(doc(db, 'stores', storeId), {
           storeId,
           ownerEmail: email.toLowerCase().trim(),
@@ -291,7 +333,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           createdAt: Date.now()
         });
 
-        // Initialize default store settings
+        // 3. Initialize default store settings
         const settingsDocRef = doc(db, 'settings', storeId);
         await setDoc(settingsDocRef, {
           restaurantInfo: {
@@ -314,92 +356,49 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           updatedAt: Date.now()
         });
 
-        toast.success(`Welcome to OrderPoint Pro, ${fullName.trim()}!`);
-        onLoginSuccess(user);
+        // 4. Immediately sign out the newly created session
+        await signOut(auth);
+
+        // 5. Clean up signup state flags
+        sessionStorage.removeItem('orderpoint_signing_up');
+        isSigningUpRef.current = false;
+
+        // 6. Clear password inputs while retaining email
+        setPassword('');
+        setConfirmPassword('');
+
+        // 7. Redirect to Login mode
+        setMode('login');
+
+        // 8. Display explicit success message
+        toast.success('Account created successfully. Please log in.', { duration: 6000 });
         return;
       } catch (createErr: any) {
-        // If email already exists, verify credentials and resolve multi-store mapping
+        sessionStorage.removeItem('orderpoint_signing_up');
+        isSigningUpRef.current = false;
+
         if (createErr.code === 'auth/email-already-in-use') {
-          try {
-            const loginCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
-            user = loginCredential.user;
-
-            const storeDocRef = doc(db, 'stores', storeId);
-            const storeDocSnap = await getDoc(storeDocRef);
-
-            if (storeDocSnap.exists()) {
-              // Case 2: Same email + same store name -> open existing store
-              toast.success(`Opening existing store "${businessName}"...`);
-              const userDocRef = doc(db, 'users', user.uid);
-              await updateDoc(userDocRef, {
-                restaurantId: storeId,
-                lastLogin: new Date().toISOString()
-              }).catch(() => {});
-
-              onLoginSuccess(user);
-              return;
-            } else {
-              // Case 3: Same email + different store name -> provision new outlet
-              toast.success(`Creating new store "${businessName}" under your account...`);
-
-              await setDoc(storeDocRef, {
-                storeId,
-                ownerEmail: email.toLowerCase().trim(),
-                ownerId: user.uid,
-                storeName: businessName.trim(),
-                storeNameNormalized: businessName.trim().toLowerCase(),
-                createdAt: Date.now()
-              });
-
-              const settingsDocRef = doc(db, 'settings', storeId);
-              await setDoc(settingsDocRef, {
-                restaurantInfo: {
-                  name: businessName.trim(),
-                  owner: fullName.trim() || user.displayName || 'Owner',
-                  phone: phone.trim(),
-                  email: email.toLowerCase().trim(),
-                  address: '',
-                  regNumber: ''
-                },
-                branding: { logoUrl: '', faviconUrl: '' },
-                gstTax: { gstNumber: '', gstRate: 0, taxEnabled: false },
-                payment: { cash: true, upi: true, creditCard: true, debitCard: false, wallet: false, upiId: '', merchantName: '' },
-                whatsapp: { number: '', businessName: businessName.trim(), autoSendBills: false },
-                qrOrdering: { enabled: true, perTable: true, selfOrdering: true },
-                notifications: { newOrder: true, payment: true, kitchenReady: true, lowStock: true, dailySummary: true },
-                security: { adminName: fullName.trim() || user.displayName || 'Owner', twoFactor: false, sessionTimeout: '30m' },
-                preferences: { darkMode: false, compactMode: false, autoPrint: false, autoRefresh: true, currency: 'INR' },
-                createdAt: Date.now(),
-                updatedAt: Date.now()
-              });
-
-              const userDocRef = doc(db, 'users', user.uid);
-              await updateDoc(userDocRef, {
-                restaurantId: storeId,
-                lastLogin: new Date().toISOString()
-              }).catch(() => {});
-
-              onLoginSuccess(user);
-              return;
-            }
-          } catch (signInErr: any) {
-            console.error('Password check failed on existing email:', signInErr);
-            const conflictMsg = 'This email is already registered. Please enter your existing password or use a different email.';
-            toast.error(conflictMsg);
-            setErrors({ email: conflictMsg });
-            setLoading(false);
-            return;
-          }
+          const registeredMsg = 'This email is already registered. Please log in.';
+          toast.error(registeredMsg);
+          setErrors({
+            emailAlreadyInUse: registeredMsg,
+            email: registeredMsg
+          });
+          return;
+        } else if (createErr.code === 'auth/weak-password') {
+          const weakMsg = 'Password must be at least 6 characters.';
+          toast.error(weakMsg);
+          setErrors({ password: weakMsg });
+          return;
         } else {
           throw createErr;
         }
       }
     } catch (e: any) {
+      sessionStorage.removeItem('orderpoint_signing_up');
+      isSigningUpRef.current = false;
       console.error('Registration failed:', e);
       let errMsg = e.message || 'Failed to create account. Please try again.';
-      if (e.code === 'auth/weak-password') {
-        errMsg = 'Password is too weak. Please use at least 6 characters with mixed symbols.';
-      }
       toast.error(errMsg);
       setErrors({ form: errMsg });
     } finally {
@@ -762,6 +761,27 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                   </div>
 
                   <form onSubmit={handleSignUpSubmit} className="space-y-3.5">
+                    {errors.emailAlreadyInUse && (
+                      <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-900 text-xs shadow-sm">
+                        <div className="flex items-center gap-2 font-medium">
+                          <AlertTriangle size={16} className="text-amber-600 shrink-0" />
+                          <span>This email is already registered. Please log in.</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setErrors({});
+                            setPassword('');
+                            setConfirmPassword('');
+                            setMode('login');
+                          }}
+                          className="px-3 py-1.5 bg-[#091E42] text-white hover:bg-[#071735] font-bold rounded-lg text-xs transition-all shrink-0 cursor-pointer shadow-sm border-none flex items-center gap-1"
+                        >
+                          <span>Go to Login page →</span>
+                        </button>
+                      </div>
+                    )}
+
                     {errors.form && (
                       <div className="p-3 bg-rose-50 border border-rose-100 rounded-xl flex items-start gap-2.5 text-rose-700 text-xs font-medium">
                         <AlertTriangle size={15} className="mt-0.5 shrink-0" />

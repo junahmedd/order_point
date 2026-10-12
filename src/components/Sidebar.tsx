@@ -105,6 +105,20 @@ export default function Sidebar({
     navigationItems.push({ id: 'SuperAdmin', label: 'Super Admin', icon: Shield });
   }
 
+  const roleNormalized = (userRole || 'RestaurantOwner').toLowerCase();
+  let allowedTabIds: SidebarTab[] = ['Dashboard', 'Orders', 'Kitchen', 'Billing', 'Menu', 'Inventory', 'Reports', 'ScanGo', 'Settings'];
+  if (roleNormalized === 'kitchen' || roleNormalized === 'chef') {
+    allowedTabIds = ['Kitchen'];
+  } else if (roleNormalized === 'waiter') {
+    allowedTabIds = ['Orders', 'Kitchen'];
+  } else if (roleNormalized === 'cashier') {
+    allowedTabIds = ['Orders', 'Billing', 'ScanGo'];
+  }
+
+  const filteredNavigationItems = navigationItems.filter(item =>
+    allowedTabIds.includes(item.id) || (item.id === 'SuperAdmin' && isSuperAdmin)
+  );
+
   const handleTabClick = (tabId: SidebarTab) => {
     onTabChange(tabId);
     if (isOpenOnMobile) {
@@ -180,7 +194,7 @@ export default function Sidebar({
 
         {/* Scrollable navigation menu tabs */}
         <div className="flex-1 overflow-y-auto px-4 py-6 space-y-[4px] scrollbar-thin scrollbar-thumb-blue-950">
-          {navigationItems.map((item) => {
+          {filteredNavigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             const isSettings = item.id === 'Settings';
@@ -248,7 +262,7 @@ export default function Sidebar({
                     {displayName}
                   </span>
                   <span className="inline-block self-start px-1.5 py-[2px] bg-blue-500/15 text-blue-300 border border-blue-400/20 text-[8px] font-black tracking-widest uppercase rounded">
-                    Admin
+                    {userRole ? userRole.replace('RestaurantOwner', 'Owner') : 'Admin'}
                   </span>
                 </div>
               )}

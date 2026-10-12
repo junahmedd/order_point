@@ -81,24 +81,30 @@ export function useLiveAppData() {
       } else {
         const params = new URLSearchParams(window.location.search);
         const urlRestaurantId = params.get('restaurantId') || params.get('store');
-        if (urlRestaurantId) {
-          setUserId(urlRestaurantId);
-          setUserRole('guest');
-          localStorage.setItem('orderpoint_user_id', urlRestaurantId);
-          localStorage.setItem('orderpoint_user_role', 'guest');
-        } else {
+        const isPublicVisitor = params.get('scan') === 'true' || params.has('feedback') || params.has('invoice');
+        if (isPublicVisitor) {
+          if (urlRestaurantId) {
+            setUserId(urlRestaurantId);
+            setUserRole('guest');
+            localStorage.setItem('orderpoint_user_id', urlRestaurantId);
+            localStorage.setItem('orderpoint_user_role', 'guest');
+          }
           try {
             const anonUser = await signInAnonymously(auth);
-            setUserId(anonUser.user.uid);
+            if (!urlRestaurantId) {
+              setUserId(anonUser.user.uid);
+              localStorage.setItem('orderpoint_user_id', anonUser.user.uid);
+            }
             setUserRole('guest');
-            localStorage.setItem('orderpoint_user_id', anonUser.user.uid);
             localStorage.setItem('orderpoint_user_role', 'guest');
           } catch (err) {
             console.info('Anonymous sign in notice:', err);
-            const cached = localStorage.getItem('orderpoint_user_id') || 'default_restaurant';
-            setUserId(cached);
-            setUserRole(localStorage.getItem('orderpoint_user_role') || 'guest');
           }
+        } else {
+          setUserId(null);
+          setUserRole(null);
+          localStorage.removeItem('orderpoint_user_id');
+          localStorage.removeItem('orderpoint_user_role');
         }
       }
     });
@@ -109,10 +115,20 @@ export function useLiveAppData() {
     };
   }, []);
 
-  const activeUserId = userId || localStorage.getItem('orderpoint_user_id') || 'default_restaurant';
+  const activeUserId = userId;
 
   useEffect(() => {
-    if (!activeUserId) return;
+    if (!activeUserId) {
+      setOrders([]);
+      setMenuItems([]);
+      setInventoryItems([]);
+      setStaffMembers([]);
+      setCustomers([]);
+      setSelfOrders([]);
+      setStockTransactions([]);
+      setLoading(false);
+      return;
+    }
     const currentRestId = activeUserId;
 
     const runSeederIfEmpty = async () => {

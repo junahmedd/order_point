@@ -231,7 +231,13 @@ export default function App() {
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
-      if (user) {
+      // If user is currently in signup flow, do not auto-set user session
+      if (sessionStorage.getItem('orderpoint_signing_up') === 'true') {
+        setCurrentUser(null);
+        setAuthLoading(false);
+        return;
+      }
+      if (user && !user.isAnonymous) {
         setCurrentUser(user);
       } else {
         setCurrentUser(null);
@@ -258,6 +264,25 @@ export default function App() {
   const { data: settingsData, loading: settingsLoading } = useSettings();
 
   const loading = dbLoading || settingsLoading;
+
+  // Role-based route guard: restrict navigation to authorized tabs only
+  useEffect(() => {
+    if (!userRole) return;
+    const r = userRole.toLowerCase();
+    if (r === 'kitchen' || r === 'chef') {
+      if (activeTab !== 'Kitchen') {
+        setActiveTab('Kitchen');
+      }
+    } else if (r === 'waiter') {
+      if (activeTab !== 'Orders' && activeTab !== 'Kitchen') {
+        setActiveTab('Orders');
+      }
+    } else if (r === 'cashier') {
+      if (activeTab !== 'Orders' && activeTab !== 'Billing' && activeTab !== 'ScanGo') {
+        setActiveTab('Orders');
+      }
+    }
+  }, [userRole, activeTab]);
 
   const handleShowToast = (msg: string) => {
     toast.success(msg);
