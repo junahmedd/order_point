@@ -564,7 +564,7 @@ export default function Reports({
         {/* TOTAL SALES */}
         <div className="bg-white rounded-[16px] p-4 shadow-sm h-[90px] flex flex-col justify-between border border-[#EDEDED] hover:border-black/5 transition-colors">
           <div className="flex items-center gap-3">
-            <div className="w-[30px] h-[30px] rounded-lg bg-[#E8F5E9] text-[#22C55E] flex items-center justify-center">
+            <div className="w-[30px] h-[30px] rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
               <DollarSign size={16} />
             </div>
             <span className="text-[9px] font-extrabold tracking-[1px] text-[#8B8B8B] uppercase">
@@ -761,10 +761,10 @@ export default function Reports({
             )}
           </div>
 
-          <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 mt-6 flex items-center gap-3">
-            <CheckCircle2 className="text-[#22C55E] shrink-0" size={18} />
+          <div className="p-4 bg-sky-50/50 rounded-2xl border border-sky-100 mt-6 flex items-center gap-3">
+            <CheckCircle2 className="text-sky-600 shrink-0" size={18} />
             <div>
-              <span className="text-xs font-bold text-[#22C55E] block">SECURED LEDGER</span>
+              <span className="text-xs font-bold text-sky-700 block">SECURED LEDGER</span>
               <span className="text-[10px] text-[#8B8B8B]">Audit trail synced perfectly</span>
             </div>
           </div>

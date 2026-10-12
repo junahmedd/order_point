@@ -1185,11 +1185,11 @@ Thank you for choosing ${restName}. We look forward to serving you again!`;
             <div className="animate-fade-in flex flex-col justify-center items-center py-8 px-4 text-center">
               
               {/* Success celebration graphic wrapper */}
-              <div className="w-16 h-16 rounded-full bg-emerald-50 border-2 border-emerald-400 flex items-center justify-center text-emerald-500 mb-4 ready-pulse">
+              <div className="w-16 h-16 rounded-full bg-sky-50 border-2 border-sky-400 flex items-center justify-center text-sky-500 mb-4 ready-pulse">
                 <CheckCircle size={38} className="stroke-[2.5]" />
               </div>
 
-              <span className="bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest px-3.5 py-1 rounded-full border border-emerald-200">
+              <span className="bg-sky-50 text-sky-700 text-[10px] font-black uppercase tracking-widest px-3.5 py-1 rounded-full border border-sky-200">
                 Settled &amp; Locked
               </span>
 
@@ -1340,8 +1340,8 @@ Thank you for choosing ${restName}. We look forward to serving you again!`;
                   </button>
                   <div>
                     {activeOrderObj.isPaid ? (
-                      <span className="text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                        🟢 PAID ({activeOrderObj.paymentMethod})
+                      <span className="text-[10px] font-black text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                        🔵 PAID ({activeOrderObj.paymentMethod})
                       </span>
                     ) : (
                       <span className="text-[10px] font-black text-amber-700 bg-amber-50 border border-amber-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
@@ -1550,7 +1550,7 @@ Thank you for choosing ${restName}. We look forward to serving you again!`;
                             Settled Transaction Record
                           </span>
                         </div>
-                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full uppercase border border-emerald-200">
+                        <span className="text-[10px] font-bold text-sky-800 bg-sky-100 px-2.5 py-0.5 rounded-full uppercase border border-sky-200">
                           PAID
                         </span>
                       </div>
@@ -1605,7 +1605,7 @@ Thank you for choosing ${restName}. We look forward to serving you again!`;
                           WhatsApp Receipt Confirmation
                         </label>
                         {activeOrderObj.billSentToWhatsApp && (
-                          <span className="text-[8.5px] font-black text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">
+                          <span className="text-[8.5px] font-black text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-full uppercase tracking-wider border border-sky-200">
                             Sent
                           </span>
                         )}
@@ -1665,7 +1665,7 @@ Thank you for choosing ${restName}. We look forward to serving you again!`;
                           WhatsApp Invoice (Optional)
                         </label>
                         {activeOrderObj.billSentToWhatsApp && (
-                          <span className="text-[8.5px] font-black text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">
+                          <span className="text-[8.5px] font-black text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-full uppercase tracking-wider border border-sky-200">
                             Shared to Client
                           </span>
                         )}

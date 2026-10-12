@@ -80,10 +80,10 @@ export default function PageLayout({
               {/* Cloud Sync Pulse Indicator */}
               <div 
                 onClick={handleSyncClick}
-                className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200/80 text-emerald-700 hover:bg-emerald-100 rounded-full text-[9px] font-black uppercase tracking-widest leading-none cursor-pointer transition-all select-none shadow-xs"
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-sky-50 border border-sky-200/80 text-sky-700 hover:bg-sky-100 rounded-full text-[9px] font-black uppercase tracking-widest leading-none cursor-pointer transition-all select-none shadow-xs"
                 title="System real-time synchronized. Click to force check."
               >
-                <span className={`w-1.5 h-1.5 rounded-full bg-emerald-500 ${isSyncing ? 'animate-spin' : 'animate-pulse'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full bg-sky-500 ${isSyncing ? 'animate-spin' : 'animate-pulse'}`} />
                 <RefreshCw size={8} className={`stroke-[3] ${isSyncing ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">LIVE SYNCED</span>
               </div>

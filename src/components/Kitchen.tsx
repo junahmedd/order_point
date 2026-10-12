@@ -140,9 +140,9 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
       onTabChange={onNavigateToTab}
       actions={
         <div className="flex flex-wrap items-center gap-2">
-          <div className="bg-emerald-50 text-emerald-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-emerald-100 flex items-center gap-1.5 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>🟢 Kitchen Online</span>
+          <div className="bg-sky-50 text-sky-700 text-[11px] font-bold px-3 py-1.5 rounded-full border border-sky-200 flex items-center gap-1.5 shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
+            <span>🔵 Kitchen Online</span>
           </div>
           <div className="bg-blue-50 text-blue-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-blue-100">
             Active: {activeOrdersCount}
@@ -150,7 +150,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
           <div className="bg-amber-50 text-amber-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-amber-100">
             Preparing: {preparingCount}
           </div>
-          <div className="bg-emerald-50 text-emerald-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-emerald-100">
+          <div className="bg-sky-50 text-sky-700 text-[11px] font-bold px-3 py-1.5 rounded-full border border-sky-200">
             Ready: {readyCount}
           </div>
           <div className="bg-purple-50 text-purple-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-purple-100">
@@ -242,11 +242,11 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
             if (isNew) {
               statusPillColor = 'bg-blue-50 text-[#3B82F6] border-blue-150';
             } else if (order.status === 'Accepted') {
-              statusPillColor = 'bg-emerald-50 text-emerald-600 border-emerald-150';
+              statusPillColor = 'bg-sky-50 text-sky-700 border-sky-200';
             } else if (isPreparing) {
               statusPillColor = 'bg-amber-50 text-[#F59E0B] border-amber-150';
             } else if (isReady) {
-              statusPillColor = 'bg-emerald-50 text-[#22C55E] border-emerald-150 ready-pulse';
+              statusPillColor = 'bg-sky-50 text-sky-700 border-sky-200 ready-pulse';
             } else if (order.status === 'Picked Up') {
               statusPillColor = 'bg-indigo-50 text-indigo-600 border-indigo-150';
             } else if (order.status === 'Out for Delivery') {
@@ -322,7 +322,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                     <span className="truncate max-w-[120px]">Cust: {order.customerName || 'Guest'}</span>
                     <span className={`text-[8.5px] font-black px-1.5 py-0.5 rounded uppercase leading-none border ${
                       order.isPaid || order.paymentStatus === 'Paid' || order.paymentStatus === 'PAID'
-                        ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                        ? 'bg-sky-50 text-sky-700 border-sky-200'
                         : 'bg-amber-50 text-amber-600 border-amber-100'
                     }`}>
                       {order.isPaid || order.paymentStatus === 'Paid' || order.paymentStatus === 'PAID' ? 'PAID' : 'UNPAID'}

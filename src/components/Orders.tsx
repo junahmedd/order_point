@@ -569,7 +569,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
                     Occupied
                   </span>
                 ) : (
-                  <span className="text-[9px] font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">
+                  <span className="text-[9px] font-black text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full uppercase tracking-wider border border-sky-200">
                     Available
                   </span>
                 )}

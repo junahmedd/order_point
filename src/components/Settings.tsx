@@ -103,11 +103,11 @@ export default function SettingsView({
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer
                     ${isActive 
-                      ? 'bg-emerald-50 text-emerald-800 border-l-[3px] border-emerald-500 shadow-xs font-semibold' 
+                      ? 'bg-sky-50 text-sky-800 border-l-[3px] border-sky-500 shadow-xs font-semibold' 
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                 >
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-emerald-600' : 'text-gray-400'}`} />
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-sky-600' : 'text-gray-400'}`} />
                   {tab.label}
                 </button>
               );
@@ -320,9 +320,9 @@ export default function SettingsView({
             initial={{ scale: 0.9, opacity: 0, y: 15 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 15 }}
-            className="bg-white border border-emerald-100 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center max-w-xs w-full mx-4 text-center border-t-4 border-t-emerald-500"
+            className="bg-white border border-sky-100 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center max-w-xs w-full mx-4 text-center border-t-4 border-t-sky-500"
           >
-            <div className="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center mb-4 text-emerald-500 animate-bounce">
+            <div className="w-14 h-14 bg-sky-50 rounded-full flex items-center justify-center mb-4 text-sky-500 animate-bounce">
               <CheckCircle size={32} className="stroke-[2.5]" />
             </div>
             <h3 className="text-gray-950 font-black text-lg tracking-tight mb-1">
@@ -332,7 +332,7 @@ export default function SettingsView({
               {successMessage}
             </p>
             <div className="mt-4 w-full bg-gray-100 h-1 rounded-full overflow-hidden">
-              <div className="bg-emerald-500 h-1 rounded-full w-full animate-pulse" />
+              <div className="bg-sky-500 h-1 rounded-full w-full animate-pulse" />
             </div>
           </motion.div>
         </div>

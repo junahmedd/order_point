@@ -216,7 +216,7 @@ export default function Inventory({
         <button
           id="btn_open_add_inventory"
           onClick={() => setIsAddModalOpen(true)}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white h-8.5 px-4.5 rounded-full text-[11px] font-black tracking-wider flex items-center justify-center gap-1.5 shadow-sm uppercase active:scale-95 cursor-pointer border-none"
+          className="bg-sky-500 hover:bg-sky-600 text-white h-8.5 px-4.5 rounded-full text-[11px] font-black tracking-wider flex items-center justify-center gap-1.5 shadow-sm uppercase active:scale-95 cursor-pointer border-none"
         >
           <Plus size={14} className="stroke-[3]" />
           <span>Add Inventory</span>
@@ -276,7 +276,7 @@ export default function Inventory({
                           className={`inline-flex items-center px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
                             isOutOfStock || isLow
                               ? 'bg-[#FFF1F2] text-[#E11D48] border border-[#FFE4E6]'
-                              : 'bg-emerald-50 text-[#22C55E] border border-emerald-100'
+                              : 'bg-sky-50 text-sky-700 border border-sky-200'
                           }`}
                         >
                           {isOutOfStock ? 'OUT OF STOCK' : isLow ? 'LOW STOCK' : 'IN STOCK'}
@@ -403,7 +403,7 @@ export default function Inventory({
               <button
                 id="modal_save_stock_btn"
                 type="submit"
-                className="w-full h-10 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-sm transition-all active:scale-[0.98] border-none cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full h-10 bg-sky-500 hover:bg-sky-600 text-white rounded-full text-xs font-bold uppercase tracking-wider shadow-sm transition-all active:scale-[0.98] border-none cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Plus size={14} className="stroke-[2.5]" />
                 <span>Add Inventory</span>

@@ -248,7 +248,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
                 Daily sales transactions trend
               </p>
             </div>
-            <div className="bg-emerald-50 px-2.5 py-1 rounded-[6px] text-[10px] text-emerald-600 font-extrabold flex items-center gap-1 border border-emerald-100 uppercase tracking-widest leading-none">
+            <div className="bg-sky-50 px-2.5 py-1 rounded-full text-[10px] text-sky-700 font-extrabold flex items-center gap-1 border border-sky-200 uppercase tracking-widest leading-none">
               <TrendingUp size={12} strokeWidth={3} /> +5.4% Up
             </div>
           </div>
@@ -331,9 +331,9 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
               Real-time synchronization across dine-in POS desk, takeaway counter, and Scan &amp; Go QR. Click to open channels.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none">All Channels Synced</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-sky-50 border border-sky-200 text-sky-700 rounded-full">
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
+            <span className="text-[10px] font-black uppercase tracking-widest leading-none">All Channels Synced</span>
           </div>
         </div>
 
@@ -358,11 +358,11 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
           {/* Takeaway channel card */}
           <div 
             onClick={() => onNavigateToTab('Orders')}
-            className="p-4 rounded-[16px] border border-emerald-100 bg-emerald-50/15 hover:shadow-md hover:border-emerald-350 hover:scale-[1.01] transition-all duration-300 cursor-pointer"
+            className="p-4 rounded-[16px] border border-sky-100 bg-sky-50/15 hover:shadow-md hover:border-sky-300 hover:scale-[1.01] transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span className="text-[10px] font-black tracking-widest text-emerald-600 uppercase">TAKEAWAY COUNTER</span>
+              <span className="w-2 h-2 rounded-full bg-sky-500" />
+              <span className="text-[10px] font-black tracking-widest text-sky-700 uppercase">TAKEAWAY COUNTER</span>
             </div>
             <div className="space-y-1 mt-3">
               <div className="flex justify-between items-baseline">

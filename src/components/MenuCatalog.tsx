@@ -288,16 +288,16 @@ export default function MenuCatalog({
                       <span className="font-bold text-slate-600">Half portion</span>
                       <div className="flex items-center gap-1.5">
                         <span className="font-extrabold text-slate-800">{currencySymbol}{(item.price / 2).toFixed(0)}</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        <span className="text-[8.5px] font-[800] uppercase tracking-wide text-emerald-600">Avail</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                        <span className="text-[8.5px] font-[800] uppercase tracking-wide text-sky-700">Avail</span>
                       </div>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-slate-600">Full portion</span>
                       <div className="flex items-center gap-1.5">
                         <span className="font-extrabold text-slate-800">{currencySymbol}{item.price}</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        <span className="text-[8.5px] font-[800] uppercase tracking-wide text-emerald-600">Avail</span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                        <span className="text-[8.5px] font-[800] uppercase tracking-wide text-sky-700">Avail</span>
                       </div>
                     </div>
                   </div>
@@ -317,8 +317,8 @@ export default function MenuCatalog({
                          }
                          return (
                            <>
-                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                             <span className="text-[9px] font-extrabold tracking-widest uppercase text-emerald-600">AVAILABLE</span>
+                             <div className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                             <span className="text-[9px] font-extrabold tracking-widest uppercase text-sky-700">AVAILABLE</span>
                            </>
                          );
                        })()}
