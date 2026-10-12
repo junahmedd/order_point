@@ -142,18 +142,18 @@ export default function Sidebar({
       {/* Main Sidebar */}
       <aside
         id="sidebar_container"
-        className={`fixed inset-y-0 left-0 bg-[#0b0c10] text-[#A1A1A1] ${sidebarWidth} transform ${
+        className={`fixed inset-y-0 left-0 bg-[#0b0c10] text-[#A1A1A1] w-[280px] lg:${sidebarWidth} transform ${
           isOpenOnMobile ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 lg:relative lg:h-screen transition-all duration-300 ease-in-out z-50 flex flex-col justify-between shrink-0 border-r border-[#1B1D2A]/30`}
+        } lg:translate-x-0 lg:relative lg:h-screen transition-all duration-300 ease-in-out z-50 flex flex-col justify-between shrink-0 border-r border-[#1B1D2A]/30 pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]`}
       >
         {/* Brand/Status Header */}
         <div className="p-4 border-b border-[#1B1D2A]/40 flex-shrink-0 h-[72px] flex items-center">
           <div className="flex items-center justify-between w-full">
-            <div className={`flex items-center ${isCollapsed ? 'justify-center w-full' : 'gap-3'}`}>
+            <div className={`flex items-center ${isCollapsed ? 'lg:justify-center lg:w-full gap-3' : 'gap-3'}`}>
               <div className="w-[36px] h-[36px] rounded-xl bg-[#22C55E] text-white flex items-center justify-center font-sans shrink-0 shadow-sm transition-all">
                 <Layers size={18} />
               </div>
-              {!isCollapsed && (
+              {(!isCollapsed || isOpenOnMobile) && (
                 <div className="flex flex-col whitespace-nowrap overflow-hidden transition-all duration-300">
                   <span className="text-white font-[800] text-[15px] leading-none tracking-tight font-sans truncate">
                     ORDERPOINT PRO
@@ -247,13 +247,13 @@ export default function Sidebar({
               </select>
             </div>
           )}
-          <div className={`flex items-center ${isCollapsed ? 'justify-center flex-col gap-2 py-2' : 'justify-between gap-2 bg-[#12141C] p-2.5 border border-white/5'} rounded-[14px] transition-all duration-300`}>
-            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} overflow-hidden`}>
+          <div className={`flex items-center ${isCollapsed && !isOpenOnMobile ? 'justify-center flex-col gap-2 py-2' : 'justify-between gap-2 bg-[#12141C] p-2.5 border border-white/5'} rounded-[14px] transition-all duration-300`}>
+            <div className={`flex items-center ${isCollapsed && !isOpenOnMobile ? 'justify-center' : 'gap-2.5'} overflow-hidden`}>
               {/* User Avatar */}
               <div className="w-[32px] h-[32px] rounded-full bg-[#1C1E24] text-gray-300 flex items-center justify-center shrink-0 border border-white/5">
                 <User size={16} />
               </div>
-              {!isCollapsed && (
+              {(!isCollapsed || isOpenOnMobile) && (
                 <div className="flex flex-col min-w-0 text-left">
                   <span className="text-white text-[13px] font-bold font-sans truncate leading-none mb-1">
                     {displayName}

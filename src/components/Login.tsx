@@ -882,7 +882,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <div id="auth_container" className="min-h-screen bg-gradient-to-br from-[#064E3B] via-[#043427] to-[#022018] flex flex-col items-center justify-center p-4 sm:p-6 font-sans selection:bg-emerald-500 selection:text-white relative overflow-hidden">
+    <div id="auth_container" className="min-h-screen bg-gradient-to-br from-[#064E3B] via-[#043427] to-[#022018] flex flex-col items-center justify-center px-4 py-6 sm:p-6 pt-[max(1.5rem,env(safe-area-inset-top,0px))] pb-[max(1.5rem,env(safe-area-inset-bottom,0px))] font-sans selection:bg-emerald-500 selection:text-white relative overflow-x-hidden overflow-y-auto">
       
       {/* Ambient Radial Glow */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(16,185,129,0.18),transparent_70%)] pointer-events-none" />
@@ -890,12 +890,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       <div className="w-full max-w-md my-auto relative z-10">
         
         {/* Simple Centered Brand Header */}
-        <div className="flex flex-col items-center justify-center text-center mb-6 space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#10B981] to-[#059669] text-white flex items-center justify-center shadow-2xl shadow-emerald-950/60 ring-4 ring-emerald-500/20">
-            <Layers size={28} />
+        <div className="flex flex-col items-center justify-center text-center mb-5 sm:mb-6 space-y-2">
+          <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#10B981] to-[#059669] text-white flex items-center justify-center shadow-2xl shadow-emerald-950/60 ring-4 ring-emerald-500/20">
+            <Layers size={26} />
           </div>
           <div>
-            <h1 className="text-2xl font-[900] tracking-tight text-white font-sans uppercase leading-none drop-shadow-sm">
+            <h1 className="text-xl sm:text-2xl font-[900] tracking-tight text-white font-sans uppercase leading-none drop-shadow-sm">
               ORDERPOINT PRO
             </h1>
             <p className="text-[10px] font-bold text-emerald-300 uppercase tracking-widest mt-1.5 opacity-90">
@@ -905,7 +905,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         </div>
 
         {/* Core Glassmorphic Card Container */}
-        <div className="bg-white rounded-[28px] p-6 sm:p-8 shadow-[0_10px_35px_rgba(0,0,0,0.03)] border border-[#E2E8F0] relative overflow-hidden">
+        <div className="bg-white rounded-3xl sm:rounded-[28px] p-5 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.3)] border border-emerald-500/20 relative overflow-hidden">
           
           <AnimatePresence mode="wait">
             {/* LOGIN SCREEN */}

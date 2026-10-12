@@ -1115,59 +1115,71 @@ export default function App() {
           </div>
         )}
 
-        {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-30 shadow-sm shrink-0">
-          <button onClick={() => setIsSidebarOpen(true)} className="p-1 rounded-md hover:bg-gray-100 flex items-center justify-center focus:outline-none bg-transparent border-none cursor-pointer">
+        {/* Mobile Header (Sleek Black with Emerald Accents & iOS/Android Notch Support) */}
+        <div className="lg:hidden flex items-center justify-between bg-neutral-950 border-b border-neutral-850 px-4 py-2.5 sticky top-0 z-30 shadow-md shrink-0 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
+          <button 
+            onClick={() => setIsSidebarOpen(true)} 
+            className="p-2 -ml-1 rounded-xl text-neutral-300 hover:text-white hover:bg-neutral-800/80 active:scale-95 flex items-center justify-center focus:outline-none bg-transparent border-none cursor-pointer transition-all"
+            aria-label="Open Navigation Menu"
+          >
             {/* SVG Menu Icon */}
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-800">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-200">
               <line x1="3" y1="12" x2="21" y2="12"></line>
               <line x1="3" y1="6" x2="21" y2="6"></line>
               <line x1="3" y1="18" x2="21" y2="18"></line>
             </svg>
           </button>
           <div className="flex flex-col items-center">
-            <div className="font-bold text-[15px] tracking-tight text-gray-900 leading-none mb-1 mt-0.5">ORDERPOINT PRO</div>
-            <div className="text-[9px] font-bold text-white bg-gray-900 px-1.5 py-0.5 rounded leading-none uppercase tracking-widest mb-1.5">POS SYSTEM</div>
-            <div className="text-[11px] font-bold text-emerald-600 uppercase tracking-widest leading-none">{!settingsLoading && settingsData?.restaurantInfo?.name ? settingsData.restaurantInfo.name : ''}</div>
+            <div className="font-black text-[14px] tracking-tight text-white leading-none mb-1 mt-0.5">ORDERPOINT PRO</div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[8px] font-black text-black bg-emerald-400 px-1.5 py-0.5 rounded leading-none uppercase tracking-widest">POS SYSTEM</span>
+              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider leading-none truncate max-w-[150px]">{!settingsLoading && settingsData?.restaurantInfo?.name ? settingsData.restaurantInfo.name : ''}</span>
+            </div>
           </div>
-          <div className="w-8"></div>
+          <div className="w-8 flex justify-end">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="System Live" />
+          </div>
         </div>
 
-        <div className={`w-full relative flex-1 h-full min-h-0 flex flex-col pb-16 lg:pb-0 ${activeTab === 'Settings' || activeTab === 'OnlineDelivery' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+        <div className={`w-full relative flex-1 h-full min-w-0 flex flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0 ${activeTab === 'Settings' || activeTab === 'OnlineDelivery' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           {renderContent()}
         </div>
 
-        {/* Mobile Bottom Navigation Bar */}
-        <div className="lg:hidden fixed bottom-0 inset-x-0 bg-black border-t border-neutral-900 h-16 flex items-center justify-around z-30 shadow-[0_-2px_15px_rgba(0,0,0,0.3)] select-none">
-          {[
-            { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
-            { id: 'Orders', label: 'POS Order', icon: ShoppingCart },
-            { id: 'Kitchen', label: 'Kitchen', icon: ChefHat },
-            { id: 'Billing', label: 'Billing', icon: Receipt },
-            { id: 'more', label: 'More', icon: Layers }
-          ].map(tab => {
-            const Icon = tab.icon;
-            const isActive = tab.id === 'more' ? isSidebarOpen : activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  if (tab.id === 'more') {
-                    setIsSidebarOpen(true);
-                  } else {
-                    setActiveTab(tab.id as SidebarTab);
-                    setIsSidebarOpen(false);
-                  }
-                }}
-                className={`flex flex-col items-center justify-center gap-1.5 flex-1 h-full bg-transparent border-none cursor-pointer transition-colors ${
-                  isActive ? 'text-emerald-400 font-extrabold' : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                <Icon size={18} strokeWidth={isActive ? 2.5 : 2} />
-                <span className="text-[9px] font-black uppercase tracking-wider leading-none">{tab.label}</span>
-              </button>
-            );
-          })}
+        {/* Mobile Bottom Navigation Bar (Black Theme with Safe-Area Inset for iOS Home Bar & Android Nav) */}
+        <div className="lg:hidden fixed bottom-0 inset-x-0 bg-neutral-950 border-t border-neutral-900 z-30 shadow-[0_-4px_25px_rgba(0,0,0,0.6)] select-none pb-[env(safe-area-inset-bottom,0px)]">
+          <div className="h-16 flex items-center justify-around px-1">
+            {[
+              { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
+              { id: 'Orders', label: 'POS Order', icon: ShoppingCart },
+              { id: 'Kitchen', label: 'Kitchen', icon: ChefHat },
+              { id: 'Billing', label: 'Billing', icon: Receipt },
+              { id: 'more', label: 'More', icon: Layers }
+            ].map(tab => {
+              const Icon = tab.icon;
+              const isActive = tab.id === 'more' ? isSidebarOpen : activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    if (tab.id === 'more') {
+                      setIsSidebarOpen(true);
+                    } else {
+                      setActiveTab(tab.id as SidebarTab);
+                      setIsSidebarOpen(false);
+                    }
+                  }}
+                  className={`flex flex-col items-center justify-center gap-1 flex-1 h-full bg-transparent border-none cursor-pointer transition-all active:scale-95 touch-manipulation ${
+                    isActive ? 'text-emerald-400 font-extrabold' : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  <div className={`p-1 rounded-xl transition-all ${isActive ? 'bg-emerald-500/15' : ''}`}>
+                    <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                  </div>
+                  <span className="text-[9px] font-black uppercase tracking-wider leading-none">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </main>
     </div>

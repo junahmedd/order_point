@@ -8,15 +8,17 @@
     <!-- PWA Settings -->
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
-    <meta name="theme-color" content="#7C3AED" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="mobile-web-app-capable" content="yes" />
     
     <!-- Apple Mobile Web App Settings -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="OrderPoint Pro" />
     <link rel="apple-touch-icon" href="/logo.svg" />
+    <meta name="format-detection" content="telephone=no" />
   </head>
-  <body>
+  <body class="bg-black select-none md:select-auto">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
