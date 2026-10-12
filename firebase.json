@@ -3,6 +3,7 @@
     "rules": "firestore.rules"
   },
   "hosting": {
+    "site": "orderpoint-pro-2353f",
     "public": "dist",
     "ignore": [
       "firebase.json",
