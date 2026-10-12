@@ -1,0 +1,108 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isStaffOrOwner(restaurantId) {
+      return isAuthenticated() && (
+        request.auth.uid == restaurantId || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData().restaurantId == restaurantId) ||
+        (exists(/databases/$(database)/documents/stores/$(restaurantId)) && get(/databases/$(database)/documents/stores/$(restaurantId)).data.ownerId == request.auth.uid)
+      );
+    }
+
+    // User profile documents
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+      allow create: if true; // Allow new registration
+    }
+
+    // Stores registry mapping
+    match /stores/{storeId} {
+      allow read: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        resource.data.ownerEmail == request.auth.token.email.lower()
+      );
+      allow write: if isAuthenticated() && (
+        (resource == null && request.resource.data.ownerId == request.auth.uid) ||
+        (resource != null && resource.data.ownerId == request.auth.uid)
+      );
+    }
+
+    // Restaurant settings
+    match /settings/{restaurantId} {
+      allow read: if isAuthenticated(); // Allowed so guest orders can read restaurant name/preferences
+      allow write: if isStaffOrOwner(restaurantId); // Only owner/staff can modify settings
+    }
+
+    // Restaurants data
+    match /restaurants/{restaurantId} {
+      // Regular read/write for owner/staff
+      allow read, write: if isStaffOrOwner(restaurantId);
+
+      // Subcollection specific controls
+      match /menuItems/{itemId} {
+        allow read: if isAuthenticated(); // Guest users can view menu
+        allow write: if isStaffOrOwner(restaurantId);
+      }
+
+      match /selfOrders/{orderId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated(); // Guests can place self-orders
+        allow update, delete: if isStaffOrOwner(restaurantId);
+      }
+
+      match /orders/{orderId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated(); // Guests can place orders directly
+        allow update, delete: if isStaffOrOwner(restaurantId);
+      }
+
+      match /customers/{customerId} {
+        allow read: if isAuthenticated();
+        allow create: if isAuthenticated(); // Guests can register or be added
+        allow update, delete: if isStaffOrOwner(restaurantId);
+      }
+
+      match /inventoryItems/{itemId} {
+        allow read: if isAuthenticated(); // For checking stock availability in menu
+        allow write: if isStaffOrOwner(restaurantId);
+      }
+
+      // Other operational tables: KDS, transactions, billing, payments, invoices, feedback
+      match /inventoryTransactions/{txId} {
+        allow read, write: if isStaffOrOwner(restaurantId);
+      }
+
+      match /billingRecords/{billId} {
+        allow read: if isAuthenticated(); // Guests can view their invoices
+        allow write: if isStaffOrOwner(restaurantId);
+      }
+
+      match /paymentRecords/{payId} {
+        allow read: if isAuthenticated();
+        allow write: if isStaffOrOwner(restaurantId);
+      }
+
+      match /invoiceRecords/{invId} {
+        allow read: if isAuthenticated();
+        allow write: if isStaffOrOwner(restaurantId);
+      }
+      
+      match /staffMembers/{staffId} {
+        allow read: if isAuthenticated();
+        allow write: if isStaffOrOwner(restaurantId);
+      }
+    }
+  }
+}
+

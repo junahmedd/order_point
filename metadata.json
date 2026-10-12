@@ -1,0 +1,6 @@
+{
+  "name": "OrderPoint Pro",
+  "description": "A premium, pixel-perfect Restroworks/Toast-style Restaurant Management POS Application featuring live active orders, real-time kitchen timers, a scalable menu catalog, inventory tracker, and full checkout billing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

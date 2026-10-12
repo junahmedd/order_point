@@ -1,0 +1,282 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React, { useState } from 'react';
+import {
+  LayoutDashboard,
+  ShoppingCart,
+  ChefHat,
+  Receipt,
+  UtensilsCrossed,
+  Package,
+  Users,
+  Contact,
+  LineChart,
+  QrCode,
+  Settings,
+  LogOut,
+  X,
+  Layers,
+  ChevronLeft,
+  ChevronRight,
+  User,
+  Star,
+  Truck,
+  Lock,
+  Sparkles,
+  Zap,
+  Crown,
+  AlertTriangle,
+  Shield
+} from 'lucide-react';
+import { SubscriptionInfo } from '../types';
+
+export type SidebarTab =
+  | 'Dashboard'
+  | 'Orders'
+  | 'Kitchen'
+  | 'Billing'
+  | 'Subscription'
+  | 'Menu'
+  | 'Inventory'
+  | 'Staff'
+  | 'Customers'
+  | 'Reports'
+  | 'ScanGo'
+  | 'OnlineDelivery'
+  | 'Feedback'
+  | 'Settings'
+  | 'SuperAdmin';
+
+interface SidebarProps {
+  activeTab: SidebarTab;
+  onTabChange: (tab: SidebarTab) => void;
+  adminName: string;
+  onLogout: () => void;
+  isOpenOnMobile: boolean;
+  onCloseMobile: () => void;
+  restaurantName: string;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+  settingsSection?: string;
+  onSettingsSectionChange?: (sec: string) => void;
+  subscription?: SubscriptionInfo;
+  userRole?: string | null;
+  userEmail?: string | null;
+  stores?: { id: string; name: string }[];
+  activeStoreId?: string | null;
+  onSwitchStore?: (id: string) => void;
+}
+
+export default function Sidebar({
+  activeTab,
+  onTabChange,
+  adminName,
+  onLogout,
+  isOpenOnMobile,
+  onCloseMobile,
+  restaurantName,
+  isCollapsed,
+  onToggleCollapse,
+  settingsSection,
+  onSettingsSectionChange,
+  subscription,
+  userRole,
+  userEmail,
+  stores,
+  activeStoreId,
+  onSwitchStore
+}: SidebarProps) {
+  const [settingsExpanded, setSettingsExpanded] = useState(true);
+
+  const planId = subscription?.subscription_plan || 'pro';
+  const endDate = subscription?.subscription_end ? new Date(subscription.subscription_end) : null;
+  const isExpired = endDate ? Date.now() > endDate.getTime() : false;
+
+  // Navigation list with specific icons corresponding to restaurant tools
+  const navigationItems: { id: SidebarTab; label: string; icon: any; isLocked?: boolean }[] = [
+    { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'Orders', label: 'Orders', icon: ShoppingCart },
+    { id: 'Kitchen', label: 'Kitchen', icon: ChefHat },
+    { id: 'Billing', label: 'Billing', icon: Receipt },
+    { id: 'ScanGo', label: 'Scan & Go', icon: QrCode },
+    { id: 'Menu', label: 'Menu', icon: UtensilsCrossed },
+    { id: 'Inventory', label: 'Inventory', icon: Package, isLocked: planId === 'basic' || isExpired },
+    { id: 'Reports', label: 'Reports', icon: LineChart },
+    { id: 'Feedback', label: 'Feedback', icon: Star },
+    { id: 'OnlineDelivery', label: 'Online Delivery', icon: Truck },
+    { id: 'Subscription', label: 'Subscription Plans', icon: Crown },
+    { id: 'Settings', label: 'Settings', icon: Settings },
+  ];
+
+  const isSuperAdmin = userRole === 'super_admin' || userEmail === 'admin@orderpointpro.in' || userEmail === 'zaid@orderpointpro.in' || userEmail?.includes('admin@orderpoint');
+  if (isSuperAdmin) {
+    navigationItems.push({ id: 'SuperAdmin', label: 'Super Admin', icon: Shield });
+  }
+
+  const handleTabClick = (tabId: SidebarTab) => {
+    onTabChange(tabId);
+    if (isOpenOnMobile) {
+      onCloseMobile();
+    }
+  };
+
+  const displayName = adminName && adminName !== "Mohammed Zaid'..." ? adminName : 'Mohammed Zaid';
+  
+  // Set widths
+  const sidebarWidth = isCollapsed ? 'w-[72px]' : 'w-[220px]';
+
+  return (
+    <>
+      {/* Backdrop for mobile */}
+      {isOpenOnMobile && (
+        <div
+          id="sidebar_backdrop"
+          className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+          onClick={onCloseMobile}
+        />
+      )}
+
+      {/* Main Sidebar */}
+      <aside
+        id="sidebar_container"
+        className={`fixed inset-y-0 left-0 bg-[#0b0c10] text-[#A1A1A1] ${sidebarWidth} transform ${
+          isOpenOnMobile ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0 lg:relative lg:h-screen transition-all duration-300 ease-in-out z-50 flex flex-col justify-between shrink-0 border-r border-[#1B1D2A]/30`}
+      >
+        {/* Brand/Status Header */}
+        <div className="p-4 border-b border-[#1B1D2A]/40 flex-shrink-0 h-[72px] flex items-center">
+          <div className="flex items-center justify-between w-full">
+            <div className={`flex items-center ${isCollapsed ? 'justify-center w-full' : 'gap-3'}`}>
+              <div className="w-[36px] h-[36px] rounded-xl bg-[#22C55E] text-white flex items-center justify-center font-sans shrink-0 shadow-sm transition-all">
+                <Layers size={18} />
+              </div>
+              {!isCollapsed && (
+                <div className="flex flex-col whitespace-nowrap overflow-hidden transition-all duration-300">
+                  <span className="text-white font-[800] text-[15px] leading-none tracking-tight font-sans truncate">
+                    ORDERPOINT PRO
+                  </span>
+                  <span className="text-white text-[9px] font-bold mt-1 leading-none uppercase tracking-widest truncate opacity-90">
+                    POS SYSTEM
+                  </span>
+                  {restaurantName && restaurantName.toLowerCase() !== 'orderpoint pro' && (
+                    <span className="text-[#22C55E] text-[11px] font-[800] mt-1.5 leading-none uppercase tracking-widest truncate max-w-[140px]">
+                      {restaurantName}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            {/* Collapse Toggle for Desktop */}
+            <button
+              onClick={onToggleCollapse}
+              className="hidden lg:flex items-center justify-center text-gray-400 hover:text-white transition-colors rounded-lg hover:bg-white/10 p-1.5 absolute right-[-14px] top-5 bg-[#12141C] border border-[#1B1D2A] shadow-sm z-50"
+              title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+            >
+              {isCollapsed ? <ChevronRight size={14} strokeWidth={3} /> : <ChevronLeft size={14} strokeWidth={3} />}
+            </button>
+
+            {/* Close button for Mobile */}
+            <button
+              onClick={onCloseMobile}
+              className="lg:hidden text-[#8B8B8B] hover:text-white focus:outline-none p-1"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* Scrollable navigation menu tabs */}
+        <div className="flex-1 overflow-y-auto px-4 py-6 space-y-[4px] scrollbar-thin scrollbar-thumb-gray-800">
+          {navigationItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            const isSettings = item.id === 'Settings';
+            const showSubMenu = isSettings && settingsExpanded && !isCollapsed;
+
+            return (
+              <div key={item.id} className="space-y-[4px]">
+                <button
+                  id={`tab_${item.id}`}
+                  onClick={() => {
+                    handleTabClick(item.id);
+                  }}
+                  className={`w-full flex items-center ${isCollapsed ? 'justify-center px-0' : 'gap-3.5 px-4'} py-3 text-xs rounded-xl transition-all duration-150 font-sans tracking-wide shrink-0 ${
+                    isActive
+                      ? 'bg-[#1C1E24] text-[#22C55E] font-extrabold border border-white/5'
+                      : 'text-gray-400 hover:bg-[#12141C] hover:text-white font-medium'
+                  }`}
+                  title={item.label}
+                >
+                  <Icon size={18} className={isActive ? 'text-[#22C55E]' : 'text-gray-400'} strokeWidth={isActive ? 2.5 : 2} />
+                  {!isCollapsed && (
+                    <div className="flex items-center justify-between flex-1 min-w-0">
+                      <span className="leading-none whitespace-nowrap text-left">{item.label}</span>
+                      {item.isLocked && (
+                        <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[9px] font-black uppercase flex items-center gap-1 border border-amber-500/30 ml-1">
+                          <Lock size={10} />
+                          <span>PRO</span>
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom Profile Section */}
+        <div className="p-3 border-t border-[#1B1D2A]/40 bg-[#07080a]/80 flex-shrink-0 space-y-2">
+          {stores && stores.length > 1 && !isCollapsed && (
+            <div className="px-1.5 pb-1 select-none w-full text-left">
+              <span className="text-[9px] font-black uppercase text-slate-500 tracking-wider block mb-1">Select Outlet</span>
+              <select
+                value={activeStoreId || ''}
+                onChange={(e) => onSwitchStore?.(e.target.value)}
+                className="w-full bg-[#12141C] border border-white/5 rounded-lg text-[11px] font-bold text-white py-1.5 px-2 focus:outline-none focus:border-[#22C55E]"
+              >
+                {stores.map(st => (
+                  <option key={st.id} value={st.id}>
+                    {st.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          <div className={`flex items-center ${isCollapsed ? 'justify-center flex-col gap-2 py-2' : 'justify-between gap-2 bg-[#12141C] p-2.5 border border-white/5'} rounded-[14px] transition-all duration-300`}>
+            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-2.5'} overflow-hidden`}>
+              {/* User Avatar */}
+              <div className="w-[32px] h-[32px] rounded-full bg-[#1C1E24] text-gray-300 flex items-center justify-center shrink-0 border border-white/5">
+                <User size={16} />
+              </div>
+              {!isCollapsed && (
+                <div className="flex flex-col min-w-0 text-left">
+                  <span className="text-white text-[13px] font-bold font-sans truncate leading-none mb-1">
+                    {displayName}
+                  </span>
+                  <span className="inline-block self-start px-1.5 py-[2px] bg-emerald-500/10 text-[#22C55E] text-[8px] font-black tracking-widest uppercase rounded">
+                    Admin
+                  </span>
+                </div>
+              )}
+            </div>
+            
+            {/* Logout button */}
+            <button
+              id="sidebar_logout_btn"
+              onClick={onLogout}
+              className={`text-rose-500 hover:text-white hover:bg-rose-500/10 transition-all shrink-0 flex items-center justify-center ${isCollapsed ? 'w-[32px] h-[32px] rounded-xl' : 'p-1.5 rounded-xl'}`}
+              title="Logout Session"
+            >
+              <LogOut size={isCollapsed ? 16 : 16} />
+            </button>
+          </div>
+        </div>
+      </aside>
+    </>
+  );
+}

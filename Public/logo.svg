@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Background Squircle (Vibrant Green) -->
+  <rect x="32" y="32" width="448" height="448" rx="112" fill="#0FA968" />
+  
+  <!-- Stack / Layers Icon (White) -->
+  <!-- Top Layer (Diamond) -->
+  <path d="M256 150 L370 207 L256 264 L142 207 Z" fill="#FFFFFF" />
+  
+  <!-- Middle Layer -->
+  <path d="M142 245 L256 302 L370 245 L370 265 L256 322 L142 265 Z" fill="#FFFFFF" />
+  
+  <!-- Bottom Layer -->
+  <path d="M142 305 L256 362 L370 305 L370 325 L256 382 L142 325 Z" fill="#FFFFFF" />
+</svg>

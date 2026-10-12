@@ -1,0 +1,350 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "SaaS user and restaurant administrator details",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "fullName": { "type": "string" },
+        "businessName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "role": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "lastLogin": { "type": "string" },
+        "profilePhoto": { "type": "string" },
+        "isVerified": { "type": "boolean" }
+      },
+      "required": ["uid", "fullName", "businessName", "email", "phone", "role", "createdAt"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Restaurant configuration settings",
+      "type": "object",
+      "properties": {
+        "restaurantInfo": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "owner": { "type": "string" },
+            "phone": { "type": "string" },
+            "email": { "type": "string" },
+            "address": { "type": "string" },
+            "regNumber": { "type": "string" }
+          }
+        },
+        "branding": {
+          "type": "object",
+          "properties": {
+            "logoUrl": { "type": "string" },
+            "faviconUrl": { "type": "string" }
+          }
+        },
+        "gstTax": {
+          "type": "object",
+          "properties": {
+            "gstNumber": { "type": "string" },
+            "gstRate": { "type": "number" },
+            "taxEnabled": { "type": "boolean" }
+          }
+        },
+        "payment": {
+          "type": "object",
+          "properties": {
+            "cash": { "type": "boolean" },
+            "upi": { "type": "boolean" },
+            "creditCard": { "type": "boolean" },
+            "debitCard": { "type": "boolean" },
+            "wallet": { "type": "boolean" },
+            "upiId": { "type": "string" },
+            "merchantName": { "type": "string" }
+          }
+        },
+        "whatsapp": {
+          "type": "object",
+          "properties": {
+            "number": { "type": "string" },
+            "businessName": { "type": "string" },
+            "autoSendBills": { "type": "boolean" }
+          }
+        },
+        "qrOrdering": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "perTable": { "type": "boolean" },
+            "selfOrdering": { "type": "boolean" }
+          }
+        },
+        "notifications": {
+          "type": "object",
+          "properties": {
+            "newOrder": { "type": "boolean" },
+            "payment": { "type": "boolean" },
+            "kitchenReady": { "type": "boolean" },
+            "lowStock": { "type": "boolean" },
+            "dailySummary": { "type": "boolean" }
+          }
+        },
+        "security": {
+          "type": "object",
+          "properties": {
+            "adminName": { "type": "string" },
+            "twoFactor": { "type": "boolean" },
+            "sessionTimeout": { "type": "string" }
+          }
+        },
+        "preferences": {
+          "type": "object",
+          "properties": {
+            "darkMode": { "type": "boolean" },
+            "compactMode": { "type": "boolean" },
+            "autoPrint": { "type": "boolean" },
+            "autoRefresh": { "type": "boolean" },
+            "currency": { "type": "string" }
+          }
+        },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      }
+    },
+    "MenuItem": {
+      "title": "MenuItem",
+      "description": "Menu catalog item information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "isAvailable": { "type": "boolean" },
+        "dotColor": { "type": "string" },
+        "imageUrl": { "type": "string" }
+      },
+      "required": ["id", "name", "price", "category", "isAvailable"]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "Stock inventory logistics",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "quantity": { "type": "number" },
+        "lowLimit": { "type": "number" },
+        "status": { "type": "string" },
+        "unit": { "type": "string" },
+        "supplier": { "type": "string" }
+      },
+      "required": ["id", "name", "quantity", "lowLimit", "unit"]
+    },
+    "StaffMember": {
+      "title": "StaffMember",
+      "description": "Staff and personnel structure",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["id", "name", "role", "email", "phone", "status"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Guest visits metrics and details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "visits": { "type": "number" },
+        "totalSpend": { "type": "number" },
+        "lastVisit": { "type": "string" }
+      },
+      "required": ["id", "name", "phone", "visits", "totalSpend"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Dine-In, Takeaway, or Delivery Order details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "orderNumber": { "type": "string" },
+        "type": { "type": "string" },
+        "tableNo": { "type": "string" },
+        "items": { "type": "array" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "customerPhone": { "type": "string" },
+        "customerName": { "type": "string" },
+        "totalAmount": { "type": "number" },
+        "isPaid": { "type": "boolean" },
+        "isBilled": { "type": "boolean" },
+        "paymentMethod": { "type": "string" },
+        "billSentToWhatsApp": { "type": "boolean" },
+        "startedAt": { "type": "number" },
+        "orderStatus": { "type": "string" },
+        "kitchenStatus": { "type": "string" },
+        "billingStatus": { "type": "string" },
+        "paymentStatus": { "type": "string" },
+        "preparedAt": { "type": "number" },
+        "servedAt": { "type": "number" },
+        "preparedBy": { "type": "string" },
+        "servedBy": { "type": "string" }
+      },
+      "required": ["id", "orderNumber", "type", "items", "status", "timestamp", "totalAmount", "isPaid", "isBilled"]
+    },
+    "ActiveSelfOrder": {
+      "title": "ActiveSelfOrder",
+      "description": "Direct tabletop Diner-App initiated order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "tableNumber": { "type": "string" },
+        "tableNo": { "type": "string" },
+        "sessionActive": { "type": "boolean" },
+        "joinedAt": { "type": "string" },
+        "orders": { "type": "array" },
+        "itemsCart": { "type": "array" },
+        "items": { "type": "array" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "total": { "type": "number" }
+      },
+      "required": ["id", "tableNumber", "sessionActive", "items"]
+    },
+    "Billing": {
+      "title": "Billing",
+      "description": "Billing information recorded on sale completion",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "orderId": { "type": "string" },
+        "invoiceNo": { "type": "string" },
+        "subtotal": { "type": "number" },
+        "gst": { "type": "number" },
+        "discount": { "type": "number" },
+        "total": { "type": "number" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["id", "orderId", "invoiceNo", "subtotal", "gst", "discount", "total", "timestamp"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Payment transactions for order receipts",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "orderId": { "type": "string" },
+        "amount": { "type": "number" },
+        "method": { "type": "string" },
+        "status": { "type": "string" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["id", "orderId", "amount", "method", "status", "timestamp"]
+    },
+    "Invoice": {
+      "title": "Invoice",
+      "description": "Invoice documents for tax records and customer retrieval",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "orderId": { "type": "string" },
+        "invoiceNo": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "tableNo": { "type": "string" },
+        "items": { "type": "array" },
+        "subtotal": { "type": "number" },
+        "gst": { "type": "number" },
+        "discount": { "type": "number" },
+        "total": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "timestamp": { "type": "number" }
+      },
+      "required": ["id", "orderId", "invoiceNo", "subtotal", "gst", "total", "paymentMethod", "timestamp"]
+    },
+    "Feedback": {
+      "title": "Feedback",
+      "description": "Customer feedback and reviews collected post-order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "orderId": { "type": "string" },
+        "invoiceNo": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "visitDate": { "type": "string" },
+        "foodRating": { "type": "number" },
+        "serviceRating": { "type": "number" },
+        "cleanlinessRating": { "type": "number" },
+        "overallRating": { "type": "number" },
+        "review": { "type": "string" },
+        "wouldVisitAgain": { "type": "string" },
+        "wouldRecommend": { "type": "string" },
+        "uploadedPhotos": { "type": "array" },
+        "feedbackDate": { "type": "number" },
+        "platform": { "type": "string" },
+        "status": { "type": "string" },
+        "managerReply": { "type": "string" }
+      },
+      "required": ["id", "orderId", "invoiceNo", "customerPhone", "foodRating", "serviceRating", "cleanlinessRating", "overallRating", "feedbackDate", "platform", "status"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "User profile with business details"
+    },
+    "settings/{userId}": {
+      "schema": "Settings",
+      "description": "User specific restaurant settings"
+    },
+    "restaurants/{restaurantId}/menuItems/{itemId}": {
+      "schema": "MenuItem",
+      "description": "Menu entries configured for the restaurant"
+    },
+    "restaurants/{restaurantId}/inventoryItems/{itemId}": {
+      "schema": "InventoryItem",
+      "description": "Inventory ledger units"
+    },
+    "restaurants/{restaurantId}/staffMembers/{staffId}": {
+      "schema": "StaffMember",
+      "description": "Personnel shift and credential rosters"
+    },
+    "restaurants/{restaurantId}/customers/{customerId}": {
+      "schema": "Customer",
+      "description": "Settle order loyal customers indicators"
+    },
+    "restaurants/{restaurantId}/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Historical and live active kitchen orders"
+    },
+    "restaurants/{restaurantId}/selfOrders/{selfOrderId}": {
+      "schema": "ActiveSelfOrder",
+      "description": "Pending tabletop scan-and-go orders awaiting counter verification"
+    },
+    "restaurants/{restaurantId}/billing/{billingId}": {
+      "schema": "Billing",
+      "description": "Billing records of sales completed"
+    },
+    "restaurants/{restaurantId}/payments/{paymentId}": {
+      "schema": "Payment",
+      "description": "Payment ledger logs of settled dues"
+    },
+    "restaurants/{restaurantId}/invoices/{invoiceId}": {
+      "schema": "Invoice",
+      "description": "Tax credit invoice details log"
+    },
+    "restaurants/{restaurantId}/feedback/{feedbackId}": {
+      "schema": "Feedback",
+      "description": "Customer ratings and complaints details"
+    }
+  }
+}
