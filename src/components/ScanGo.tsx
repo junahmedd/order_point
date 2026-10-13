@@ -130,8 +130,20 @@ export default function ScanGo({
                           <span className="text-[8.5px] font-black bg-amber-500 text-white px-2 py-0.5 rounded leading-none uppercase">
                             {so.tableNo || so.tableNumber || 'Table 1'}
                           </span>
+                          {(so as any).orderToken && (
+                            <span className="text-[8.5px] font-black bg-blue-600 text-white px-1.5 py-0.5 rounded leading-none font-mono uppercase">
+                              {(so as any).orderToken}
+                            </span>
+                          )}
                         </div>
-                        <span className="text-xs font-black text-slate-900 font-mono font-extrabold">₹{so.total || 0}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-[8px] font-black px-1.5 py-0.5 rounded leading-none uppercase ${
+                            so.isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                          }`}>
+                            {so.isPaid ? 'PAID' : 'COUNTER'}
+                          </span>
+                          <span className="text-xs font-black text-slate-900 font-mono font-extrabold">₹{so.total || 0}</span>
+                        </div>
                       </div>
                       <span className="text-[9.5px] text-slate-400 block font-semibold leading-none">
                         Contact: {so.customerPhone || 'N/A'} • {so.items ? so.items.length : 0} item(s) logged

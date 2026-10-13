@@ -359,6 +359,10 @@ export interface ActiveSelfOrder {
   customerName?: string;
   customerPhone?: string;
   total?: number;
+  isPaid?: boolean;
+  paymentStatus?: string;
+  orderToken?: string;
+  orderNumber?: string;
 }
 
 export interface CustomerFeedback {

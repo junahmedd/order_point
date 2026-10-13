@@ -5,6 +5,7 @@ import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { Order, MenuItem, InventoryItem, StaffMember, Customer, ActiveSelfOrder, StockTransaction } from '../types';
 import { INITIAL_MENU_ITEMS, INITIAL_INVENTORY_ITEMS, INITIAL_STAFF_MEMBERS, INITIAL_CUSTOMERS, INITIAL_ORDERS } from '../data';
 import toast from 'react-hot-toast';
+import { soundAlert } from '../lib/soundAlert';
 
 function isPlainObject(value: any): boolean {
   if (value === null || typeof value !== 'object') {
@@ -165,9 +166,21 @@ export function useLiveAppData() {
 
     runSeederIfEmpty();
 
+    let initialOrdersLoaded = false;
     const ordersPath = `restaurants/${currentRestId}/orders`;
     const ordersQuery = query(collection(db, ordersPath), orderBy('timestamp', 'desc'));
     const unsubOrders = onSnapshot(ordersQuery, (snapshot) => {
+      if (initialOrdersLoaded) {
+        snapshot.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            soundAlert.playNewOrderBell();
+            const ord = change.doc.data() as Order;
+            const tokenStr = (ord as any).orderToken ? ` [Token: ${(ord as any).orderToken}]` : '';
+            toast.success(`🔔 New Order! ${ord.tableNo || 'Counter'}${tokenStr}`, { duration: 4000 });
+          }
+        });
+      }
+      initialOrdersLoaded = true;
       setOrders(snapshot.docs.map(doc => doc.data() as Order));
     }, (error) => {
       console.warn('Firestore orders listener warning:', error);
@@ -203,8 +216,19 @@ export function useLiveAppData() {
       console.warn('Firestore customers listener warning:', error);
     });
 
+    let initialSelfOrdersLoaded = false;
     const selfOrdersPath = `restaurants/${currentRestId}/selfOrders`;
     const unsubSelfOrders = onSnapshot(collection(db, selfOrdersPath), (snapshot) => {
+      if (initialSelfOrdersLoaded) {
+        snapshot.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            soundAlert.playNewOrderBell();
+            const so = change.doc.data() as ActiveSelfOrder;
+            toast.success(`📱 New Self-Order: ${so.customerName || so.tableNo || 'Diner'}`, { duration: 4000 });
+          }
+        });
+      }
+      initialSelfOrdersLoaded = true;
       setSelfOrders(snapshot.docs.map(doc => doc.data() as ActiveSelfOrder));
     }, (error) => {
       setLoading(false);

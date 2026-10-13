@@ -674,33 +674,46 @@ export default function App() {
             onApproveSelfOrder={async (id) => {
               const target = selfOrders.find(so => so.id === id);
               if (target) {
-                const ord = {
-                  id: generateOrderId(),
-                  orderNumber: generateOrderNumber(),
-                  type: 'Dine-In' as const,
-                  tableNo: target.tableNo || target.tableNumber || 'Table 1',
-                  items: target.items,
-                  status: 'New' as const,
-                  createdAt: new Date().toISOString(),
-                  timestamp: Date.now(),
-                  totalAmount: target.total || 0,
-                  customerName: target.customerName,
-                  customerPhone: target.customerPhone,
-                  isPaid: (target as any).isPaid || false,
-                  isBilled: false,
-                  orderStatus: 'New',
-                  kitchenStatus: 'Pending',
-                  billingStatus: 'Pending',
-                  paymentStatus: (target as any).paymentStatus || ((target as any).isPaid ? 'PAID' : 'Pending'),
-                  paymentMethod: (target as any).paymentMethod || 'QR Order',
-                  orderToken: (target as any).orderToken || (target as any).token || `A${Math.floor(100 + Math.random() * 900)}`,
-                  orderSource: 'QR Order',
-                  preparedAt: 0,
-                  servedAt: 0,
-                  preparedBy: '',
-                  servedBy: '',
-                };
-                await handleAddNewOrder(ord);
+                const existingOrder = orders.find(o => o.id === target.id);
+                if (existingOrder) {
+                  await updateOrder(target.id, {
+                    status: 'New',
+                    orderStatus: 'Confirmed',
+                    kitchenStatus: 'Pending',
+                    billingStatus: (target as any).isPaid ? 'Paid' : 'Pending',
+                    paymentStatus: (target as any).isPaid ? 'Paid' : ((target as any).paymentStatus || 'Pending'),
+                    isPaid: (target as any).isPaid || false,
+                    tableNo: target.tableNo || target.tableNumber || existingOrder.tableNo,
+                  });
+                } else {
+                  const ord: Order = {
+                    id: target.id,
+                    orderNumber: (target as any).orderNumber || generateOrderNumber(),
+                    type: 'Dine-In' as const,
+                    tableNo: target.tableNo || target.tableNumber || 'Table 01',
+                    items: target.items || (target as any).itemsCart || [],
+                    status: 'New' as const,
+                    createdAt: target.joinedAt || new Date().toISOString(),
+                    timestamp: (target as any).timestamp || Date.now(),
+                    totalAmount: target.total || 0,
+                    customerName: target.customerName,
+                    customerPhone: target.customerPhone,
+                    isPaid: (target as any).isPaid || false,
+                    isBilled: false,
+                    orderStatus: 'Confirmed',
+                    kitchenStatus: 'Pending',
+                    billingStatus: (target as any).isPaid ? 'Paid' : 'Pending',
+                    paymentStatus: (target as any).paymentStatus || ((target as any).isPaid ? 'Paid' : 'Pending'),
+                    paymentMethod: (target as any).paymentMethod || 'QR Order',
+                    orderToken: (target as any).orderToken || (target as any).token || `A${Math.floor(100 + Math.random() * 900)}`,
+                    orderSource: 'QR',
+                    preparedAt: 0,
+                    servedAt: 0,
+                    preparedBy: '',
+                    servedBy: '',
+                  };
+                  await handleAddNewOrder(ord);
+                }
                 await deleteSelfOrder(id);
                 toast.success(`Self-order approved for ${target.customerName}`);
               }
