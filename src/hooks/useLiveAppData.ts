@@ -81,7 +81,7 @@ export function useLiveAppData() {
       } else {
         const params = new URLSearchParams(window.location.search);
         const urlRestaurantId = params.get('restaurantId') || params.get('store');
-        const isPublicVisitor = params.get('scan') === 'true' || params.has('feedback') || params.has('invoice');
+        const isPublicVisitor = params.get('scan') === 'true' || window.location.pathname.startsWith('/scan') || params.has('feedback') || params.has('invoice');
         if (isPublicVisitor) {
           if (urlRestaurantId) {
             setUserId(urlRestaurantId);

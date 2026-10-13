@@ -319,6 +319,9 @@ export interface Order {
   riderPhone?: string;
   estimatedPickupTime?: string;
   estimatedDeliveryTime?: string;
+  subtotal?: number;
+  orderToken?: string;
+  notes?: string;
   taxes?: number;
   deliveryFee?: number;
   discount?: number;

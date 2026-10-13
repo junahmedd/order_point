@@ -3,10 +3,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import PageLayout from './PageLayout';
-import { ChefHat, Flame, CheckCircle, Clock, Play, Sparkles, Star, Truck, ShieldAlert, XCircle } from 'lucide-react';
+import { ChefHat, Flame, CheckCircle, Clock, Play, Sparkles, Star, Truck, ShieldAlert, XCircle, Volume2 } from 'lucide-react';
 import { Order } from '../types';
+import { soundAlert } from '../lib/soundAlert';
 
 interface KitchenProps {
   orders: Order[];
@@ -25,6 +26,16 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Sound alert chime when new orders enter the kitchen
+  const prevOrdersCountRef = useRef(orders.length);
+  useEffect(() => {
+    if (orders.length > prevOrdersCountRef.current) {
+      soundAlert.playNewOrderBell();
+      onShowToast('🔔 New Kitchen Ticket Received!');
+    }
+    prevOrdersCountRef.current = orders.length;
+  }, [orders.length, onShowToast]);
 
   // Compute stats across ALL orders
   const activeOrdersCount = orders.filter(o => o.status !== 'Completed').length;
@@ -279,9 +290,15 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                       <h3 className="font-extrabold text-[15px] text-[#111111] truncate font-sans tracking-tight">
                         {order.orderSource ? `${order.orderSource}` : (order.tableNo ? (order.tableNo.trim().toLowerCase().startsWith('table') ? order.tableNo.trim() : `Table ${order.tableNo.trim()}`) : order.type)}
                       </h3>
-                      <span className="text-[10px] font-black bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded shrink-0">
-                        Tk: #{order.orderNumber.replace(/\D/g, '') || order.orderNumber}
-                      </span>
+                      {(order as any).orderToken ? (
+                        <span className="text-[10px] font-black bg-blue-600 text-white px-2 py-0.5 rounded font-mono shrink-0 shadow-2xs">
+                          TOKEN #{(order as any).orderToken}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-black bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded shrink-0">
+                          Tk: #{order.orderNumber.replace(/\D/g, '') || order.orderNumber}
+                        </span>
+                      )}
                       
                       {/* Priority indicator icons */}
                       <div className="flex items-center gap-0.5 shrink-0">
@@ -322,10 +339,12 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                     <span className="truncate max-w-[120px]">Cust: {order.customerName || 'Guest'}</span>
                     <span className={`text-[8.5px] font-black px-1.5 py-0.5 rounded uppercase leading-none border ${
                       order.isPaid || order.paymentStatus === 'Paid' || order.paymentStatus === 'PAID'
-                        ? 'bg-sky-50 text-sky-700 border-sky-200'
-                        : 'bg-amber-50 text-amber-600 border-amber-100'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : 'bg-amber-50 text-amber-700 border-amber-200'
                     }`}>
-                      {order.isPaid || order.paymentStatus === 'Paid' || order.paymentStatus === 'PAID' ? 'PAID' : 'UNPAID'}
+                      {order.isPaid || order.paymentStatus === 'Paid' || order.paymentStatus === 'PAID' 
+                        ? 'PAID (GPay / Online)' 
+                        : (order as any).paymentMethod === 'Pay at Counter' ? 'PAY AT COUNTER' : 'UNPAID'}
                     </span>
                   </div>
 

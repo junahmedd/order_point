@@ -24,6 +24,7 @@ import { auth, db } from './firebase';
 import { collection, doc, query, where, getDocs, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { Store, ArrowRight, RefreshCw } from 'lucide-react';
 import DinerSimulator from './components/DinerSimulator';
+import CustomerQrOrder from './components/CustomerQrOrder';
 import { calculateStoreId } from './components/Login';
 
 import { useLiveAppData } from './hooks/useLiveAppData';
@@ -45,7 +46,8 @@ export default function App() {
   const [invoiceStoreId, setInvoiceStoreId] = useState<string | null>(null);
 
   const [isScanMode, setIsScanMode] = useState<boolean>(false);
-  const [scanTable, setScanTable] = useState<string>('Table 05');
+  const [scanTable, setScanTable] = useState<string>('Table 01');
+  const [scanStoreId, setScanStoreId] = useState<string>('');
 
   const [userStores, setUserStores] = useState<any[]>([]);
   const [storesLoading, setStoresLoading] = useState(false);
@@ -161,12 +163,16 @@ export default function App() {
       setInvoiceStoreId(invStore);
     }
 
-    const isScan = params.get('scan') === 'true';
-    const table = params.get('table');
+    const isScan = params.get('scan') === 'true' || window.location.pathname.startsWith('/scan');
+    const table = params.get('table') || params.get('tableId');
+    const store = params.get('restaurantId') || params.get('store');
     if (isScan) {
       setIsScanMode(true);
       if (table) {
         setScanTable(table);
+      }
+      if (store) {
+        setScanStoreId(store);
       }
     }
   }, []);
@@ -680,12 +686,15 @@ export default function App() {
                   totalAmount: target.total || 0,
                   customerName: target.customerName,
                   customerPhone: target.customerPhone,
-                  isPaid: false,
+                  isPaid: (target as any).isPaid || false,
                   isBilled: false,
                   orderStatus: 'New',
                   kitchenStatus: 'Pending',
                   billingStatus: 'Pending',
-                  paymentStatus: 'Unpaid',
+                  paymentStatus: (target as any).paymentStatus || ((target as any).isPaid ? 'PAID' : 'Pending'),
+                  paymentMethod: (target as any).paymentMethod || 'QR Order',
+                  orderToken: (target as any).orderToken || (target as any).token || `A${Math.floor(100 + Math.random() * 900)}`,
+                  orderSource: 'QR Order',
                   preparedAt: 0,
                   servedAt: 0,
                   preparedBy: '',
@@ -748,38 +757,13 @@ export default function App() {
   }
 
   if (isScanMode) {
+    const activeRestId = scanStoreId || (userStores && userStores[0]?.storeId) || 'demo_store';
     return (
       <>
         <Toaster position="top-right" />
-        <DinerSimulator
-          selectedTable={scanTable}
-          setSelectedTable={setScanTable}
-          menuItems={menuItems}
-          inventoryItems={inventoryItems}
-          orders={orders}
-          onAddOrder={addOrder}
-          onPlaceSelfOrder={async (customerName, phone, tableNo, items) => {
-            const total = items.reduce((sum, item) => sum + (item.menuItem.price * item.quantity), 0);
-            const newSelfOrder = {
-              id: 'so_' + Date.now(),
-              tableNumber: tableNo,
-              tableNo: tableNo,
-              sessionActive: true,
-              joinedAt: new Date().toISOString(),
-              orders: [],
-              itemsCart: items,
-              items: items,
-              customerName,
-              customerPhone: phone,
-              total
-            };
-            await addSelfOrder(newSelfOrder);
-            toast.success(`Success! Self-order placed for ${tableNo}`);
-          }}
-          onShowToast={handleShowToast}
-          isOpen={true}
-          onClose={() => {}}
-          isStandalone={true}
+        <CustomerQrOrder
+          restaurantId={activeRestId}
+          tableId={scanTable}
         />
       </>
     );

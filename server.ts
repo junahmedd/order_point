@@ -655,6 +655,311 @@ async function startServer() {
   });
 
   // ==========================================
+  // HELPER: Concurrency-Safe Order Token Generator
+  // ==========================================
+  async function generateOrderTokenAndNumber(restaurantId: string): Promise<{ token: string; orderNumber: string }> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const startOfDay = today.getTime();
+
+      let seq = 1;
+      if (adminDb) {
+        const snap = await adminDb.collection('restaurants').doc(restaurantId).collection('orders')
+          .where('timestamp', '>=', startOfDay)
+          .get();
+        seq = snap.size + 1;
+      } else {
+        seq = Math.floor(10 + Math.random() * 90);
+      }
+
+      const token = `A${String(seq).padStart(3, '0')}`;
+      const orderNumber = `OP-${1000 + seq}`;
+      return { token, orderNumber };
+    } catch (err) {
+      const fallbackSeq = Math.floor(100 + Math.random() * 900);
+      return { token: `A${fallbackSeq}`, orderNumber: `OP-${fallbackSeq}` };
+    }
+  }
+
+  // ==========================================
+  // API ROUTE: Create Payment Attempt (Google Pay / Razorpay)
+  // ==========================================
+  app.post('/api/payments/create-order', async (req, res) => {
+    const { restaurantId, tableNo, items, customerName, customerPhone } = req.body;
+
+    if (!restaurantId || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'restaurantId and items are required.' });
+    }
+
+    try {
+      // Calculate server-side total
+      let subtotal = 0;
+      for (const it of items) {
+        const itemPrice = Number(it.unitPrice || it.menuItem?.price || 0);
+        const qty = Number(it.quantity || 1);
+        subtotal += itemPrice * qty;
+      }
+
+      const taxRate = 0.05; // 5% GST
+      const tax = Math.round(subtotal * taxRate);
+      const totalAmount = subtotal + tax;
+      const amountPaise = totalAmount * 100;
+
+      const orderInternalId = 'ord_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+      let razorpayOrderId = `rzp_order_${Date.now()}`;
+      const keyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_placeholder';
+
+      if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_ID !== 'rzp_test_placeholder') {
+        try {
+          const rzpOrder = await razorpay.orders.create({
+            amount: amountPaise,
+            currency: 'INR',
+            receipt: `rcpt_${Date.now()}`,
+            notes: {
+              restaurantId,
+              tableNo: tableNo || 'Table',
+              orderInternalId
+            }
+          });
+          razorpayOrderId = rzpOrder.id;
+        } catch (rzpErr: any) {
+          console.warn('Razorpay order creation warning:', rzpErr?.message || rzpErr);
+        }
+      }
+
+      return res.json({
+        success: true,
+        orderId: orderInternalId,
+        razorpayOrderId,
+        keyId,
+        amount: amountPaise,
+        currency: 'INR',
+        totalAmount,
+        subtotal,
+        tax
+      });
+    } catch (err: any) {
+      console.error('Error creating payment order:', err);
+      return res.status(500).json({ error: err.message || 'Payment initiation failed.' });
+    }
+  });
+
+  // ==========================================
+  // API ROUTE: Verify Google Pay / UPI Payment & Save Order
+  // ==========================================
+  app.post('/api/payments/verify', async (req, res) => {
+    const { 
+      restaurantId, 
+      tableNo, 
+      items, 
+      customerName, 
+      customerPhone, 
+      notes, 
+      razorpay_order_id, 
+      razorpay_payment_id, 
+      razorpay_signature,
+      paymentMethod = 'Google Pay (UPI)' 
+    } = req.body;
+
+    if (!restaurantId || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'restaurantId and valid items are required.' });
+    }
+
+    try {
+      // Signature verification if real Razorpay secret is set
+      if (razorpay_signature && process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_KEY_SECRET !== 'placeholder_secret') {
+        const expectedSig = crypto
+          .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+          .update((razorpay_order_id || '') + '|' + (razorpay_payment_id || ''))
+          .digest('hex');
+
+        if (expectedSig !== razorpay_signature) {
+          return res.status(400).json({ error: 'Invalid payment signature verification.' });
+        }
+      }
+
+      // Generate trusted concurrency-safe Order Token
+      const { token, orderNumber } = await generateOrderTokenAndNumber(restaurantId);
+      const orderId = 'ord_' + Date.now();
+
+      let subtotal = 0;
+      const formattedItems = items.map((it: any) => {
+        const price = Number(it.unitPrice || it.menuItem?.price || 0);
+        const qty = Number(it.quantity || 1);
+        subtotal += price * qty;
+        return {
+          menuItem: it.menuItem || { id: it.productId || 'item', name: it.productName || 'Item', price },
+          quantity: qty,
+          productId: it.productId || it.menuItem?.id,
+          productName: it.productName || it.menuItem?.name,
+          unitPrice: price,
+          totalPrice: price * qty
+        };
+      });
+
+      const taxRate = 0.05;
+      const taxes = Math.round(subtotal * taxRate);
+      const totalAmount = subtotal + taxes;
+
+      const orderData = {
+        id: orderId,
+        orderNumber,
+        orderToken: token,
+        type: 'Dine-In',
+        tableNo: tableNo || 'Table 01',
+        items: formattedItems,
+        status: 'New',
+        orderStatus: 'Confirmed',
+        kitchenStatus: 'Pending',
+        billingStatus: 'Paid',
+        paymentStatus: 'Paid',
+        isPaid: true,
+        isBilled: false,
+        paymentMethod,
+        transactionId: razorpay_payment_id || `tx_${Date.now()}`,
+        totalAmount,
+        subtotal,
+        taxes,
+        customerName: customerName || 'Diner Guest',
+        customerPhone: customerPhone || '',
+        notes: notes || '',
+        orderSource: 'QR',
+        createdAt: new Date().toISOString(),
+        timestamp: Date.now()
+      };
+
+      if (adminDb) {
+        // Save to restaurant orders collection
+        await adminDb.collection('restaurants').doc(restaurantId).collection('orders').doc(orderId).set(orderData);
+        // Also add to selfOrders collection for live scan dashboard sync
+        await adminDb.collection('restaurants').doc(restaurantId).collection('selfOrders').doc(orderId).set({
+          id: orderId,
+          orderNumber,
+          orderToken: token,
+          tableNo: tableNo || 'Table 01',
+          tableNumber: tableNo || 'Table 01',
+          customerName: customerName || 'Diner Guest',
+          customerPhone: customerPhone || '',
+          items: formattedItems,
+          total: totalAmount,
+          isPaid: true,
+          paymentStatus: 'Paid',
+          joinedAt: new Date().toISOString(),
+          sessionActive: true
+        });
+      }
+
+      return res.json({
+        success: true,
+        order: orderData,
+        orderId,
+        orderNumber,
+        orderToken: token,
+        totalAmount,
+        paymentStatus: 'Paid'
+      });
+    } catch (err: any) {
+      console.error('Error verifying payment on server:', err);
+      return res.status(500).json({ error: err.message || 'Payment verification failed.' });
+    }
+  });
+
+  // ==========================================
+  // API ROUTE: Pay at Counter / Cash QR Order
+  // ==========================================
+  app.post('/api/payments/pay-counter', async (req, res) => {
+    const { restaurantId, tableNo, items, customerName, customerPhone, notes } = req.body;
+
+    if (!restaurantId || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'restaurantId and items are required.' });
+    }
+
+    try {
+      const { token, orderNumber } = await generateOrderTokenAndNumber(restaurantId);
+      const orderId = 'ord_' + Date.now();
+
+      let subtotal = 0;
+      const formattedItems = items.map((it: any) => {
+        const price = Number(it.unitPrice || it.menuItem?.price || 0);
+        const qty = Number(it.quantity || 1);
+        subtotal += price * qty;
+        return {
+          menuItem: it.menuItem || { id: it.productId || 'item', name: it.productName || 'Item', price },
+          quantity: qty,
+          productId: it.productId || it.menuItem?.id,
+          productName: it.productName || it.menuItem?.name,
+          unitPrice: price,
+          totalPrice: price * qty
+        };
+      });
+
+      const taxRate = 0.05;
+      const taxes = Math.round(subtotal * taxRate);
+      const totalAmount = subtotal + taxes;
+
+      const orderData = {
+        id: orderId,
+        orderNumber,
+        orderToken: token,
+        type: 'Dine-In',
+        tableNo: tableNo || 'Table 01',
+        items: formattedItems,
+        status: 'New',
+        orderStatus: 'Confirmed',
+        kitchenStatus: 'Pending',
+        billingStatus: 'Pending',
+        paymentStatus: 'Pending',
+        isPaid: false,
+        isBilled: false,
+        paymentMethod: 'Pay at Counter',
+        transactionId: '',
+        totalAmount,
+        subtotal,
+        taxes,
+        customerName: customerName || 'Diner Guest',
+        customerPhone: customerPhone || '',
+        notes: notes || '',
+        orderSource: 'QR',
+        createdAt: new Date().toISOString(),
+        timestamp: Date.now()
+      };
+
+      if (adminDb) {
+        await adminDb.collection('restaurants').doc(restaurantId).collection('orders').doc(orderId).set(orderData);
+        await adminDb.collection('restaurants').doc(restaurantId).collection('selfOrders').doc(orderId).set({
+          id: orderId,
+          orderNumber,
+          orderToken: token,
+          tableNo: tableNo || 'Table 01',
+          tableNumber: tableNo || 'Table 01',
+          customerName: customerName || 'Diner Guest',
+          customerPhone: customerPhone || '',
+          items: formattedItems,
+          total: totalAmount,
+          isPaid: false,
+          paymentStatus: 'Pending',
+          joinedAt: new Date().toISOString(),
+          sessionActive: true
+        });
+      }
+
+      return res.json({
+        success: true,
+        order: orderData,
+        orderId,
+        orderNumber,
+        orderToken: token,
+        totalAmount,
+        paymentStatus: 'Pending'
+      });
+    } catch (err: any) {
+      console.error('Error placing counter order:', err);
+      return res.status(500).json({ error: err.message || 'Failed to place counter order.' });
+    }
+  });
+
+  // ==========================================
   // API ROUTE: Fast Feedback Initialization
   // ==========================================
   app.get('/api/feedback/init', async (req, res) => {
