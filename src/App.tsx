@@ -563,49 +563,29 @@ export default function App() {
       case 'Dashboard':
         return <Dashboard orders={orders} menuItems={menuItems} inventoryItems={inventoryItems} onNavigateToTab={setActiveTab} restaurantName={settingsData.restaurantInfo.name} settings={settingsData as any} />;
       case 'Orders':
-        return (
-          <Orders 
-            menuItems={menuItems} 
-            inventoryItems={inventoryItems} 
-            orders={orders} 
-            selfOrders={selfOrders}
-            onNavigateToTab={setActiveTab} 
-            onAddOrderToKitchen={async (orderPartial: any) => { 
-              const tokenSeq = 'A' + ((orders.length % 999) + 1).toString().padStart(3, '0');
-              const ord: Order = {
-                id: generateOrderId(),
-                orderNumber: generateOrderNumber(),
-                orderToken: orderPartial.orderToken || tokenSeq,
-                orderSource: orderPartial.orderSource || 'POS Desk',
-                status: 'New',
-                orderStatus: 'Confirmed',
-                kitchenStatus: 'Pending',
-                billingStatus: 'Pending',
-                paymentStatus: orderPartial.paymentStatus || 'Pending',
-                paymentMethod: orderPartial.paymentMethod || 'Cash',
-                createdAt: new Date().toISOString(),
-                timestamp: Date.now(),
-                totalAmount: orderPartial.items.reduce((sum: number, item: any) => sum + (item.menuItem.price * item.quantity), 0),
-                isPaid: !!orderPartial.isPaid,
-                isBilled: false,
-                preparedAt: 0,
-                servedAt: 0,
-                preparedBy: '',
-                servedBy: '',
-                ...orderPartial
-              };
-              await handleAddNewOrder(ord); 
-              toast.success(`Order #${ord.orderNumber} (TOKEN #${ord.orderToken}) Sent to Kitchen!`); 
-            }} 
-            onUpdateOrder={async (id, updates) => {
-              await updateOrder(id, updates);
-            }}
-            onMarkOrderPaid={handleMarkOrderPaid}
-            onShowToast={handleShowToast} 
-            settings={settingsData as any} 
-            userRole={userRole}
-          />
-        );
+        return <Orders menuItems={menuItems} inventoryItems={inventoryItems} orders={orders} onNavigateToTab={setActiveTab} onAddOrderToKitchen={async (orderPartial: any) => { 
+          const ord: Order = {
+            id: generateOrderId(),
+            orderNumber: generateOrderNumber(),
+            status: 'New',
+            createdAt: new Date().toISOString(),
+            timestamp: Date.now(),
+            totalAmount: orderPartial.items.reduce((sum: number, item: any) => sum + (item.menuItem.price * item.quantity), 0),
+            isPaid: false,
+            isBilled: false,
+            orderStatus: 'New',
+            kitchenStatus: 'Pending',
+            billingStatus: 'Pending',
+            paymentStatus: 'Unpaid',
+            preparedAt: 0,
+            servedAt: 0,
+            preparedBy: '',
+            servedBy: '',
+            ...orderPartial
+          };
+          await handleAddNewOrder(ord); 
+          toast.success('Order Sent to Kitchen!'); 
+        }} onShowToast={handleShowToast} settings={settingsData as any} />;
       case 'Kitchen':
         return <Kitchen orders={orders} onNavigateToTab={setActiveTab} onUpdateOrderStatus={async (id, status, updates = {}) => {
           let extraUpdates: any = {};
