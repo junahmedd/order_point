@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { db, auth, OperationType, handleFirestoreError } from '../firebase';
 import { collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, query, orderBy, getDocs, getDoc } from 'firebase/firestore';
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
-import { Order, MenuItem, InventoryItem, StaffMember, Customer, ActiveSelfOrder, StockTransaction } from '../types';
+import { Order, MenuItem, InventoryItem, StaffMember, Customer, ActiveSelfOrder, StockTransaction, WaiterCall } from '../types';
 import { INITIAL_MENU_ITEMS, INITIAL_INVENTORY_ITEMS, INITIAL_STAFF_MEMBERS, INITIAL_CUSTOMERS, INITIAL_ORDERS } from '../data';
 import toast from 'react-hot-toast';
 import { soundAlert } from '../lib/soundAlert';
@@ -47,6 +47,7 @@ export function useLiveAppData() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selfOrders, setSelfOrders] = useState<ActiveSelfOrder[]>([]);
   const [stockTransactions, setStockTransactions] = useState<StockTransaction[]>([]);
+  const [waiterCalls, setWaiterCalls] = useState<WaiterCall[]>([]);
 
   useEffect(() => {
     let unsubUserSnap: (() => void) | null = null;
@@ -127,6 +128,7 @@ export function useLiveAppData() {
       setCustomers([]);
       setSelfOrders([]);
       setStockTransactions([]);
+      setWaiterCalls([]);
       setLoading(false);
       return;
     }
@@ -243,6 +245,24 @@ export function useLiveAppData() {
       console.warn('Firestore transactions listener warning:', error);
     });
 
+    let initialWaiterCallsLoaded = false;
+    const waiterCallsPath = `restaurants/${currentRestId}/waiterCalls`;
+    const unsubWaiterCalls = onSnapshot(collection(db, waiterCallsPath), (snapshot) => {
+      if (initialWaiterCallsLoaded) {
+        snapshot.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            soundAlert.playNewOrderBell();
+            const call = change.doc.data() as WaiterCall;
+            toast.success(`🛎️ ${call.requestType || 'Service Call'} from ${call.tableNo || 'Table'}!`, { duration: 6000 });
+          }
+        });
+      }
+      initialWaiterCallsLoaded = true;
+      setWaiterCalls(snapshot.docs.map(doc => doc.data() as WaiterCall));
+    }, (error) => {
+      console.warn('Firestore waiterCalls listener warning:', error);
+    });
+
     return () => {
       unsubOrders();
       unsubMenu();
@@ -251,6 +271,7 @@ export function useLiveAppData() {
       unsubCustomers();
       unsubSelfOrders();
       unsubTx();
+      unsubWaiterCalls();
     };
   }, [activeUserId]);
 
@@ -456,6 +477,15 @@ export function useLiveAppData() {
     }
   };
 
+  const resolveWaiterCall = async (callId: string) => {
+    if (!activeUserId) return;
+    try {
+      await deleteDoc(doc(db, `restaurants/${activeUserId}/waiterCalls`, callId));
+    } catch (error) {
+      console.warn('Error resolving waiter call:', error);
+    }
+  };
+
   return {
     loading,
     restaurantId: activeUserId,
@@ -466,6 +496,7 @@ export function useLiveAppData() {
     staffMembers, addStaffMember, updateStaffMember,
     customers, addCustomer, updateCustomer, deleteCustomer,
     selfOrders, addSelfOrder, deleteSelfOrder,
+    waiterCalls, resolveWaiterCall,
     addBillingRecord, addPaymentRecord, addInvoiceRecord,
     stockTransactions, addStockTransaction
   };

@@ -365,6 +365,16 @@ export interface ActiveSelfOrder {
   orderNumber?: string;
 }
 
+export interface WaiterCall {
+  id: string;
+  tableNo: string;
+  customerName?: string;
+  requestType: 'Waiter Call' | 'Water Request' | string;
+  status: 'Pending' | 'Resolved' | string;
+  timestamp: number;
+  createdAt: string;
+}
+
 export interface CustomerFeedback {
   id: string;
   orderId: string;

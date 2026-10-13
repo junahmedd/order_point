@@ -263,6 +263,7 @@ export default function App() {
     staffMembers, addStaffMember, updateStaffMember,
     customers, addCustomer, updateCustomer, deleteCustomer,
     selfOrders, addSelfOrder, deleteSelfOrder,
+    waiterCalls, resolveWaiterCall,
     addBillingRecord, addPaymentRecord, addInvoiceRecord,
     stockTransactions, addStockTransaction
   } = useLiveAppData();
@@ -329,11 +330,17 @@ export default function App() {
 
     const formattedMethod = paymentMethod.toUpperCase();
 
+    // Preserve Kitchen status if order is still actively cooking
+    const nextStatus = (order.status === 'Ready' || order.kitchenStatus === 'Prepared' || order.kitchenStatus === 'Served' || order.type === 'Takeaway') 
+      ? 'Completed' 
+      : order.status;
+
     // 1. Mark order paid and billed in the live database with all customer details and pdf
     await updateOrder(orderId, { 
       isPaid: true, 
       isBilled: true, 
-      status: 'Completed',
+      status: nextStatus,
+      billingStatus: 'Paid',
       paymentMethod: formattedMethod,
       payment_method: formattedMethod,
       invoiceNumber: invoiceNo,
@@ -1047,6 +1054,36 @@ export default function App() {
         {!isOnline && (
           <div className="bg-amber-600 text-white px-4 py-2.5 flex items-center justify-center gap-2 shadow-md shrink-0 border-b border-amber-700 font-sans z-30 animate-pulse text-xs font-bold">
             <span>📶 You're offline — Some features may be unavailable until your connection returns.</span>
+          </div>
+        )}
+
+        {/* Live Waiter / Service Calls Alert Bar */}
+        {waiterCalls && waiterCalls.length > 0 && (
+          <div className="bg-sky-900 text-white px-4 py-2.5 flex items-center justify-between gap-3 shadow-md shrink-0 border-b border-sky-800 z-30">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping shrink-0" />
+              <span className="text-xs font-black uppercase text-amber-300 shrink-0">🛎️ Service Alerts:</span>
+              <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
+                {waiterCalls.map(c => (
+                  <div key={c.id} className="flex items-center gap-1.5 bg-sky-950/80 border border-sky-700/60 px-2.5 py-1 rounded-lg text-xs shrink-0">
+                    <span className="font-bold text-white">{c.tableNo}</span>
+                    <span className="text-sky-300 text-[11px]">({c.requestType})</span>
+                    <button 
+                      onClick={() => resolveWaiterCall(c.id)} 
+                      className="ml-1 text-[10px] font-black uppercase bg-emerald-600 hover:bg-emerald-700 text-white px-1.5 py-0.5 rounded cursor-pointer border-none transition-colors"
+                    >
+                      ✓ Attended
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <button 
+              onClick={() => waiterCalls.forEach(c => resolveWaiterCall(c.id))} 
+              className="text-[10px] font-bold uppercase text-sky-300 hover:text-white bg-transparent border-none cursor-pointer underline shrink-0"
+            >
+              Clear All
+            </button>
           </div>
         )}
 

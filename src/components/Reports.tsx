@@ -405,7 +405,10 @@ export default function Reports({
       .reduce((sum, o) => sum + o.totalAmount, 0);
 
     const upiRevenue = paidOrders
-      .filter(o => getPaymentMethodStr(o) === 'upi')
+      .filter(o => {
+        const m = getPaymentMethodStr(o);
+        return m.includes('upi') || m.includes('gpay') || m.includes('google pay');
+      })
       .reduce((sum, o) => sum + o.totalAmount, 0);
 
     const cardRevenue = paidOrders

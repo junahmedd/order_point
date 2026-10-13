@@ -143,21 +143,28 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
   const [cart, setCart] = useState<Record<string, { menuItem: MenuItem; quantity: number }>>({});
   const [isMobileCartOpen, setIsMobileCartOpen] = useState(false);
 
-  // Dynamic Table Status Logic: Available (Green), Occupied (Orange), Billing (Red)
+  // Dynamic Table Status Logic: Available (Green), Occupied (Orange)
   const dynamicTables = useMemo(() => {
     if (settings?.tables && Array.isArray(settings.tables) && settings.tables.length > 0) {
       return settings.tables.map((t: any) => t.name);
     }
-    return ['Table 1', 'Table 2', 'Table 3', 'Table 4', 'Table 5'];
+    return ['Table 01', 'Table 02', 'Table 03', 'Table 04', 'Table 05', 'Table 06', 'Table 07', 'Table 08'];
   }, [settings]);
+
+  const normalizeTbl = (t?: string) => {
+    if (!t) return '';
+    return t.toLowerCase().replace(/\s+/g, '').replace(/^table0?/, 'table');
+  };
 
   const tableStatuses = useMemo(() => {
     const statuses: Record<string, 'Available' | 'Occupied'> = {};
     dynamicTables.forEach(table => {
-      const activeOrderForTable = orders.find(o => 
-        o.tableNo === table && 
-        !o.isPaid
-      );
+      const targetNorm = normalizeTbl(table);
+      const activeOrderForTable = orders.find(o => {
+        if (!o.tableNo) return false;
+        if (o.status === 'Completed' || o.status === 'Delivered' || o.status === 'Cancelled') return false;
+        return normalizeTbl(o.tableNo) === targetNorm;
+      });
       if (activeOrderForTable) {
         statuses[table] = 'Occupied';
       } else {

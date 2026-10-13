@@ -288,7 +288,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                   <div className="flex justify-between items-center gap-1 shrink-0 pt-1">
                     <div className="flex items-center gap-1.5 min-w-0">
                       <h3 className="font-extrabold text-[15px] text-[#111111] truncate font-sans tracking-tight">
-                        {order.orderSource ? `${order.orderSource}` : (order.tableNo ? (order.tableNo.trim().toLowerCase().startsWith('table') ? order.tableNo.trim() : `Table ${order.tableNo.trim()}`) : order.type)}
+                        {order.orderSource && order.orderSource !== 'QR' ? `${order.orderSource}` : (order.tableNo ? (order.tableNo.trim().toLowerCase().startsWith('table') ? order.tableNo.trim() : `Table ${order.tableNo.trim()}`) : order.type)}
                       </h3>
                       {(order as any).orderToken ? (
                         <span className="text-[10px] font-black bg-blue-600 text-white px-2 py-0.5 rounded font-mono shrink-0 shadow-2xs">
@@ -312,7 +312,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                             <Star size={12} className="fill-current" />
                           </span>
                         )}
-                        {(order.type === 'Delivery' || order.orderSource) && (
+                        {(order.type === 'Delivery' || (order.orderSource && order.orderSource !== 'QR')) && (
                           <span title="Delivery package" className="text-[#3B82F6]">
                             <Truck size={12} />
                           </span>
@@ -331,7 +331,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                   <div className="flex justify-between items-center text-[9.5px] font-bold text-gray-400 select-none bg-gray-50 px-2 py-0.5 rounded-[6px] mt-1.5 shrink-0 uppercase tracking-widest">
                     <span>#OP-{order.orderNumber}</span>
                     <span>{getFormattedTime(order.timestamp)}</span>
-                    <span className="text-[#111111] font-black">{order.orderSource || order.type}</span>
+                    <span className="text-[#111111] font-black">{order.orderSource === 'QR' ? 'QR Dine-In' : (order.orderSource || order.type)}</span>
                   </div>
 
                   {/* CUSTOMER & PAYMENT STATUS LINE */}
@@ -392,7 +392,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                 <div className="pt-2 shrink-0 border-t border-gray-100/75">
                   <div className="flex flex-col gap-1.5">
                     
-                    {order.orderSource ? (
+                    {order.orderSource && order.orderSource !== 'QR' ? (
                       /* Online delivery status transition actions */
                       <div className="flex flex-col gap-1.5 w-full">
                         {order.status === 'New' && (
@@ -539,7 +539,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                             className="h-[30px] text-[10px] font-extrabold tracking-wider uppercase rounded-[8px] bg-slate-900 hover:bg-black text-white flex items-center justify-center gap-1 cursor-pointer w-full border-none"
                           >
                             <CheckCircle size={11} />
-                            <span>COMPLETE</span>
+                            <span>SERVE / COMPLETE</span>
                           </button>
                         )}
                       </div>

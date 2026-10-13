@@ -42,7 +42,10 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
       .reduce((sum, o) => sum + o.totalAmount, 0);
 
     const upiSales = paidOrders
-      .filter(o => o.paymentMethod?.toLowerCase() === 'upi')
+      .filter(o => {
+        const m = o.paymentMethod?.toLowerCase() || '';
+        return m.includes('upi') || m.includes('gpay') || m.includes('google pay');
+      })
       .reduce((sum, o) => sum + o.totalAmount, 0);
 
     const cardSales = paidOrders
@@ -56,10 +59,19 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
     const zomatoOrders = orders.filter(o => o.orderSource === 'Zomato');
     const zomatoRevenue = zomatoOrders.filter(o => o.isPaid).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-    const scangoOrders = orders.filter(o => o.type === 'Dine-In' && (o.id?.startsWith('so_') || (o as any).isSelfOrder || o.customerName?.toLowerCase().includes('self')));
+    const scangoOrders = orders.filter(o => 
+      o.orderSource === 'QR' || 
+      o.orderSource === 'QR Order' || 
+      (o.type === 'Dine-In' && (o.id?.startsWith('so_') || (o as any).isSelfOrder || o.customerName?.toLowerCase().includes('self')))
+    );
     const scangoRevenue = scangoOrders.filter(o => o.isPaid).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-    const dineInOrders = orders.filter(o => o.type === 'Dine-In' && !(o.id?.startsWith('so_') || (o as any).isSelfOrder || o.customerName?.toLowerCase().includes('self')));
+    const dineInOrders = orders.filter(o => 
+      o.type === 'Dine-In' && 
+      o.orderSource !== 'QR' && 
+      o.orderSource !== 'QR Order' && 
+      !(o.id?.startsWith('so_') || (o as any).isSelfOrder || o.customerName?.toLowerCase().includes('self'))
+    );
     const dineInRevenue = dineInOrders.filter(o => o.isPaid).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
     const takeawayOrders = orders.filter(o => o.type === 'Takeaway');
