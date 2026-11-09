@@ -345,7 +345,7 @@ export default function App() {
     await updateOrder(orderId, { 
       isPaid: true, 
       isBilled: true, 
-      status: nextStatus,
+      status: 'Completed',
       billingStatus: 'Paid',
       paymentMethod: formattedMethod,
       payment_method: formattedMethod,

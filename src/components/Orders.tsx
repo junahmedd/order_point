@@ -163,7 +163,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
       const targetNorm = normalizeTbl(table);
       const activeOrderForTable = orders.find(o => {
         if (!o.tableNo) return false;
-        if (o.status === 'Completed' || o.status === 'Delivered' || o.status === 'Cancelled') return false;
+        if (o.status === 'Completed' || o.status === 'Delivered' || o.status === 'Cancelled' || o.isPaid) return false;
         return normalizeTbl(o.tableNo) === targetNorm;
       });
       if (activeOrderForTable) {

@@ -7,12 +7,12 @@ import { useState, useMemo, useEffect } from 'react';
 import PageLayout from './PageLayout';
 import { 
   Receipt, 
-  Search, 
   CheckCircle, 
   Printer, 
   CreditCard, 
   Download, 
   ArrowLeft, 
+  ArrowRight,
   User, 
   Calendar,
   Check,
@@ -22,7 +22,7 @@ import {
   ChefHat,
   ShoppingBag,
   Sparkles,
-  Layers
+  Clock
 } from 'lucide-react';
 import { Order, MenuItem } from '../types';
 import { jsPDF } from 'jspdf';
@@ -73,66 +73,40 @@ export default function Billing({
   const taxEnabled = settings?.taxEnabled !== undefined ? settings.taxEnabled : true;
   const gstRate = taxEnabled ? (gstPercentage / 100) : 0;
   
-  // Navigation & Selection state - initial selectedOrderId is empty so table selection shows first!
+  // Navigation & Selection state - initial selectedOrderId is empty so occupied tables list shows first!
   const [selectedOrderId, setSelectedOrderId] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState<string>('');
   const [billingTab, setBillingTab] = useState<'pending' | 'history'>('pending');
   
-  // Payment settlement state - UPI removed from pre-billing options per instruction 2; Cash and Card only
+  // Payment settlement state - pre-billing options are Cash and Card only (no separate pre-billing UPI)
   const [selectedMethod, setSelectedMethod] = useState<'cash' | 'card'>('cash');
   const [customerPhone, setCustomerPhone] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [viewInvoiceModal, setViewInvoiceModal] = useState<boolean>(false);
 
-  // Filtered unpaid and paid orders
-  const unpaidOrders = useMemo(() => {
-    let result = orders.filter(o => !o.isPaid && o.status !== 'Cancelled');
-    if (searchQuery.trim() !== '') {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(o => 
-        (o.customerPhone && o.customerPhone.includes(q)) ||
-        o.orderNumber.toLowerCase().includes(q) ||
-        (o.tableNo && o.tableNo.toLowerCase().includes(q)) ||
-        (o.customerName && o.customerName.toLowerCase().includes(q))
-      );
-    }
-    result.sort((a, b) => a.timestamp - b.timestamp);
-    return result;
-  }, [orders, searchQuery]);
+  // Filter ONLY occupied tables / active orders that need billing (search bar removed completely)
+  const occupiedTableOrders = useMemo(() => {
+    const list = orders.filter(o => !o.isPaid && o.status !== 'Cancelled' && o.status !== 'Completed');
+    // Sort oldest active orders first
+    list.sort((a, b) => a.timestamp - b.timestamp);
+    return list;
+  }, [orders]);
 
+  // Paid orders history
   const paidOrders = useMemo(() => {
-    let result = orders.filter(o => o.isPaid);
-    if (searchQuery.trim() !== '') {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(o => 
-        (o.customerPhone && o.customerPhone.includes(q)) ||
-        o.orderNumber.toLowerCase().includes(q) ||
-        (o.tableNo && o.tableNo.toLowerCase().includes(q)) ||
-        (o.customerName && o.customerName.toLowerCase().includes(q)) ||
-        ((o as any).invoiceNumber && (o as any).invoiceNumber.toLowerCase().includes(q))
-      );
-    }
-    result.sort((a, b) => b.timestamp - a.timestamp);
-    return result;
-  }, [orders, searchQuery]);
+    const list = orders.filter(o => o.isPaid || o.status === 'Completed' && (o as any).invoiceNumber);
+    list.sort((a, b) => b.timestamp - a.timestamp);
+    return list;
+  }, [orders]);
 
-  // Dynamic tables list
-  const dynamicTables = useMemo(() => {
-    if (settings?.tables && Array.isArray(settings.tables) && settings.tables.length > 0) {
-      return settings.tables.map((t: any) => t.name || t);
-    }
-    return ['Table 1', 'Table 2', 'Table 3', 'Table 4', 'Table 5', 'Table 6'];
-  }, [settings?.tables]);
-
-  // Active Order Object - STRICT RULE: ONLY returns an order if selectedOrderId is explicitly chosen!
+  // Active Order Object - STRICT RULE: ONLY returns an order when selectedOrderId is set (when BILL NOW is clicked!)
   const activeOrderObj = useMemo(() => {
     if (!selectedOrderId) return null;
     if (billingTab === 'history') {
       return paidOrders.find(o => o.id === selectedOrderId) || null;
     } else {
-      return unpaidOrders.find(o => o.id === selectedOrderId) || null;
+      return occupiedTableOrders.find(o => o.id === selectedOrderId) || null;
     }
-  }, [selectedOrderId, billingTab, paidOrders, unpaidOrders]);
+  }, [selectedOrderId, billingTab, paidOrders, occupiedTableOrders]);
 
   // Synchronize phone number when active order changes
   useEffect(() => {
@@ -183,7 +157,7 @@ export default function Billing({
   }, [calculatedItems]);
 
   const taxAmount = Math.round(subtotal * gstRate);
-  // Total without discount per instruction 3 (Discount field completely removed)
+  // Total without discount per requirement (Discount field completely removed)
   const totalAmountVal = subtotal + taxAmount;
 
   // Formatted Customer & Table labels
@@ -196,7 +170,7 @@ export default function Billing({
     return `Dine-In (${cleanTable})`;
   }, [activeOrderObj]);
 
-  // Branded Invoice Data for Image 2/4 layout
+  // Branded Invoice Data for Image 2 layout
   const brandedInvoiceData: BrandedInvoiceData | null = useMemo(() => {
     if (!activeOrderObj) return null;
     return {
@@ -223,7 +197,7 @@ export default function Billing({
     };
   }, [activeOrderObj, activeInvoiceNo, activeTokenNo, settings, formattedCustomerLabel, selectedMethod, calculatedItems, subtotal, taxAmount, gstPercentage, totalAmountVal]);
 
-  // Generate PDF Helper
+  // PDF Generator Helper
   const handleDownloadPDF = () => {
     if (!brandedInvoiceData) return;
     try {
@@ -272,8 +246,8 @@ export default function Billing({
     window.print();
   };
 
-  // CONFIRM BILLING ACTION
-  const handleConfirmBilling = async () => {
+  // FINALIZE PAYMENT ACTION (Confirm Billing)
+  const handleFinalizePayment = async () => {
     if (!activeOrderObj) return;
     setIsProcessing(true);
 
@@ -283,7 +257,7 @@ export default function Billing({
       const assignedInvoiceNo = activeInvoiceNo;
       const assignedTokenNo = activeTokenNo;
 
-      // 1. Mark Order as Paid in Firestore
+      // 1. Mark Order as Paid and Completed in Firestore (Automatically releases table!)
       await onMarkOrderPaid(activeOrderObj.id, selectedMethod, {
         discount: 0,
         invoiceNo: assignedInvoiceNo,
@@ -329,37 +303,19 @@ export default function Billing({
         const formattedPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
         const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(whatsappMessage)}`;
         window.open(waUrl, '_blank');
-        onShowToast(`Bill confirmed • ${assignedInvoiceNo} (${assignedTokenNo})`);
-      } else {
-        onShowToast(`Bill confirmed • ${assignedInvoiceNo} (${assignedTokenNo})`);
       }
+
+      onShowToast(`Payment finalized • ${assignedInvoiceNo} (${assignedTokenNo})`);
 
       // 4. Open Invoice Modal / View for instant Cashier confirmation
       setViewInvoiceModal(true);
     } catch (err: any) {
-      console.error('Confirm billing error:', err);
-      onShowToast('Error processing bill. Please retry.');
+      console.error('Finalize payment error:', err);
+      onShowToast('Error finalizing payment. Please retry.');
     } finally {
       setIsProcessing(false);
     }
   };
-
-  // Helper to find an active unpaid order for a specific table
-  const findActiveOrderForTable = (tableName: string) => {
-    const cleanTarget = tableName.toLowerCase().replace(/\s+/g, '');
-    return unpaidOrders.find(o => {
-      if (!o.tableNo) return false;
-      const cleanOrderTable = o.tableNo.toLowerCase().replace(/\s+/g, '');
-      return cleanOrderTable === cleanTarget ||
-             cleanOrderTable === cleanTarget.replace('table', 't') ||
-             cleanOrderTable.replace('table', 't') === cleanTarget;
-    });
-  };
-
-  // Active Takeaway orders (not bound to standard tables)
-  const activeTakeaways = useMemo(() => {
-    return unpaidOrders.filter(o => o.type === 'Takeaway' || !o.tableNo);
-  }, [unpaidOrders]);
 
   return (
     <PageLayout
@@ -372,7 +328,7 @@ export default function Billing({
     >
       <div className="w-full font-sans select-none pb-8">
         
-        {/* SUB-TABS: Active Tables & Orders vs Paid Invoices */}
+        {/* SUB-TABS: Occupied Tables vs Paid Invoices */}
         <div className="flex items-center justify-between gap-3 mb-4 max-w-2xl mx-auto">
           <div className="bg-gray-100 p-1 rounded-xl flex items-center text-xs font-bold w-full sm:w-auto">
             <button
@@ -384,7 +340,7 @@ export default function Billing({
                   : 'text-gray-500 hover:text-gray-900 bg-transparent'
               }`}
             >
-              Active Tables ({unpaidOrders.length})
+              Occupied Tables ({occupiedTableOrders.length})
             </button>
             <button
               type="button"
@@ -406,169 +362,128 @@ export default function Billing({
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-all cursor-pointer border-none shrink-0"
             >
               <ArrowLeft size={13} />
-              <span>Tables</span>
+              <span>Occupied Tables</span>
             </button>
           )}
         </div>
 
-        {/* VIEW 1: TABLE SELECTION (Displays when no table is clicked yet) */}
+        {/* ============================================================== */}
+        {/* VIEW 1: OCCUPIED TABLES LIST (Only displays occupied tables!) */}
+        {/* Search bar removed completely. Billing opens ONLY on BILL NOW! */}
+        {/* ============================================================== */}
         {!activeOrderObj ? (
-          <div className="max-w-2xl mx-auto space-y-4 animate-fade-in">
+          <div className="max-w-2xl mx-auto space-y-3.5 animate-fade-in">
             
             {billingTab === 'pending' ? (
               <>
-                {/* Search Bar */}
-                <div className="relative">
-                  <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search Table, Token, Phone..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-10 pl-9 pr-4 bg-white border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-[#046c38] placeholder:text-gray-400 shadow-2xs"
-                  />
-                </div>
-
-                {/* Table Boxes Grid */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs font-bold text-gray-500 px-1">
-                    <span>RESTAURANT TABLES</span>
-                    <span>Click active table to open bill</span>
+                {occupiedTableOrders.length === 0 ? (
+                  <div className="py-16 text-center bg-white border border-gray-150 rounded-3xl p-6 sm:p-8 space-y-3 shadow-2xs">
+                    <div className="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center">
+                      <CheckCircle size={32} className="stroke-[2]" />
+                    </div>
+                    <h3 className="text-base font-black text-gray-950">No Occupied Tables</h3>
+                    <p className="text-xs text-gray-400 max-w-sm mx-auto leading-relaxed">
+                      All restaurant tables are currently available and bills are settled. When a waiter or POS places an order, the occupied table will appear here with a <strong className="text-gray-700">BILL NOW</strong> option.
+                    </p>
                   </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
-                    {dynamicTables.map((tableName) => {
-                      const activeOrder = findActiveOrderForTable(tableName);
-                      const isOccupied = !!activeOrder;
-                      const tk = activeOrder ? formatTokenDisplay((activeOrder as any).orderToken || activeOrder.orderNumber) : '';
-                      const inv = activeOrder ? formatInvoiceNumberDisplay((activeOrder as any).invoiceNumber, activeOrder.orderNumber) : '';
-
-                      return (
-                        <div
-                          key={tableName}
-                          onClick={() => {
-                            if (activeOrder) {
-                              setSelectedOrderId(activeOrder.id);
-                              setViewInvoiceModal(false);
-                            } else {
-                              onShowToast(`${tableName} has no active order.`);
-                            }
-                          }}
-                          className={`p-3 rounded-2xl border transition-all text-left select-none relative ${
-                            isOccupied
-                              ? 'bg-emerald-50/50 border-[#046c38] shadow-xs cursor-pointer hover:bg-emerald-50 hover:shadow-sm ring-1 ring-[#046c38]'
-                              : 'bg-gray-50/60 border-gray-200 text-gray-400 cursor-not-allowed opacity-75'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between mb-1.5">
-                            <div className="flex items-center gap-1.5">
-                              <Armchair size={14} className={isOccupied ? 'text-[#046c38]' : 'text-gray-400'} />
-                              <span className={`font-black text-xs sm:text-sm ${isOccupied ? 'text-gray-950' : 'text-gray-500'}`}>
-                                {tableName}
-                              </span>
-                            </div>
-                            {isOccupied ? (
-                              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
-                            ) : (
-                              <span className="text-[9px] font-bold text-gray-400 uppercase">Free</span>
-                            )}
-                          </div>
-
-                          {isOccupied && activeOrder ? (
-                            <div className="space-y-1">
-                              <div className="flex items-center justify-between text-[10px] font-mono font-bold">
-                                <span className="bg-white text-gray-700 px-1.5 py-0.5 rounded border border-gray-200">{inv}</span>
-                                <span className="bg-black text-white px-1.5 py-0.5 rounded">{tk}</span>
-                              </div>
-                              <div className="flex items-baseline justify-between pt-1 border-t border-emerald-100">
-                                <span className="text-[10px] text-gray-500 truncate max-w-[80px]">
-                                  {activeOrder.items.length} {activeOrder.items.length === 1 ? 'item' : 'items'}
-                                </span>
-                                <span className="text-xs sm:text-sm font-black text-[#046c38] font-mono">
-                                  {currencySymbol}{activeOrder.totalAmount}
-                                </span>
-                              </div>
-                              <div className="pt-0.5 text-center">
-                                <span className="text-[9.5px] font-extrabold text-[#046c38] tracking-wider uppercase block">
-                                  Click to Bill →
-                                </span>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="py-2.5 text-center">
-                              <span className="text-[10px] text-gray-400 block font-medium">Available</span>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Takeaway Orders Section (if any active) */}
-                {activeTakeaways.length > 0 && (
-                  <div className="space-y-2 pt-2">
-                    <div className="flex items-center justify-between text-xs font-bold text-gray-500 px-1">
-                      <span>TAKEAWAY TICKETS</span>
-                      <span>{activeTakeaways.length} pending</span>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-xs font-extrabold text-gray-500 px-1">
+                      <span>OCCUPIED TABLES REQUIRING BILLING ({occupiedTableOrders.length})</span>
+                      <span className="text-[11px] text-emerald-700 font-bold">Live Synced</span>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {activeTakeaways.map((ord, idx) => {
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {occupiedTableOrders.map((ord, idx) => {
                         const tk = formatTokenDisplay((ord as any).orderToken || ord.orderNumber, idx + 1);
                         const inv = formatInvoiceNumberDisplay((ord as any).invoiceNumber, ord.orderNumber, idx + 1);
-                        const label = ord.customerName || (ord.customerPhone ? `Guest (${ord.customerPhone})` : 'Takeaway Guest');
+                        const isTakeaway = ord.type === 'Takeaway' || !ord.tableNo;
+                        const tableName = isTakeaway 
+                          ? 'Takeaway' 
+                          : (ord.tableNo.toLowerCase().startsWith('table') ? ord.tableNo : `Table ${ord.tableNo}`);
+
+                        // Preview of items
+                        const itemsSummary = ord.items.map(i => `${i.productName || i.menuItem?.name} (x${i.quantity})`).join(', ');
 
                         return (
                           <div
                             key={ord.id}
-                            onClick={() => { setSelectedOrderId(ord.id); setViewInvoiceModal(false); }}
-                            className="p-3 rounded-2xl bg-amber-50/40 border border-amber-300 hover:bg-amber-50 transition-all cursor-pointer shadow-2xs space-y-1.5 select-none"
+                            className="bg-white border-2 border-emerald-600/30 hover:border-emerald-600 rounded-2xl p-4 shadow-xs hover:shadow-md transition-all space-y-3 flex flex-col justify-between"
                           >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-1.5">
-                                <ShoppingBag size={14} className="text-amber-700" />
-                                <span className="font-black text-xs text-gray-950 truncate max-w-[140px]">{label}</span>
+                            <div className="space-y-2">
+                              {/* Top Table Header & Badges */}
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  {isTakeaway ? (
+                                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
+                                      <ShoppingBag size={16} />
+                                    </div>
+                                  ) : (
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#046c38] flex items-center justify-center shrink-0">
+                                      <Armchair size={16} />
+                                    </div>
+                                  )}
+                                  <div>
+                                    <h4 className="font-black text-sm text-gray-950 leading-tight">
+                                      {tableName}
+                                    </h4>
+                                    <span className="text-[10px] text-gray-400 block font-medium">
+                                      {ord.customerName || 'Guest'}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold">
+                                  <span className="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded border border-gray-200">
+                                    {inv}
+                                  </span>
+                                  <span className="bg-black text-white px-1.5 py-0.5 rounded">
+                                    {tk}
+                                  </span>
+                                </div>
                               </div>
-                              <span className="text-xs font-black text-gray-950 font-mono">
-                                {currencySymbol}{ord.totalAmount}
-                              </span>
+
+                              {/* Ordered Items Preview */}
+                              <div className="bg-gray-50/80 p-2.5 rounded-xl border border-gray-150">
+                                <span className="text-[10.5px] text-gray-500 font-medium line-clamp-2 leading-relaxed">
+                                  {itemsSummary || 'Food items'}
+                                </span>
+                              </div>
                             </div>
-                            <div className="flex items-center justify-between text-[10px] font-mono font-bold">
-                              <span className="bg-white text-gray-700 px-1.5 py-0.5 rounded border border-gray-200">{inv}</span>
-                              <span className="bg-black text-white px-1.5 py-0.5 rounded">{tk}</span>
+
+                            {/* Bottom Total Amount and Prominent BILL NOW button */}
+                            <div className="pt-2 border-t border-gray-100 flex items-center justify-between gap-3">
+                              <div>
+                                <span className="text-[10px] text-gray-400 uppercase font-bold block">Bill Total</span>
+                                <span className="text-base sm:text-lg font-black text-gray-950 font-mono leading-none">
+                                  {currencySymbol}{ord.totalAmount}
+                                </span>
+                              </div>
+
+                              {/* BILL NOW BUTTON (Automatically opens the billing receipt for this specific table) */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedOrderId(ord.id);
+                                  setViewInvoiceModal(false);
+                                }}
+                                className="h-10 px-4 bg-[#046c38] hover:bg-[#03542b] active:scale-[0.98] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer border-none"
+                              >
+                                <span>BILL NOW</span>
+                                <ArrowRight size={13} />
+                              </button>
                             </div>
+
                           </div>
                         );
                       })}
                     </div>
                   </div>
                 )}
-
-                {unpaidOrders.length === 0 && (
-                  <div className="py-14 text-center bg-white border border-gray-150 rounded-2xl p-6 space-y-2">
-                    <CheckCircle size={36} className="mx-auto text-emerald-500 stroke-[1.5]" />
-                    <h3 className="text-sm font-black text-gray-900">All Tables Settled!</h3>
-                    <p className="text-xs text-gray-400 max-w-xs mx-auto">
-                      New orders taken from POS or mobile waiter tablets will instantly appear in these table boxes.
-                    </p>
-                  </div>
-                )}
               </>
             ) : (
               /* PAID INVOICES TAB */
               <div className="space-y-2.5">
-                <div className="relative">
-                  <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search by invoice, token, customer phone..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-10 pl-9 pr-4 bg-white border border-gray-200 rounded-xl text-xs text-gray-900 focus:outline-none focus:border-[#046c38] placeholder:text-gray-400 shadow-2xs"
-                  />
-                </div>
-
                 {paidOrders.length === 0 ? (
                   <div className="py-14 text-center bg-white border border-gray-150 rounded-2xl p-6 space-y-2">
                     <Receipt size={36} className="mx-auto text-gray-300 stroke-[1.5]" />
@@ -621,7 +536,7 @@ export default function Billing({
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg text-xs font-bold transition-colors cursor-pointer border-none"
               >
                 <ArrowLeft size={13} />
-                <span>Back to Tables</span>
+                <span>Back to Occupied Tables</span>
               </button>
               <div className="flex items-center gap-2">
                 <button
@@ -655,7 +570,10 @@ export default function Billing({
 
         ) : (
 
-          /* VIEW 2: CASHIER BILLING PAGE (PIXEL-PERFECT MATCH TO IMAGE 2) */
+          /* ============================================================== */
+          /* VIEW 2: CASHIER BILLING RECEIPT (PIXEL-PERFECT MATCH TO IMAGE 2) */
+          /* Centered properly on laptops, compact and responsive on mobile */
+          /* ============================================================== */
           <div className="w-full max-w-xl mx-auto space-y-3 animate-fade-in">
             
             {/* Top Bar with Back Arrow and Sequential Number Tags */}
@@ -666,7 +584,7 @@ export default function Billing({
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition-all cursor-pointer border-none"
               >
                 <ArrowLeft size={14} />
-                <span>Back to Tables</span>
+                <span>Back to Occupied Tables</span>
               </button>
 
               <div className="flex items-center gap-2">
@@ -679,7 +597,7 @@ export default function Billing({
               </div>
             </div>
 
-            {/* MAIN WHITE CARD CONTAINER (IMAGE 2 MOCKUP LAYOUT) */}
+            {/* MAIN WHITE RECEIPT CONTAINER (IMAGE 2 MOCKUP LAYOUT) */}
             <div className="bg-white border border-gray-200 rounded-3xl p-3.5 sm:p-5 shadow-xs space-y-3 sm:space-y-4 font-sans">
               
               {/* 1. RESTAURANT HEADER CARD (Image 2) */}
@@ -802,7 +720,7 @@ export default function Billing({
                     <span className="font-bold text-gray-950 font-mono">{currencySymbol}{taxAmount.toFixed(2)}</span>
                   </div>
 
-                  {/* TOTAL GREEN BANNER (Instruction 4: Change "TOTAL PAID" to simply "TOTAL") */}
+                  {/* TOTAL GREEN BANNER (Label is strictly "TOTAL") */}
                   <div className="bg-[#eaf7ee] border border-[#cbebd3] rounded-xl p-3 flex justify-between items-center mt-2.5">
                     <span className="text-base sm:text-lg font-black text-gray-950 tracking-tight">TOTAL</span>
                     <span className="text-xl sm:text-2xl font-black text-[#046c38] font-mono tracking-tight">
@@ -812,7 +730,7 @@ export default function Billing({
                 </div>
               </div>
 
-              {/* 5. PAYMENT METHOD (Instruction 2: Remove separate UPI option before billing - Cash and Card only) */}
+              {/* 5. PAYMENT METHOD (Cash and Card only - UPI removed before billing) */}
               <div className="space-y-1.5 select-none pt-1">
                 <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block">
                   Payment Method
@@ -858,7 +776,7 @@ export default function Billing({
                 </div>
               </div>
 
-              {/* 6. WHATSAPP MOBILE NUMBER (Instruction 5: Remove the word "Optional") */}
+              {/* 6. WHATSAPP MOBILE NUMBER (Word "Optional" removed!) */}
               <div className="space-y-1 select-none">
                 <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
                   <Send size={12} className="text-[#046c38]" />
@@ -878,20 +796,20 @@ export default function Billing({
                   />
                 </div>
                 <p className="text-[10px] text-gray-400 font-medium">
-                  Upon confirming payment, OrderPoint Pro automatically launches WhatsApp with the customer's PDF bill link.
+                  Upon finalizing payment, OrderPoint Pro automatically opens WhatsApp with the customer's PDF bill link.
                 </p>
               </div>
 
-              {/* 7. CONFIRM BILLING BUTTON */}
+              {/* 7. FINALIZE PAYMENT BUTTON */}
               <div className="pt-1">
                 <button
                   type="button"
                   id="btn_confirm_billing"
                   disabled={isProcessing}
-                  onClick={handleConfirmBilling}
+                  onClick={handleFinalizePayment}
                   className="w-full h-12 sm:h-13 bg-[#046c38] hover:bg-[#03542b] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl text-sm sm:text-base font-black tracking-wider uppercase shadow-md hover:shadow-lg transition-all active:scale-[0.99] cursor-pointer border-none flex items-center justify-center gap-2"
                 >
-                  <span>{isProcessing ? 'Processing Bill...' : 'Confirm Billing'}</span>
+                  <span>{isProcessing ? 'Finalizing Payment...' : 'Finalize Payment'}</span>
                 </button>
               </div>
 
