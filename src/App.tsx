@@ -761,7 +761,36 @@ export default function App() {
   if (feedbackInvoice && feedbackStoreId) {
     return (
       <>
-        <Toaster position="top-right" />
+        <Toaster 
+        position="top-center"
+        containerStyle={{ top: 16 }}
+        toastOptions={{
+          duration: 2200,
+          style: {
+            fontSize: '12px',
+            fontWeight: '600',
+            borderRadius: '12px',
+            padding: '8px 14px',
+            background: '#111111',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.14)',
+            maxWidth: '340px',
+            zIndex: 99999,
+          },
+          success: {
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#FFFFFF',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#FFFFFF',
+            },
+          },
+        }}
+      />
         <CustomerFeedbackPage invoiceNo={feedbackInvoice} restaurantId={feedbackStoreId} />
       </>
     );
@@ -770,7 +799,36 @@ export default function App() {
   if (invoiceIdParam && invoiceStoreId) {
     return (
       <>
-        <Toaster position="top-right" />
+        <Toaster 
+        position="top-center"
+        containerStyle={{ top: 16 }}
+        toastOptions={{
+          duration: 2200,
+          style: {
+            fontSize: '12px',
+            fontWeight: '600',
+            borderRadius: '12px',
+            padding: '8px 14px',
+            background: '#111111',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.14)',
+            maxWidth: '340px',
+            zIndex: 99999,
+          },
+          success: {
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#FFFFFF',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#FFFFFF',
+            },
+          },
+        }}
+      />
         <LiveInvoiceViewer invoiceId={invoiceIdParam} restaurantId={invoiceStoreId} />
       </>
     );
@@ -780,7 +838,36 @@ export default function App() {
     const activeRestId = scanStoreId || (userStores && userStores[0]?.storeId) || 'demo_store';
     return (
       <>
-        <Toaster position="top-right" />
+        <Toaster 
+        position="top-center"
+        containerStyle={{ top: 16 }}
+        toastOptions={{
+          duration: 2200,
+          style: {
+            fontSize: '12px',
+            fontWeight: '600',
+            borderRadius: '12px',
+            padding: '8px 14px',
+            background: '#111111',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.14)',
+            maxWidth: '340px',
+            zIndex: 99999,
+          },
+          success: {
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#FFFFFF',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#FFFFFF',
+            },
+          },
+        }}
+      />
         <CustomerQrOrder
           restaurantId={activeRestId}
           tableId={scanTable}
@@ -833,7 +920,36 @@ export default function App() {
   if (!currentUser) {
     return (
       <>
-        <Toaster position="top-right" />
+        <Toaster 
+        position="top-center"
+        containerStyle={{ top: 16 }}
+        toastOptions={{
+          duration: 2200,
+          style: {
+            fontSize: '12px',
+            fontWeight: '600',
+            borderRadius: '12px',
+            padding: '8px 14px',
+            background: '#111111',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.14)',
+            maxWidth: '340px',
+            zIndex: 99999,
+          },
+          success: {
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#FFFFFF',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#FFFFFF',
+            },
+          },
+        }}
+      />
         <Login onLoginSuccess={handleLoginSuccess} />
       </>
     );
@@ -842,7 +958,36 @@ export default function App() {
   if (showStoreSelector) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-sans text-white">
-        <Toaster position="top-right" />
+        <Toaster 
+        position="top-center"
+        containerStyle={{ top: 16 }}
+        toastOptions={{
+          duration: 2200,
+          style: {
+            fontSize: '12px',
+            fontWeight: '600',
+            borderRadius: '12px',
+            padding: '8px 14px',
+            background: '#111111',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.14)',
+            maxWidth: '340px',
+            zIndex: 99999,
+          },
+          success: {
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#FFFFFF',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#FFFFFF',
+            },
+          },
+        }}
+      />
         <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
           <div className="text-center space-y-2">
             <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto mb-2 border border-emerald-500/20">
@@ -1018,7 +1163,36 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#f9fafb] font-sans overflow-hidden">
-      <Toaster position="top-right" />
+      <Toaster 
+        position="top-center"
+        containerStyle={{ top: 16 }}
+        toastOptions={{
+          duration: 2200,
+          style: {
+            fontSize: '12px',
+            fontWeight: '600',
+            borderRadius: '12px',
+            padding: '8px 14px',
+            background: '#111111',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.14)',
+            maxWidth: '340px',
+            zIndex: 99999,
+          },
+          success: {
+            iconTheme: {
+              primary: '#10B981',
+              secondary: '#FFFFFF',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: '#FFFFFF',
+            },
+          },
+        }}
+      />
       <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}

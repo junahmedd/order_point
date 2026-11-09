@@ -96,6 +96,8 @@ export default function Billing({ orders, menuItems, onMarkOrderPaid, onSendWhat
   const [lastPaidOrderObj, setLastPaidOrderObj] = useState<any | null>(null);
   const [successWhatsAppPhone, setSuccessWhatsAppPhone] = useState('');
   const [showFeedbackPreview, setShowFeedbackPreview] = useState<{ invoiceNo: string, restaurantId: string } | null>(null);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [sendWhatsAppInvoice, setSendWhatsAppInvoice] = useState(false);
 
   // Success Checkout Screen state (holding the information of the last paid receipt for our receipt popup)
   const [paymentSuccessOrder, setPaymentSuccessOrder] = useState<{
@@ -123,12 +125,14 @@ export default function Billing({ orders, menuItems, onMarkOrderPaid, onSendWhat
   const paidOrders = useMemo(() => {
     let result = orders.filter(o => o.isPaid);
 
-    // Filter by table or order search query
+    // Filter by customer phone number, table, token, or order ID
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
       result = result.filter(o => 
+        (o.customerPhone && o.customerPhone.includes(query)) ||
         o.orderNumber.toLowerCase().includes(query) ||
         (o.tableNo && o.tableNo.toLowerCase().includes(query)) ||
+        (o.customerName && o.customerName.toLowerCase().includes(query)) ||
         o.type.toLowerCase().includes(query) ||
         ((o as any).invoiceNumber && (o as any).invoiceNumber.toLowerCase().includes(query))
       );
@@ -148,12 +152,15 @@ export default function Billing({ orders, menuItems, onMarkOrderPaid, onSendWhat
   const unpaidOrders = useMemo(() => {
     let result = orders.filter(o => !o.isPaid && o.status !== 'Cancelled');
 
-    // Filter by table or order search query
+    // Filter by customer phone number, table, token, or order ID (Requirement 6)
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
       result = result.filter(o => 
+        (o.customerPhone && o.customerPhone.includes(query)) ||
         o.orderNumber.toLowerCase().includes(query) ||
         (o.tableNo && o.tableNo.toLowerCase().includes(query)) ||
+        (o.customerName && o.customerName.toLowerCase().includes(query)) ||
+        o.items.some(i => (i.productName || i.menuItem?.name || '').toLowerCase().includes(query)) ||
         o.type.toLowerCase().includes(query)
       );
     }
@@ -1090,13 +1097,24 @@ Thank you for choosing ${restName}. We look forward to serving you again!`;
                           <h4 className="text-[14px] font-[800] text-[#111111] leading-none">
                             {order.tableNo ? (order.tableNo.trim().toLowerCase().startsWith('table') ? order.tableNo.trim() : `Table ${order.tableNo.trim()}`) : order.type}
                           </h4>
+                          {(order as any).orderToken && (
+                            <span className="bg-black text-white px-1.5 py-0.2 rounded text-[8.5px] font-mono font-bold">
+                              Tk: #{(order as any).orderToken}
+                            </span>
+                          )}
                           {isVIP && (
                             <span className="bg-amber-50 text-amber-600 px-1 py-0.5 rounded text-[9px] font-bold border border-amber-100">
                               VIP
                             </span>
                           )}
                         </div>
-                        <span className="text-[10.5px] text-gray-500 font-medium">#{order.orderNumber} • {elapsedMins}m ago</span>
+                        <span className="text-[10px] text-gray-500 font-medium block">
+                          #{order.orderNumber} • {elapsedMins}m ago
+                          {order.customerPhone ? ` • 📞 ${order.customerPhone}` : ''}
+                        </span>
+                        <span className="text-[9.5px] text-gray-400 truncate max-w-[160px] block mt-0.5">
+                          {order.items.map(i => `${i.quantity}× ${i.productName || i.menuItem?.name}`).join(', ')}
+                        </span>
                       </div>
                       <div className="text-right">
                         <span className="text-[16px] font-[800] text-[#111111] leading-none block">
@@ -1297,26 +1315,35 @@ Thank you for choosing ${restName}. We look forward to serving you again!`;
                   </div>
                 </div>
 
-                {/* Quick actions (Print Invoice, PDF Download) */}
+                {/* Quick actions (View Invoice, Print Invoice, PDF Download) */}
                 <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsInvoiceModalOpen(true)}
+                    className="h-9 px-3.5 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-gray-800 text-xs font-bold uppercase tracking-wider transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                  >
+                    <Receipt size={14} className="text-gray-600" />
+                    <span>View Invoice</span>
+                  </button>
+
                   <button
                     id="btn_print_invoice_real"
                     onClick={handlePrintInvoiceReal}
                     title="Open standard browser print dialog"
-                    className="h-9 px-4 rounded-xl bg-black hover:bg-gray-900 border border-black text-white text-xs font-bold uppercase tracking-wider transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-xs hover:scale-[1.01]"
+                    className="h-9 px-3.5 rounded-xl bg-black hover:bg-neutral-800 border border-black text-white text-xs font-bold uppercase tracking-wider transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
                   >
                     <Printer size={14} />
-                    <span>Print Invoice</span>
+                    <span className="hidden sm:inline">Print</span>
                   </button>
 
                   <button
                     onClick={handleDownloadPDFLocal}
                     disabled={downloadingPDF}
                     title="Download compliant tax PDF document"
-                    className="h-9 px-4 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold uppercase tracking-wider transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                    className="h-9 px-3.5 rounded-xl border border-gray-250 bg-white hover:bg-gray-50 text-gray-700 text-xs font-bold uppercase tracking-wider transition-all inline-flex items-center gap-1.5 cursor-pointer"
                   >
                     <Download size={14} className={downloadingPDF ? "animate-bounce" : ""} />
-                    <span>Download PDF</span>
+                    <span className="hidden sm:inline">PDF</span>
                   </button>
                 </div>
               </div>
@@ -1600,45 +1627,59 @@ Thank you for choosing ${restName}. We look forward to serving you again!`;
                   </div>
                 ) : (
                   <>
-                    {/* 📱 SECTION 2: WHATSAPP INVOICE */}
-                    <div className="p-4 bg-emerald-50/20 border border-emerald-100 rounded-2xl space-y-2.5">
+                    {/* 📱 SECTION 2: WHATSAPP INVOICE (Requirement 3: Ask mobile number only when sharing on WhatsApp) */}
+                    <div className="p-3.5 bg-gray-50/70 border border-gray-200 rounded-2xl space-y-2">
                       <div className="flex items-center justify-between">
-                        <label className="text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider flex items-center gap-1.5">
-                          <MessageSquare size={12} className="text-emerald-600" />
-                          WhatsApp Invoice (Optional)
+                        <label className="text-[11px] font-extrabold text-gray-800 uppercase tracking-wider flex items-center gap-2 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={sendWhatsAppInvoice}
+                            onChange={(e) => setSendWhatsAppInvoice(e.target.checked)}
+                            className="w-4 h-4 rounded text-black focus:ring-black cursor-pointer"
+                          />
+                          <MessageSquare size={14} className="text-emerald-600" />
+                          <span>Share Invoice on WhatsApp</span>
                         </label>
                         {activeOrderObj.billSentToWhatsApp && (
-                          <span className="text-[8.5px] font-black text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-full uppercase tracking-wider border border-sky-200">
-                            Shared to Client
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                            Shared
                           </span>
                         )}
                       </div>
-                      <div className="relative">
-                        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-extrabold text-[12px]">+91</span>
-                        <input
-                          type="text"
-                          placeholder="Enter 10-Digit Mobile Number"
-                          value={customerPhone}
-                          onChange={(e) => {
-                            const numericVal = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
-                            setCustomerPhone(numericVal);
-                          }}
-                          className="w-full h-11 pl-[38px] pr-3 bg-white border border-gray-250 rounded-xl text-xs font-bold focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 transition-all font-mono placeholder:text-gray-400"
-                          maxLength={10}
-                        />
-                      </div>
-                      {customerPhone.length > 0 && (
-                        <p className={`text-[10px] font-medium mt-1 ${customerPhone.length === 10 && /^[6-9]/.test(customerPhone) ? 'text-emerald-600' : 'text-rose-600'}`}>
-                          {customerPhone.length < 10 
-                            ? "Please enter a valid 10-digit mobile number." 
-                            : (!/^[6-9]/.test(customerPhone) 
-                              ? "Mobile number must start with 6, 7, 8, or 9." 
-                              : "✓ Valid WhatsApp mobile number")}
-                        </p>
+
+                      {sendWhatsAppInvoice && (
+                        <div className="space-y-1.5 pt-1.5 animate-fade-in">
+                          <div className="flex gap-2">
+                            <div className="relative flex-1">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs">+91</span>
+                              <input
+                                type="tel"
+                                placeholder="Enter 10-Digit Mobile Number"
+                                value={customerPhone}
+                                onChange={(e) => {
+                                  const numericVal = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+                                  setCustomerPhone(numericVal);
+                                }}
+                                className="w-full h-10 pl-10 pr-3 bg-white border border-gray-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-black font-sans"
+                                maxLength={10}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={handleSendWhatsAppBillLocal}
+                              disabled={sendingWhatsApp || customerPhone.length !== 10 || !/^[6-9]/.test(customerPhone)}
+                              className="px-3.5 h-10 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-xl text-xs font-bold transition-all cursor-pointer border-none shadow-xs"
+                            >
+                              {sendingWhatsApp ? 'Sending...' : 'Send'}
+                            </button>
+                          </div>
+                          {customerPhone.length > 0 && customerPhone.length < 10 && (
+                            <p className="text-[10px] text-amber-600 font-medium">
+                              Enter a valid 10-digit mobile number
+                            </p>
+                          )}
+                        </div>
                       )}
-                      <p className="text-[10px] text-gray-400 font-medium">
-                        If provided, the system will automatically send the PDF invoice to WhatsApp upon processing the payment.
-                      </p>
                     </div>
 
                     {/* 💳 SECTION 3: PAYMENT METHOD */}
@@ -1815,6 +1856,141 @@ Thank you for choosing ${restName}. We look forward to serving you again!`;
                 onClose={() => setShowFeedbackPreview(null)}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* SEPARATE COMPLETE CLEAN INVOICE MODAL (Requirement 2) */}
+      {isInvoiceModalOpen && activeOrderObj && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] space-y-4">
+            
+            {/* Modal Top Actions */}
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 shrink-0">
+              <span className="text-xs font-black uppercase tracking-wider text-gray-500">Tax Invoice Receipt</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handlePrintInvoiceReal}
+                  className="px-3 py-1.5 rounded-xl bg-black text-white text-xs font-bold flex items-center gap-1.5 hover:bg-neutral-800 transition-colors border-none cursor-pointer shadow-xs"
+                >
+                  <Printer size={13} />
+                  <span>Print</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadPDFLocal}
+                  disabled={downloadingPDF}
+                  className="px-3 py-1.5 rounded-xl border border-gray-250 bg-white text-gray-800 text-xs font-bold flex items-center gap-1.5 hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                  <Download size={13} />
+                  <span>PDF</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsInvoiceModalOpen(false)}
+                  className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 border-none bg-transparent cursor-pointer"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Simple, Clean Invoice Document */}
+            <div className="flex-1 overflow-y-auto space-y-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100 font-sans text-xs">
+              
+              {/* Restaurant Header */}
+              <div className="text-center space-y-1 pb-3 border-b border-gray-200">
+                <h3 className="text-base font-black text-gray-950 uppercase tracking-tight">
+                  {settings?.restaurantName || 'THE ROYAL FEAST'}
+                </h3>
+                <p className="text-[11px] text-gray-500 font-medium">
+                  {settings?.address || '123 Royal Palace Avenue, India'}
+                </p>
+                <span className="inline-block text-[9.5px] font-black uppercase tracking-widest text-gray-600 bg-white px-2.5 py-0.5 rounded border border-gray-200 mt-1">
+                  Tax Invoice
+                </span>
+              </div>
+
+              {/* Invoice Meta */}
+              <div className="flex justify-between items-center text-[11px] text-gray-600 font-medium pb-2 border-b border-dashed border-gray-200">
+                <div>
+                  <span className="block text-gray-400 text-[9px] uppercase font-bold">Invoice Number</span>
+                  <span className="font-mono font-bold text-gray-900">#{activeInvoiceNo}</span>
+                </div>
+                <div className="text-right">
+                  <span className="block text-gray-400 text-[9px] uppercase font-bold">Date & Time</span>
+                  <span className="font-medium text-gray-900">{new Date(activeOrderObj.timestamp).toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center text-[11px] text-gray-600 font-medium pb-2 border-b border-dashed border-gray-200">
+                <div>
+                  <span className="block text-gray-400 text-[9px] uppercase font-bold">Table / Order</span>
+                  <span className="font-bold text-gray-900">
+                    {activeOrderObj.tableNo ? (activeOrderObj.tableNo.trim().toLowerCase().startsWith('table') ? activeOrderObj.tableNo.trim() : `Table ${activeOrderObj.tableNo.trim()}`) : activeOrderObj.type}
+                    {(activeOrderObj as any).orderToken ? ` (Tk #${(activeOrderObj as any).orderToken})` : ''}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="block text-gray-400 text-[9px] uppercase font-bold">Payment Status</span>
+                  <span className={`font-black ${activeOrderObj.isPaid ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    {activeOrderObj.isPaid ? 'PAID' : 'PAYMENT PENDING'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Items Table */}
+              <div className="space-y-1">
+                <div className="flex justify-between text-[10px] font-black uppercase tracking-wider text-gray-400 pb-1 border-b border-gray-200">
+                  <span className="flex-1">Item</span>
+                  <span className="w-12 text-center">Qty</span>
+                  <span className="w-16 text-right">Amount</span>
+                </div>
+                {activeOrderObj.items.map((item, idx) => {
+                  const unitPrice = item.unitPrice !== undefined ? item.unitPrice : item.menuItem.price;
+                  return (
+                    <div key={idx} className="flex justify-between py-1 text-xs text-gray-800">
+                      <span className="flex-1 font-semibold truncate pr-2">{item.productName || item.menuItem.name}</span>
+                      <span className="w-12 text-center font-bold text-gray-600">{item.quantity}</span>
+                      <span className="w-16 text-right font-mono font-bold text-gray-950">{currencySymbol}{unitPrice * item.quantity}.00</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Totals */}
+              <div className="pt-2 border-t border-gray-200 space-y-1 text-xs">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span className="font-mono font-bold text-gray-800">{currencySymbol}{currentSubtotal}.00</span>
+                </div>
+                {currentGst > 0 && (
+                  <div className="flex justify-between text-gray-600">
+                    <span>Tax ({gstPercentage}%)</span>
+                    <span className="font-mono font-bold text-gray-800">{currencySymbol}{currentGst}.00</span>
+                  </div>
+                )}
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-rose-600">
+                    <span>Discount</span>
+                    <span className="font-mono">-{currencySymbol}{discountAmount}.00</span>
+                  </div>
+                )}
+                <div className="flex justify-between pt-2 border-t border-gray-300 font-black text-sm text-gray-950">
+                  <span>Grand Total</span>
+                  <span className="font-mono">{currencySymbol}{grandSettleTotal}.00</span>
+                </div>
+              </div>
+
+              {/* Polite Footer */}
+              <div className="text-center pt-3 border-t border-gray-200 text-[10px] text-gray-400 font-medium">
+                Thank you for dining with us! Please visit again.
+              </div>
+
+            </div>
+
           </div>
         </div>
       )}

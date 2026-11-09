@@ -322,14 +322,16 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
       return;
     }
 
-    const isPhoneValid = customerPhone.length === 10 && /^[6-9][0-9]{9}$/.test(customerPhone);
-    if (!isPhoneValid) {
-      if (customerPhone.length < 10) {
-        onShowToast('Please enter a valid 10-digit mobile number.');
-      } else {
-        onShowToast('Mobile number must start with 6, 7, 8, or 9.');
+    if (selectedType === 'Takeaway' && customerPhone.length > 0) {
+      const isPhoneValid = customerPhone.length === 10 && /^[6-9][0-9]{9}$/.test(customerPhone);
+      if (!isPhoneValid) {
+        if (customerPhone.length < 10) {
+          onShowToast('Please enter a valid 10-digit mobile number.');
+        } else {
+          onShowToast('Mobile number must start with 6, 7, 8, or 9.');
+        }
+        return;
       }
-      return;
     }
 
     if (selectedType === 'Dine-In') {
@@ -354,8 +356,8 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
       type: selectedType,
       tableNo: selectedType === 'Dine-In' ? selectedTable : undefined,
       items: cartValues.itemsArray,
-      customerName: `Guest (${customerPhone.trim()})`,
-      customerPhone: customerPhone.trim(),
+      customerName: selectedType === 'Dine-In' ? `Dine-In (${selectedTable})` : (customerPhone ? `Guest (${customerPhone.trim()})` : 'Takeaway Guest'),
+      customerPhone: customerPhone ? customerPhone.trim() : '',
       deliveryAddress: selectedType === 'Delivery' ? deliveryAddress.trim() : undefined,
       landmark: undefined,
       pickupTime: undefined
@@ -576,30 +578,32 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
 
           {/* Customer Details & Table Selections */}
           <div className="space-y-3 bg-gray-50/80 rounded-2xl p-3.5 border border-gray-100">
-            {/* Customer Mobile Number */}
-            <div className="space-y-1">
-              <label className="text-[10px] font-extrabold text-gray-700 uppercase tracking-wider block">Customer Mobile Number</label>
-              <input
-                type="tel"
-                placeholder="Enter 10-Digit Mobile Number"
-                value={customerPhone}
-                onChange={(e) => {
-                  const numericVal = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
-                  setCustomerPhone(numericVal);
-                }}
-                className="w-full h-11 px-3.5 bg-white border border-gray-200 rounded-xl text-sm font-medium font-sans text-gray-700 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-gray-950/10 focus:border-gray-950 transition-all"
-                maxLength={10}
-              />
-              {customerPhone.length > 0 && (
-                <p className={`text-[10px] font-semibold ${customerPhone.length === 10 && /^[6-9]/.test(customerPhone) ? 'text-emerald-600' : 'text-rose-500'}`}>
-                  {customerPhone.length < 10 
-                    ? "Enter 10-digit mobile number" 
-                    : (!/^[6-9]/.test(customerPhone) 
-                      ? "Must start with 6, 7, 8, or 9" 
-                      : "✓ Valid Mobile Number")}
-                </p>
-              )}
-            </div>
+            {/* Customer Mobile Number (Hidden for Dine-In per Requirement 3; shown for Takeaway) */}
+            {selectedType !== 'Dine-In' && (
+              <div className="space-y-1">
+                <label className="text-[10px] font-extrabold text-gray-700 uppercase tracking-wider block">Customer Mobile Number (Optional)</label>
+                <input
+                  type="tel"
+                  placeholder="Enter 10-Digit Mobile Number"
+                  value={customerPhone}
+                  onChange={(e) => {
+                    const numericVal = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+                    setCustomerPhone(numericVal);
+                  }}
+                  className="w-full h-11 px-3.5 bg-white border border-gray-200 rounded-xl text-sm font-medium font-sans text-gray-700 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-gray-950/10 focus:border-gray-950 transition-all"
+                  maxLength={10}
+                />
+                {customerPhone.length > 0 && (
+                  <p className={`text-[10px] font-semibold ${customerPhone.length === 10 && /^[6-9]/.test(customerPhone) ? 'text-emerald-600' : 'text-rose-500'}`}>
+                    {customerPhone.length < 10 
+                      ? "Enter 10-digit mobile number" 
+                      : (!/^[6-9]/.test(customerPhone) 
+                        ? "Must start with 6, 7, 8, or 9" 
+                        : "✓ Valid Mobile Number")}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Conditional Table Selector */}
             {selectedType === 'Dine-In' && (
@@ -724,7 +728,11 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
             <button
               id="btn_send_kitchen_ticket_desktop"
               onClick={handlePlaceOrder}
-              disabled={cartValues.itemsArray.length === 0 || (selectedType === 'Dine-In' && (isTableLocked || !selectedTable)) || customerPhone.length !== 10 || !/^[6-9]/.test(customerPhone)}
+              disabled={
+                cartValues.itemsArray.length === 0 || 
+                (selectedType === 'Dine-In' && (isTableLocked || !selectedTable)) ||
+                (selectedType === 'Takeaway' && customerPhone.length > 0 && (customerPhone.length < 10 || !/^[6-9]/.test(customerPhone)))
+              }
               className="w-full h-12 rounded-xl font-bold text-sm bg-black hover:bg-neutral-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white uppercase tracking-wider text-center transition-all duration-150 flex items-center justify-center gap-2 active:scale-[0.99] shadow-sm hover:shadow-md cursor-pointer border-none"
             >
               {isTableLocked && selectedType === 'Dine-In' ? (
@@ -745,7 +753,11 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
             <button
               id="btn_send_kitchen_ticket"
               onClick={handlePlaceOrder}
-              disabled={cartValues.itemsArray.length === 0 || (selectedType === 'Dine-In' && (isTableLocked || !selectedTable)) || customerPhone.length !== 10 || !/^[6-9]/.test(customerPhone)}
+              disabled={
+                cartValues.itemsArray.length === 0 || 
+                (selectedType === 'Dine-In' && (isTableLocked || !selectedTable)) ||
+                (selectedType === 'Takeaway' && customerPhone.length > 0 && (customerPhone.length < 10 || !/^[6-9]/.test(customerPhone)))
+              }
               className="w-full h-12 rounded-xl font-bold text-sm bg-black hover:bg-neutral-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white uppercase tracking-wider text-center transition-all duration-150 flex items-center justify-center gap-2 active:scale-[0.99] shadow-sm cursor-pointer border-none"
             >
               {isTableLocked && selectedType === 'Dine-In' ? (

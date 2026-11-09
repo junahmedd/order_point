@@ -257,7 +257,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
               <div
                 id={`kds_card_${order.id}`}
                 key={order.id}
-                className="bg-white rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.02)] border border-[#EDEDED] p-4 flex flex-col justify-between h-[280px] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden"
+                className="bg-white rounded-2xl shadow-xs border border-gray-200/90 p-3.5 flex flex-col justify-between min-h-[220px] hover:shadow-md hover:border-gray-300 transition-all duration-200 relative overflow-hidden"
               >
                 {/* Elegant status strip at the very top */}
                 <span className={`absolute top-0 left-0 right-0 h-1.5 ${statusIndicatorColor}`} />
@@ -266,66 +266,60 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                 <div className="flex flex-col min-h-0 flex-1">
                   
                   {/* CARD HEADER ROW */}
-                  <div className="flex justify-between items-center gap-1 shrink-0 pt-1">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <h3 className="font-extrabold text-[15px] text-[#111111] truncate font-sans tracking-tight">
+                  <div className="flex justify-between items-center gap-2 shrink-0 pt-0.5">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <h3 className="font-black text-sm text-gray-950 truncate tracking-tight">
                         {order.orderSource && order.orderSource !== 'QR' ? `${order.orderSource}` : (order.tableNo ? (order.tableNo.trim().toLowerCase().startsWith('table') ? order.tableNo.trim() : `Table ${order.tableNo.trim()}`) : order.type)}
                       </h3>
                       {(order as any).orderToken ? (
-                        <span className="text-[10px] font-black bg-blue-600 text-white px-2 py-0.5 rounded font-mono shrink-0 shadow-2xs">
-                          TOKEN #{(order as any).orderToken}
+                        <span className="text-[10px] font-black bg-black text-white px-2 py-0.5 rounded-full font-mono shrink-0 shadow-2xs">
+                          Token #{(order as any).orderToken}
                         </span>
                       ) : (
-                        <span className="text-[10px] font-black bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded shrink-0">
+                        <span className="text-[10px] font-black bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full font-mono shrink-0">
                           Tk: #{order.orderNumber.replace(/\D/g, '') || order.orderNumber}
                         </span>
                       )}
                       
                       {/* Priority indicator icons */}
-                      <div className="flex items-center gap-0.5 shrink-0">
+                      <div className="flex items-center gap-1 shrink-0">
                         {isUrgent && (
-                          <span title="Urgent delay" className="text-[#EF4444]">
+                          <span title="Urgent delay" className="text-red-500">
                             <Flame size={12} className="fill-current animate-bounce" />
                           </span>
                         )}
                         {priorityLabel && (
-                          <span title="VIP Table" className="text-[#F59E0B]">
+                          <span title="VIP Table" className="text-amber-500">
                             <Star size={12} className="fill-current" />
-                          </span>
-                        )}
-                        {(order.type === 'Delivery' || (order.orderSource && order.orderSource !== 'QR')) && (
-                          <span title="Delivery package" className="text-[#3B82F6]">
-                            <Truck size={12} />
                           </span>
                         )}
                       </div>
                     </div>
  
                     {/* Timer Badge pill */}
-                    <div className={`px-2 py-0.5 rounded-full text-[10.5px] font-[800] border flex items-center gap-1 shrink-0 ${timerColorClass}`}>
+                    <div className={`px-2 py-0.5 rounded-full text-[10px] font-bold border flex items-center gap-1 shrink-0 ${timerColorClass}`}>
                       <Clock size={11} />
                       <span>{order.status === 'New' || order.status === 'Accepted' ? '00:00' : getElapsedTimeString(order)}</span>
                     </div>
                   </div>
 
-                  {/* ORDER IDENTIFIER BASE INFO */}
-                  <div className="flex justify-between items-center text-[9.5px] font-bold text-gray-400 select-none bg-gray-50 px-2 py-0.5 rounded-[6px] mt-1.5 shrink-0 uppercase tracking-widest">
-                    <span>#OP-{order.orderNumber}</span>
-                    <span>{getFormattedTime(order.timestamp)}</span>
-                    <span className="text-[#111111] font-black">{order.orderSource === 'QR' ? 'QR Dine-In' : (order.orderSource || order.type)}</span>
-                  </div>
-
-                  {/* CUSTOMER & PAYMENT STATUS LINE */}
-                  <div className="flex justify-between items-center text-[10.5px] mt-1.5 text-slate-600 font-bold px-1 shrink-0 select-none">
-                    <span className="truncate max-w-[120px]">Cust: {order.customerName || 'Guest'}</span>
-                    <span className={`text-[8.5px] font-black px-1.5 py-0.5 rounded uppercase leading-none border ${
+                  {/* ORDER IDENTIFIER BASE INFO & PAYMENT STATUS */}
+                  <div className="flex justify-between items-center text-[10px] font-medium text-gray-500 select-none bg-gray-50/80 px-2.5 py-1 rounded-lg mt-2 shrink-0 border border-gray-100">
+                    <div className="flex items-center gap-1.5 truncate">
+                      <span className="font-mono font-bold text-gray-700">#{order.orderNumber.replace(/^#?OP-OP-/, 'OP-').replace(/^#/, '')}</span>
+                      <span>•</span>
+                      <span>{getFormattedTime(order.timestamp)}</span>
+                      <span>•</span>
+                      <span className="font-bold text-gray-900">{order.orderSource === 'QR' ? 'QR Dine-In' : (order.orderSource || order.type)}</span>
+                    </div>
+                    <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md uppercase tracking-wider border shrink-0 ${
                       order.isPaid || order.paymentStatus === 'Paid' || order.paymentStatus === 'PAID'
                         ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                         : 'bg-amber-50 text-amber-700 border-amber-200'
                     }`}>
                       {order.isPaid || order.paymentStatus === 'Paid' || order.paymentStatus === 'PAID' 
-                        ? 'PAID (GPay / Online)' 
-                        : (order as any).paymentMethod === 'Pay at Counter' ? 'PAY AT COUNTER' : 'UNPAID'}
+                        ? 'PAID' 
+                        : (order as any).paymentMethod === 'Pay at Counter' ? 'COUNTER' : 'UNPAID'}
                     </span>
                   </div>
 
@@ -341,28 +335,26 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                   <div className="border-b border-gray-100/50 my-1.5 shrink-0" />
 
                   {/* DISH ITEMS CONTAINER */}
-                  <div className="flex-1 overflow-hidden space-y-1.5 select-none pr-0.5 mt-0.5">
+                  <div className="space-y-1.5 select-none py-2 my-auto">
                     {menuItemsSlice.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-center gap-1.5 text-[12.5px] items-start leading-none">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <span className="font-extrabold text-[#111111] shrink-0 text-[13px]">
+                      <div key={idx} className="flex justify-between items-center gap-2 text-xs">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="w-5 h-5 rounded bg-gray-100 text-gray-900 font-black text-[11px] flex items-center justify-center shrink-0">
                             {item.quantity}×
                           </span>
-                          <span className="font-bold text-gray-700 truncate" title={item.menuItem.name}>
+                          <span className="font-bold text-gray-800 truncate" title={item.menuItem.name}>
                             {item.menuItem.name}
                           </span>
                         </div>
-                        {/* Compact tag instead of green/red dots */}
-                        <span className={`px-1.5 py-0.5 text-[7.5px] font-[900] rounded-md tracking-wider uppercase inline-block shrink-0 ${handleCategoryPillBg(item.menuItem.category)}`}>
+                        <span className={`px-1.5 py-0.5 text-[8px] font-extrabold rounded-md uppercase tracking-wider shrink-0 ${handleCategoryPillBg(item.menuItem.category)}`}>
                           {item.menuItem.category}
                         </span>
                       </div>
                     ))}
 
-                    {/* Overflow label: +X more items if bounds exceeded */}
                     {hiddenItemsCount > 0 && (
-                      <div className="text-[10px] font-black italic text-[#F59E0B] pl-2 self-start transform scale-95 origin-left">
-                        + {hiddenItemsCount} more dishes Pending...
+                      <div className="text-[10px] font-bold text-amber-600 pl-1">
+                        + {hiddenItemsCount} more items...
                       </div>
                     )}
                   </div>
@@ -476,12 +468,12 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                             id={`btn_accept_${order.id}`}
                             onClick={() => {
                               onUpdateOrderStatus(order.id, 'Accepted');
-                              onShowToast(`Order #${order.orderNumber} ACCEPTED`);
+                              onShowToast(`Order #${order.orderNumber} Accepted`);
                             }}
-                            className="h-[30px] text-[10px] font-extrabold tracking-wider uppercase rounded-[8px] bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1 cursor-pointer w-full border-none"
+                            className="h-9 text-[11px] font-bold tracking-wider uppercase rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white flex items-center justify-center gap-1.5 cursor-pointer w-full border-none shadow-xs transition-all"
                           >
-                            <CheckCircle size={11} />
-                            <span>ACCEPT</span>
+                            <CheckCircle size={13} />
+                            <span>Accept Order</span>
                           </button>
                         )}
                         {order.status === 'Accepted' && (
@@ -489,12 +481,12 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                             id={`btn_start_${order.id}`}
                             onClick={() => {
                               onUpdateOrderStatus(order.id, 'Preparing', { startedAt: Date.now() });
-                              onShowToast(`Order #${order.orderNumber} started PREPARING`);
+                              onShowToast(`Order #${order.orderNumber} Preparing`);
                             }}
-                            className="h-[30px] text-[10px] font-extrabold tracking-wider uppercase rounded-[8px] bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center gap-1 cursor-pointer w-full border-none"
+                            className="h-9 text-[11px] font-bold tracking-wider uppercase rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white flex items-center justify-center gap-1.5 cursor-pointer w-full border-none shadow-xs transition-all"
                           >
-                            <Play size={10} className="fill-current" />
-                            <span>START PREPARING</span>
+                            <Play size={12} className="fill-current" />
+                            <span>Start Preparing</span>
                           </button>
                         )}
                         {order.status === 'Preparing' && (
@@ -502,12 +494,12 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                             id={`btn_ready_${order.id}`}
                             onClick={() => {
                               onUpdateOrderStatus(order.id, 'Ready', { preparedAt: Date.now() });
-                              onShowToast(`Order #${order.orderNumber} marked READY`);
+                              onShowToast(`Order #${order.orderNumber} Ready`);
                             }}
-                            className="h-[30px] text-[10px] font-extrabold tracking-wider uppercase rounded-[8px] bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center gap-1 cursor-pointer w-full border-none font-black"
+                            className="h-9 text-[11px] font-bold tracking-wider uppercase rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white flex items-center justify-center gap-1.5 cursor-pointer w-full border-none shadow-xs transition-all font-black"
                           >
-                            <ChefHat size={11} />
-                            <span>MARK READY</span>
+                            <ChefHat size={13} />
+                            <span>Mark Ready</span>
                           </button>
                         )}
                         {order.status === 'Ready' && (
@@ -515,12 +507,12 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                             id={`btn_served_${order.id}`}
                             onClick={() => {
                               onUpdateOrderStatus(order.id, 'Completed', { servedAt: Date.now() });
-                              onShowToast(`Order #${order.orderNumber} status changed to SERVED`);
+                              onShowToast(`Order #${order.orderNumber} Completed`);
                             }}
-                            className="h-[30px] text-[10px] font-extrabold tracking-wider uppercase rounded-[8px] bg-slate-900 hover:bg-black text-white flex items-center justify-center gap-1 cursor-pointer w-full border-none"
+                            className="h-9 text-[11px] font-bold tracking-wider uppercase rounded-xl bg-black hover:bg-neutral-800 active:scale-[0.99] text-white flex items-center justify-center gap-1.5 cursor-pointer w-full border-none shadow-xs transition-all"
                           >
-                            <CheckCircle size={11} />
-                            <span>SERVE / COMPLETE</span>
+                            <CheckCircle size={13} />
+                            <span>Serve / Complete</span>
                           </button>
                         )}
                       </div>

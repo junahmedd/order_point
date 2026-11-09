@@ -224,29 +224,14 @@ export default function Inventory({
       }
     >
 
-      {/* Top Search & Filter Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <div className="relative flex-1 max-w-md">
-          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search items, ingredients, suppliers..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9.5 pr-8 py-2 bg-white border border-gray-200/90 rounded-xl text-xs font-semibold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-2xs"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 cursor-pointer"
-            >
-              <X size={14} />
-            </button>
-          )}
-        </div>
-        <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider self-end sm:self-center">
+      {/* Item count status bar (Search bar removed per requirements) */}
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+          Warehouse Inventory Registry
+        </span>
+        <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
           {filteredItems.length} {filteredItems.length === 1 ? 'Item' : 'Items'}
-        </div>
+        </span>
       </div>
 
       {/* MOBILE CARDS VIEW (Clean, touch-friendly, no ugly wrapped tables) */}
