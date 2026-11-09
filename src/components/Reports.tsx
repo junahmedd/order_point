@@ -449,43 +449,6 @@ export default function Reports({
     return Math.max(...sellingItems.map(it => it.qty));
   }, [sellingItems]);
 
-  const portionAnalytics = useMemo(() => {
-    const analysis: Record<string, {
-      parentName: string;
-      portions: Record<string, { qty: number; revenue: number }>;
-      totalQty: number;
-      totalRevenue: number;
-    }> = {};
-
-    filteredOrders.forEach(order => {
-      order.items.forEach(it => {
-        const parentName = it.productName || it.menuItem.name;
-        const portionName = it.size || 'Single/Regular';
-
-        if (!analysis[parentName]) {
-          analysis[parentName] = {
-            parentName,
-            portions: {},
-            totalQty: 0,
-            totalRevenue: 0
-          };
-        }
-
-        if (!analysis[parentName].portions[portionName]) {
-          analysis[parentName].portions[portionName] = { qty: 0, revenue: 0 };
-        }
-
-        const price = it.menuItem.price || 0;
-        analysis[parentName].portions[portionName].qty += it.quantity;
-        analysis[parentName].portions[portionName].revenue += price * it.quantity;
-        analysis[parentName].totalQty += it.quantity;
-        analysis[parentName].totalRevenue += price * it.quantity;
-      });
-    });
-
-    return Object.values(analysis).sort((a, b) => b.totalRevenue - a.totalRevenue);
-  }, [filteredOrders]);
-
   const stockDepleted = useMemo(() => {
     return (inventoryItems || []).filter(i => i.status === 'LOW STOCK' || i.quantity === 0);
   }, [inventoryItems]);
@@ -772,92 +735,6 @@ export default function Reports({
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Portion & Variant Performance Analysis */}
-      <div className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-150 mt-6 text-left">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-gray-100 pb-4">
-          <div>
-            <h3 className="text-[14px] font-black text-[#111111] tracking-wider uppercase mb-1">
-              PORTION &amp; VARIANT PERFORMANCE ANALYSIS
-            </h3>
-            <p className="text-[11px] font-semibold text-gray-400">
-              Granular sales breakdown comparing Single, Half, and Full portion performance metrics
-            </p>
-          </div>
-          <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider border border-indigo-100 flex items-center gap-1.5 self-start sm:self-auto">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-            <span>Portion Breakdown</span>
-          </div>
-        </div>
-
-        {portionAnalytics.length === 0 ? (
-          <div className="text-center py-12 text-slate-400">
-            <span className="italic block text-sm">No transaction ledger records found.</span>
-            <span className="text-[11px] block mt-1">Complete a tabletop checkout to display variant analytics.</span>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                  <th className="pb-3 pl-4">Dish Item</th>
-                  <th className="pb-3 text-center">Portion</th>
-                  <th className="pb-3 text-center">Qty Sold</th>
-                  <th className="pb-3 text-right pr-4">Revenue</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {portionAnalytics.map((item, idx) => {
-                  const portionKeys = Object.keys(item.portions);
-                  return portionKeys.map((portKey, pIdx) => {
-                    const portData = item.portions[portKey];
-                    const revPercentage = item.totalRevenue > 0 ? Math.round((portData.revenue / item.totalRevenue) * 100) : 0;
-                    return (
-                      <tr key={`${idx}-${portKey}`} className="text-xs hover:bg-slate-50/50 transition-colors">
-                        {pIdx === 0 ? (
-                          <td className="py-3.5 pl-4 font-bold text-slate-900 font-sans" rowSpan={portionKeys.length}>
-                            {item.parentName}
-                            <span className="text-[10px] text-slate-400 font-semibold block mt-0.5">
-                              Total Rev: ₹{item.totalRevenue}
-                            </span>
-                          </td>
-                        ) : null}
-                        <td className="py-3.5 text-center font-extrabold text-slate-650">
-                          <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                            portKey === 'Half' ? 'bg-amber-50 text-amber-700 border border-amber-100' :
-                            portKey === 'Full' ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' :
-                            'bg-slate-100 text-slate-600 border border-slate-200'
-                          }`}>
-                            {portKey}
-                          </span>
-                        </td>
-                        <td className="py-3.5 text-center font-bold text-slate-800">
-                          {portData.qty}
-                        </td>
-                        <td className="py-3.5 text-right pr-4">
-                          <div className="flex flex-col items-end">
-                            <span className="font-extrabold text-slate-950 font-mono">₹{portData.revenue}</span>
-                            <div className="w-16 bg-gray-150 h-1 rounded-full overflow-hidden mt-1 flex">
-                              <div 
-                                className={`h-full rounded-full ${
-                                  portKey === 'Half' ? 'bg-amber-500' :
-                                  portKey === 'Full' ? 'bg-indigo-500' :
-                                  'bg-slate-400'
-                                }`}
-                                style={{ width: `${revPercentage}%` }}
-                              />
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  });
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
 
     </PageLayout>
