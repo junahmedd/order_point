@@ -224,24 +224,152 @@ export default function Inventory({
       }
     >
 
-      {/* Main Stock Table inside clean white 32px Card */}
-      <div className="bg-white border border-[#F0F2F5] rounded-[32px] overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.02)]">
+      {/* Top Search & Filter Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div className="relative flex-1 max-w-md">
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search items, ingredients, suppliers..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9.5 pr-8 py-2 bg-white border border-gray-200/90 rounded-xl text-xs font-semibold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-2xs"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 cursor-pointer"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+        <div className="text-[11px] font-bold text-gray-400 uppercase tracking-wider self-end sm:self-center">
+          {filteredItems.length} {filteredItems.length === 1 ? 'Item' : 'Items'}
+        </div>
+      </div>
+
+      {/* MOBILE CARDS VIEW (Clean, touch-friendly, no ugly wrapped tables) */}
+      <div className="block md:hidden space-y-3">
+        {filteredItems.length === 0 ? (
+          <div className="bg-white border border-gray-100 rounded-2xl p-8 text-center shadow-2xs space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-center text-gray-400 mx-auto">
+              <Package size={22} className="text-gray-400" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-gray-900">
+                {searchQuery ? 'No matching items found' : 'No Inventory Items'}
+              </p>
+              <p className="text-xs text-gray-400 mt-1 max-w-xs mx-auto">
+                {searchQuery ? `No records found matching "${searchQuery}".` : 'Keep track of kitchen ingredients, supplier stock, and low-level alerts.'}
+              </p>
+            </div>
+            {!searchQuery && (
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 bg-gray-950 text-white text-xs font-bold rounded-xl shadow-xs hover:bg-black transition-all cursor-pointer"
+              >
+                <Plus size={14} />
+                <span>Add Item</span>
+              </button>
+            )}
+          </div>
+        ) : (
+          filteredItems.map(item => {
+            const isOutOfStock = item.quantity === 0;
+            const isLow = !isOutOfStock && item.quantity <= item.lowLimit;
+            
+            return (
+              <div
+                id={`inventory_card_${item.id}`}
+                key={item.id}
+                className="bg-white border border-gray-100 rounded-2xl p-4 shadow-2xs space-y-3"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-bold text-gray-950 truncate leading-snug">{item.name}</h4>
+                    {item.supplier && (
+                      <span className="text-[11px] font-medium text-gray-400 block truncate mt-0.5">{item.supplier}</span>
+                    )}
+                  </div>
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider shrink-0 ${
+                      isOutOfStock || isLow
+                        ? 'bg-rose-50 text-rose-600 border border-rose-200'
+                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    }`}
+                  >
+                    {isOutOfStock ? 'OUT OF STOCK' : isLow ? 'LOW STOCK' : 'IN STOCK'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 bg-gray-50/80 rounded-xl p-2.5 border border-gray-100">
+                  <div>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Quantity</span>
+                    <span className={`text-sm font-black ${isOutOfStock || isLow ? 'text-rose-600' : 'text-gray-900'}`}>
+                      {item.quantity} <span className="text-xs font-semibold text-gray-500">{item.unit || 'units'}</span>
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Low Stock Limit</span>
+                    <span className="text-sm font-bold text-gray-700">
+                      {item.lowLimit} <span className="text-xs font-semibold text-gray-400">{item.unit || 'units'}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+                  <button
+                    id={`btn_adj_stock_mob_${item.id}`}
+                    onClick={() => handleAdjustQuantity(item)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    <Edit2 size={13} />
+                    <span>Adjust Stock</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm(`Remove ${item.name} from warehouse listings?`)) {
+                        onDeleteInventoryItem(item.id);
+                        onShowToast(`Deleted ${item.name}`);
+                      }
+                    }}
+                    className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                    title="Delete record"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* DESKTOP TABLE VIEW (Spacious, non-wrapping headers, clean typography) */}
+      <div className="hidden md:block bg-white border border-gray-100 rounded-3xl overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse min-w-[650px]">
             <thead>
-              <tr className="border-b border-[#F0F2F5]/80 bg-[#FAFCFB]/60 text-[10px] font-bold text-[#A5A5A5] uppercase tracking-widest h-16">
-                <th className="py-5 pl-12 text-left">ITEM NAME</th>
-                <th className="py-5 text-center w-48">QUANTITY</th>
-                <th className="py-5 text-center w-56">LOW STOCK LIMIT</th>
-                <th className="py-5 text-center w-48">STATUS</th>
-                <th className="py-5 pr-12 text-right w-36">ACTIONS</th>
+              <tr className="border-b border-gray-100 bg-gray-50/70 text-[11px] font-bold text-gray-400 uppercase tracking-wider h-14">
+                <th className="py-4 px-6 text-left whitespace-nowrap">ITEM NAME</th>
+                <th className="py-4 px-4 text-center whitespace-nowrap">QUANTITY</th>
+                <th className="py-4 px-4 text-center whitespace-nowrap">LOW STOCK LIMIT</th>
+                <th className="py-4 px-4 text-center whitespace-nowrap">STATUS</th>
+                <th className="py-4 px-6 text-right whitespace-nowrap">ACTIONS</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F0F2F5]/60 text-xs">
+            <tbody className="divide-y divide-gray-100 text-xs">
               {filteredItems.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-16 text-center text-slate-400 font-bold">
-                    No matching items in warehouse registers
+                  <td colSpan={5} className="py-16 text-center text-gray-400 font-medium space-y-2">
+                    <Package size={30} className="mx-auto text-gray-300 mb-2 stroke-[1.5]" />
+                    <p className="text-sm font-bold text-gray-800">
+                      {searchQuery ? 'No matching inventory items found' : 'No items registered in warehouse'}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {searchQuery ? 'Try adjusting your search query.' : 'Click "Add Inventory" above to register stock items.'}
+                    </p>
                   </td>
                 </tr>
               ) : (
@@ -253,30 +381,35 @@ export default function Inventory({
                     <tr
                       id={`inventory_row_${item.id}`}
                       key={item.id}
-                      className="hover:bg-[#F8FAF9]/30 transition-colors h-20"
+                      className="hover:bg-gray-50/50 transition-colors h-16"
                     >
                       {/* Material Name */}
-                      <td className="py-5 pl-12 text-[#111111] font-[800] text-sm text-left">
-                        {item.name}
+                      <td className="py-4 px-6 text-gray-900 font-bold text-sm">
+                        <div className="flex flex-col">
+                          <span>{item.name}</span>
+                          {item.supplier && (
+                            <span className="text-[11px] font-normal text-gray-400">{item.supplier}</span>
+                          )}
+                        </div>
                       </td>
 
                       {/* Quantity: dynamic red if low limit reached */}
-                      <td className={`py-5 text-center text-sm font-bold ${isOutOfStock || isLow ? 'text-[#E11D48] font-[900]' : 'text-[#111111]'}`}>
-                        {item.quantity}
+                      <td className={`py-4 px-4 text-center text-sm font-bold ${isOutOfStock || isLow ? 'text-rose-600 font-black' : 'text-gray-900'}`}>
+                        {item.quantity} <span className="text-xs font-normal text-gray-500">{item.unit || 'units'}</span>
                       </td>
 
                       {/* Low Stock Limit */}
-                      <td className="py-5 text-center text-[#4B5563] font-[800] text-sm">
-                        {item.lowLimit}
+                      <td className="py-4 px-4 text-center text-gray-600 font-bold text-sm">
+                        {item.lowLimit} <span className="text-xs font-normal text-gray-400">{item.unit || 'units'}</span>
                       </td>
 
                       {/* Status chip pill */}
-                      <td className="py-5 text-center">
+                      <td className="py-4 px-4 text-center">
                         <span
-                          className={`inline-flex items-center px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
                             isOutOfStock || isLow
-                              ? 'bg-[#FFF1F2] text-[#E11D48] border border-[#FFE4E6]'
-                              : 'bg-sky-50 text-sky-700 border border-sky-200'
+                              ? 'bg-rose-50 text-rose-600 border border-rose-200'
+                              : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                           }`}
                         >
                           {isOutOfStock ? 'OUT OF STOCK' : isLow ? 'LOW STOCK' : 'IN STOCK'}
@@ -284,15 +417,15 @@ export default function Inventory({
                       </td>
 
                       {/* Standard actions icon styling */}
-                      <td className="py-5 pr-12 text-right">
-                        <div className="flex items-center justify-end gap-5 text-[#9CA3AF]">
+                      <td className="py-4 px-6 text-right">
+                        <div className="flex items-center justify-end gap-3 text-gray-400">
                           <button
                             id={`btn_adj_stock_${item.id}`}
                             onClick={() => handleAdjustQuantity(item)}
-                            className="hover:text-[#111111] transition-colors cursor-pointer p-1"
+                            className="hover:text-gray-900 transition-colors cursor-pointer p-1.5 hover:bg-gray-100 rounded-lg"
                             title="Adjust Stock Quantity"
                           >
-                            <Edit2 size={15} className="stroke-[1.5]" />
+                            <Edit2 size={15} />
                           </button>
                           <button
                             onClick={() => {
@@ -301,10 +434,10 @@ export default function Inventory({
                                 onShowToast(`Deleted ${item.name} list reference`);
                               }
                             }}
-                            className="hover:text-[#E11D48] transition-colors cursor-pointer p-1"
+                            className="hover:text-rose-600 transition-colors cursor-pointer p-1.5 hover:bg-rose-50 rounded-lg"
                             title="Delete Warehousing record"
                           >
-                            <Trash2 size={15} className="stroke-[1.5]" />
+                            <Trash2 size={15} />
                           </button>
                         </div>
                       </td>

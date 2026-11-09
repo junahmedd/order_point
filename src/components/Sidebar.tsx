@@ -160,9 +160,6 @@ export default function Sidebar({
                   <span className="text-white font-[800] text-[15px] leading-none tracking-tight font-sans truncate">
                     ORDERPOINT PRO
                   </span>
-                  <span className="text-blue-300 text-[9px] font-extrabold mt-1 leading-none uppercase tracking-widest truncate opacity-90">
-                    POS SYSTEM
-                  </span>
                   {restaurantName && restaurantName.toLowerCase() !== 'orderpoint pro' && (
                     <span className="text-blue-400 text-[11px] font-[800] mt-1.5 leading-none uppercase tracking-widest truncate max-w-[140px]">
                       {restaurantName}

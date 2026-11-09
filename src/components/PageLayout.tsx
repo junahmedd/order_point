@@ -79,22 +79,6 @@ export default function PageLayout({
               <h1 className="text-xl font-black text-gray-950 tracking-tight leading-none uppercase truncate">
                 {title}
               </h1>
-              {/* Cloud Sync Pulse Indicator */}
-              {pillVariant !== 'none' && (
-                <div 
-                  onClick={handleSyncClick}
-                  className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider leading-none cursor-pointer transition-all select-none shadow-xs ${
-                    pillVariant === 'green'
-                      ? 'bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100'
-                      : 'bg-sky-50 border border-sky-200/80 text-sky-700 hover:bg-sky-100'
-                  }`}
-                  title="System real-time synchronized. Click to force check."
-                >
-                  <span className={`w-1.5 h-1.5 rounded-full ${pillVariant === 'green' ? 'bg-emerald-500' : 'bg-sky-500'} ${isSyncing ? 'animate-spin' : 'animate-pulse'}`} />
-                  <RefreshCw size={8} className={`stroke-[3] ${isSyncing ? 'animate-spin' : ''}`} />
-                  <span className="hidden sm:inline">LIVE</span>
-                </div>
-              )}
             </div>
             {subtitle && (
               <p className="text-xs font-semibold text-gray-500 mt-1 leading-normal truncate">

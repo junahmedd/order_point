@@ -1148,7 +1148,7 @@ export default function App() {
           <div className="flex flex-col items-center">
             <div className="font-black text-[14px] tracking-tight text-white leading-none mb-1 mt-0.5">ORDERPOINT PRO</div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[8px] font-black text-blue-200 bg-blue-500/20 border border-blue-400/20 px-1.5 py-0.5 rounded leading-none uppercase tracking-widest">POS SYSTEM</span>
+              
               <span className="text-[10px] font-bold text-blue-300 uppercase tracking-wider leading-none truncate max-w-[150px]">{!settingsLoading && settingsData?.restaurantInfo?.name ? settingsData.restaurantInfo.name : ''}</span>
             </div>
           </div>
