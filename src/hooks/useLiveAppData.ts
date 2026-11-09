@@ -190,7 +190,18 @@ export function useLiveAppData() {
 
     const menuPath = `restaurants/${currentRestId}/menuItems`;
     const unsubMenu = onSnapshot(collection(db, menuPath), (snapshot) => {
-      setMenuItems(snapshot.docs.map(doc => doc.data() as MenuItem));
+      const allItems = snapshot.docs.map(doc => doc.data() as MenuItem);
+      // Auto-purge any legacy "Brownie" items if present in the database
+      const brownieDocs = snapshot.docs.filter(d => {
+        const dData = d.data();
+        return d.id === 'm1' || (dData.name && dData.name.toLowerCase().includes('brownie'));
+      });
+      if (brownieDocs.length > 0) {
+        brownieDocs.forEach(d => {
+          deleteDoc(doc(db, menuPath, d.id)).catch(() => {});
+        });
+      }
+      setMenuItems(allItems.filter(it => it.id !== 'm1' && !it.name?.toLowerCase().includes('brownie')));
     }, (error) => {
       console.warn('Firestore menu listener warning:', error);
     });

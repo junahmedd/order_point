@@ -518,31 +518,36 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
       </div>
 
       {/* RIGHT COLUMN: Current Order operational panel */}
-      <div className={`w-full xl:w-[350px] bg-white border border-gray-200 xl:rounded-[22px] shadow-sm p-4 sm:p-5 h-fit flex flex-col space-y-4 xl:sticky xl:top-4 ${isMobileCartOpen ? 'fixed inset-0 z-50 overflow-y-auto w-full h-full rounded-none bg-white pb-24' : 'hidden xl:flex'}`}>
+      <div className={`w-full xl:w-[360px] bg-white border border-gray-200 xl:rounded-[24px] shadow-sm flex flex-col xl:sticky xl:top-4 h-fit ${
+        isMobileCartOpen 
+          ? 'fixed inset-0 z-50 overflow-y-auto bg-gray-50/70 p-3 sm:p-5' 
+          : 'hidden xl:flex p-4 sm:p-5'
+      }`}>
+        <div className="w-full max-w-md mx-auto space-y-3.5 bg-white rounded-2xl p-4 sm:p-5 border border-gray-100/80 shadow-2xs">
         
-        {/* Top Header with small back button for mobile */}
-        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+        {/* Top Header Box (Full solid black box) */}
+        <div className="bg-black text-white rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm select-none">
           <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={() => setIsMobileCartOpen(false)}
-              className="xl:hidden flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 transition-colors border-none cursor-pointer active:scale-95"
+              className="xl:hidden flex items-center justify-center w-7 h-7 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors border-none cursor-pointer active:scale-95"
               title="Back to Order"
             >
-              <ArrowLeft size={16} className="stroke-[2.5]" />
+              <ArrowLeft size={15} className="stroke-[2.5] text-white" />
             </button>
             <div className="flex items-center gap-2">
-              <ShoppingBag size={18} className="text-black stroke-[2.5]" />
-              <h2 className="text-base font-black text-black uppercase tracking-tight">Current Order</h2>
+              <ShoppingBag size={17} className="text-white stroke-[2.5]" />
+              <h2 className="text-sm font-black text-white uppercase tracking-tight">Current Order</h2>
             </div>
           </div>
           {cartValues.itemsArray.length > 0 && (
             <button
               onClick={handleClearCart}
-              className="text-xs font-bold text-rose-500 hover:text-rose-600 flex items-center gap-1 transition-colors cursor-pointer bg-transparent border-none p-1"
+              className="text-xs font-bold text-rose-500 hover:text-rose-400 flex items-center gap-1 transition-colors cursor-pointer bg-transparent border-none p-1"
             >
-              <Trash2 size={13} />
-              <span>Reset Cart</span>
+              <Trash2 size={13} className="text-rose-500" />
+              <span className="text-rose-500">Reset Cart</span>
             </button>
           )}
         </div>
@@ -631,11 +636,11 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
           )}
         </div>
 
-        {/* Scrollable Cart Items rows */}
-        <div className="flex-1 max-h-[240px] overflow-y-auto space-y-2 pr-1">
+        {/* Cart Items list (Compact, cleanly spaced without artificial gap) */}
+        <div className="space-y-2 max-h-[300px] xl:max-h-[260px] overflow-y-auto pr-0.5">
           {cartValues.itemsArray.length === 0 ? (
-            <div className="py-10 text-center text-gray-400 space-y-2 select-none">
-              <Utensils size={30} className="mx-auto text-gray-300 stroke-[1.5]" />
+            <div className="py-8 text-center text-gray-400 space-y-2 select-none">
+              <Utensils size={28} className="mx-auto text-gray-300 stroke-[1.5]" />
               <p className="text-xs font-bold uppercase tracking-wider text-gray-400">No Items Added</p>
               <p className="text-[11px] text-gray-400">Select dishes from the menu to start order.</p>
             </div>
@@ -726,6 +731,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
             <span>ORDER</span>
           )}
         </button>
+        </div>
 
       </div>
 

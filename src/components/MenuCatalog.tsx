@@ -34,6 +34,7 @@ export default function MenuCatalog({
   // Add/Edit item state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [deletingItem, setDeletingItem] = useState<MenuItem | null>(null);
   
   const [name, setName] = useState('');
   const [price, setPrice] = useState('180');
@@ -315,13 +316,8 @@ export default function MenuCatalog({
                       <Edit2 size={10} className="text-gray-500"/> EDIT
                     </button>
                     <button
-                      onClick={() => {
-                        if (confirm(`Are you sure you want to delete ${item.name}?`)) {
-                          onDeleteMenuItem(item.id);
-                          onShowToast(`Deleted ${item.name} from manual registry`);
-                        }
-                      }}
-                      className="flex-1 h-7 rounded-lg border border-rose-100 bg-white text-rose-500 hover:bg-rose-50 flex items-center justify-center gap-1 text-[8.5px] font-extrabold tracking-wider uppercase transition-colors"
+                      onClick={() => setDeletingItem(item)}
+                      className="flex-1 h-7 rounded-lg border border-rose-100 bg-white text-rose-500 hover:bg-rose-50 flex items-center justify-center gap-1 text-[8.5px] font-extrabold tracking-wider uppercase transition-colors cursor-pointer"
                     >
                       <Trash2 size={10} className="text-rose-400"/> DELETE
                     </button>
@@ -433,6 +429,42 @@ export default function MenuCatalog({
                 {editingItem ? 'Update Menu Item' : 'Save Menu Item'}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Small Delete Confirmation Popup Card */}
+      {deletingItem && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-xs w-full p-5 shadow-2xl border border-gray-100 text-center space-y-4">
+            <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+              <Trash2 size={18} />
+            </div>
+            
+            <p className="text-xs font-bold text-gray-800 leading-snug">
+              Are you sure you want to delete {deletingItem.name}?
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  onDeleteMenuItem(deletingItem.id);
+                  onShowToast(`Deleted ${deletingItem.name}`);
+                  setDeletingItem(null);
+                }}
+                className="h-9 px-4 rounded-xl bg-emerald-800 hover:bg-emerald-900 active:scale-95 text-white text-xs font-bold transition-all cursor-pointer shadow-xs border-none"
+              >
+                Yes
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeletingItem(null)}
+                className="h-9 px-4 rounded-xl bg-rose-800 hover:bg-rose-900 active:scale-95 text-white text-xs font-bold transition-all cursor-pointer shadow-xs border-none"
+              >
+                No
+              </button>
+            </div>
           </div>
         </div>
       )}

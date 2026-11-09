@@ -7,17 +7,6 @@ import { MenuItem, InventoryItem, StaffMember, Customer, Order } from './types';
 
 export const INITIAL_MENU_ITEMS: MenuItem[] = [
   {
-    id: 'm1',
-    name: 'Chocolate Brownie',
-    price: 150,
-    description: 'Warm chocolate brownie with walnuts.',
-    category: 'Desserts',
-    isAvailable: true,
-    dotColor: '#F59E0B',
-    imageUrl: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600',
-    recipe: [{ inventoryItemId: 'i5', amount: 0.1 }]
-  },
-  {
     id: 'm2',
     name: 'Cold Coffee',
     price: 120,
