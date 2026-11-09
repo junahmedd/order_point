@@ -198,36 +198,22 @@ export default function MenuCatalog({
       }
     >
 
-      {/* Filter and Search segment strictly matching image */}
-      <div className="flex flex-col lg:flex-row gap-4 items-center mb-8">
-        <div className="relative w-full lg:max-w-md flex-1">
-          <input
-            id="catalog_search_bar"
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search items..."
-            className="w-full h-[50px] px-6 bg-[#FCFCFD] border-none rounded-2xl text-[13px] font-semibold text-[#111111] focus:outline-none focus:ring-1 focus:ring-gray-200 placeholder-gray-400 transition-colors"
-          />
-        </div>
-
-        {/* Category Filter Horizontal pills */}
-        <div className="flex flex-wrap items-center gap-2">
-          {(['All', 'Veg', 'Non-Veg', 'Drinks', 'Desserts'] as const).map(cat => (
-            <button
-              id={`pill_filter_${cat.replace(' ', '')}`}
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-5 h-[50px] rounded-2xl text-[13px] font-bold tracking-wide transition-all ${
-                selectedCategory === cat
-                  ? 'bg-[#111111] text-white shadow-sm'
-                  : 'bg-white border border-[#EDEDED] text-gray-500 hover:text-[#111111]'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
+      {/* Category Filter Horizontal pills (Search bar removed for clean UI) */}
+      <div className="flex flex-wrap items-center gap-1.5 mb-5">
+        {(['All', 'Veg', 'Non-Veg', 'Drinks', 'Desserts'] as const).map(cat => (
+          <button
+            id={`pill_filter_${cat.replace(' ', '')}`}
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-3.5 h-8 rounded-full text-xs font-bold tracking-wide transition-all cursor-pointer ${
+              selectedCategory === cat
+                ? 'bg-[#111111] text-white shadow-xs'
+                : 'bg-white border border-[#EDEDED] text-gray-500 hover:text-[#111111] hover:bg-gray-50'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
       </div>
 
       {/* Grid Cards - 5 Cards Per Row on Standard Screens */}
@@ -337,7 +323,7 @@ export default function MenuCatalog({
                       }}
                       className="flex-1 h-7 rounded-lg border border-rose-100 bg-white text-rose-500 hover:bg-rose-50 flex items-center justify-center gap-1 text-[8.5px] font-extrabold tracking-wider uppercase transition-colors"
                     >
-                      <Trash2 size={10} className="text-rose-400"/> DEL
+                      <Trash2 size={10} className="text-rose-400"/> DELETE
                     </button>
                   </div>
                 </div>

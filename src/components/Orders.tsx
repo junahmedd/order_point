@@ -13,7 +13,8 @@ import {
   Trash2, 
   Utensils,
   Lock,
-  ArrowRight
+  ArrowRight,
+  ArrowLeft
 } from 'lucide-react';
 import { MenuItem, Order, OrderType, Category, InventoryItem } from '../types';
 import { INITIAL_MENU_ITEMS } from '../data';
@@ -381,40 +382,24 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
         {/* LEFT COLUMN: Menu Browsing Area (70% space) */}
         <div className="flex-1 flex flex-col space-y-6">
           
-          {/* Search & Filter Top Control Bar (Single Horizontal Row) */}
-        <div className="bg-white border border-[#EDEDED] p-3 rounded-[18px] shadow-3xs flex flex-col lg:flex-row gap-3 items-center justify-between">
-          {/* Search field */}
-          <div className="relative flex-1 w-full lg:max-w-xs">
-            <input
-              id="order_search_items"
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search dishes..."
-              className="w-full h-11 pl-10 pr-4 bg-gray-50 border border-[#E2E8F0] rounded-xl text-[13px] text-[#111111] focus:outline-none focus:ring-1 focus:ring-gray-300 placeholder-gray-400 transition-all font-medium"
-            />
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-          </div>
-
-          {/* Category Filter Pills */}
-          <div className="flex flex-wrap items-center gap-1.5 w-full lg:w-auto">
+          {/* Category Filter Pills (Reduced pill size, search bar removed) */}
+          <div className="flex flex-wrap items-center gap-1.5">
             {CATEGORY_CHIPS.map(chip => (
               <button
                 id={`btn_cat_filter_${chip.value}`}
                 key={chip.value}
                 onClick={() => setSelectedCategory(chip.value)}
-                className={`px-3.5 h-[41px] rounded-xl text-[12px] font-bold tracking-wide transition-all duration-200 flex items-center gap-1.5 border select-none ${
-                    selectedCategory === chip.value
-                      ? 'bg-[#111111] text-white border-transparent shadow-xs scale-[1.02] font-extrabold'
-                      : 'bg-white border-[#E2E8F0] text-gray-500 hover:text-[#111111] hover:border-gray-300 hover:bg-gray-50 hover:shadow-2xs'
+                className={`px-3 h-8 rounded-full text-xs font-bold tracking-wide transition-all duration-150 flex items-center gap-1.5 border select-none cursor-pointer ${
+                  selectedCategory === chip.value
+                    ? 'bg-[#111111] text-white border-[#111111] shadow-xs font-black'
+                    : 'bg-white border-gray-200 text-gray-600 hover:text-[#111111] hover:bg-gray-50 hover:border-gray-300'
                 }`}
               >
-                <span className="text-[10px]">{chip.dot}</span>
+                <span className="text-[9px]">{chip.dot}</span>
                 <span>{chip.label}</span>
               </button>
             ))}
           </div>
-        </div>
 
         {/* Grid of Dishes Menu Cards */}
         {filteredMenuItems.length === 0 ? (
@@ -433,7 +418,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
                 <div
                   id={`dish_selection_card_${dish.id}`}
                   key={dish.id}
-                  onClick={() => handleAddToCart(dish)}
+                  onClick={() => { if (inCartQty === 0) { handleAddToCart(dish); } }}
                   className="group flex flex-col rounded-[16px] border border-[#E2E8F0] bg-white overflow-hidden shadow-sm transition-all duration-300 hover:border-[#111111] hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer select-none h-[230px] flex-shrink-0"
                 >
                   {/* Food Image (reduced to 116px height) */}
@@ -453,7 +438,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
                     {/* Live item in ticket count top right */}
                     {inCartQty > 0 && (
                       <div className="absolute top-2 right-2 z-10 flex items-center bg-[#111111] text-white border border-white/20 text-[8.5px] font-[800] px-1.5 py-0.5 rounded-full shadow-md">
-                        {inCartQty} Joined
+                        {inCartQty} in cart
                       </div>
                     )}
                   </div>
@@ -471,15 +456,58 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
                       </p>
                     </div>
 
-                    {/* Price display below description */}
+                    {/* Price & Quantity Stepper / Add button */}
                     <div className="flex justify-between items-center pt-1.5 border-t border-gray-50 flex-shrink-0">
-                      <span className="text-[16px] font-[808] text-[#111111] tracking-tight font-sans">
+                      <span className="text-[15px] font-black text-gray-950 tracking-tight font-sans">
                         {currencySymbol}{dish.price}
                       </span>
-                      <span className="text-[8.5px] font-bold text-gray-400 group-hover:text-[#111111] transition-colors flex items-center gap-0.5 uppercase tracking-wider">
-                        Quick Add
-                        <Plus size={8} className="stroke-[3]" />
-                      </span>
+                      {inCartQty > 0 ? (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-7 inline-flex items-center gap-1.5 bg-gray-950 text-white rounded-full px-2 shadow-xs border border-gray-900"
+                        >
+                          <button
+                            type="button"
+                            id={`btn_qty_minus_${dish.id}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUpdateQty(dish.id, -1);
+                            }}
+                            className="w-5 h-5 flex items-center justify-center text-white/90 hover:text-white rounded-full hover:bg-white/20 active:scale-90 transition-all cursor-pointer"
+                            title="Decrease quantity"
+                          >
+                            <Minus size={11} className="stroke-[3]" />
+                          </button>
+                          <span className="min-w-[14px] text-center font-black text-xs text-white select-none">
+                            {inCartQty}
+                          </span>
+                          <button
+                            type="button"
+                            id={`btn_qty_plus_${dish.id}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUpdateQty(dish.id, 1);
+                            }}
+                            className="w-5 h-5 flex items-center justify-center text-white/90 hover:text-white rounded-full hover:bg-white/20 active:scale-90 transition-all cursor-pointer"
+                            title="Increase quantity"
+                          >
+                            <Plus size={11} className="stroke-[3]" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          id={`btn_add_dish_${dish.id}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToCart(dish);
+                          }}
+                          className="h-7 px-3 rounded-full bg-gray-950 hover:bg-black text-white text-[11px] font-bold tracking-wider flex items-center gap-1 shadow-xs active:scale-95 transition-all cursor-pointer"
+                        >
+                          <span>ADD</span>
+                          <Plus size={10} className="stroke-[3]" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -489,49 +517,47 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
         )}
       </div>
 
-      {/* RIGHT COLUMN: Current Order sticky operational panel (30% space) */}
-      <div className={`w-full xl:w-[350px] bg-white border border-[#E2E8F0] xl:rounded-[22px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 h-fit flex flex-col space-y-5 xl:sticky xl:top-4 ${isMobileCartOpen ? 'fixed inset-0 z-50 overflow-y-auto w-full h-full rounded-none bg-white' : 'hidden xl:flex'}`}>
+      {/* RIGHT COLUMN: Current Order operational panel */}
+      <div className={`w-full xl:w-[350px] bg-white border border-gray-200 xl:rounded-[22px] shadow-sm p-4 sm:p-5 h-fit flex flex-col space-y-4 xl:sticky xl:top-4 ${isMobileCartOpen ? 'fixed inset-0 z-50 overflow-y-auto w-full h-full rounded-none bg-white pb-24' : 'hidden xl:flex'}`}>
         
-        {/* Mobile Close Button */}
-        <div className="xl:hidden flex justify-between items-center pb-2 border-b border-gray-100">
-          <button
-            type="button"
-            onClick={() => setIsMobileCartOpen(false)}
-            className="flex items-center gap-1 text-slate-500 hover:text-slate-700 bg-transparent border-none cursor-pointer text-xs font-black uppercase"
-          >
-            ← Back to Menu
-          </button>
-          <span className="text-xs font-bold text-slate-800">Checkout Cart</span>
-        </div>
-        
-        {/* Cart Title & Clear Operation */}
-        <div className="flex justify-between items-center border-b border-gray-100 pb-3">
-          <div className="flex items-center gap-2">
-            <ShoppingBag size={18} className="text-[#111111] stroke-[2.5]" />
-            <h2 className="text-[17px] font-[800] text-[#111111] uppercase tracking-tight">Current Order</h2>
+        {/* Top Header with small back button for mobile */}
+        <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsMobileCartOpen(false)}
+              className="xl:hidden flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 transition-colors border-none cursor-pointer active:scale-95"
+              title="Back to Order"
+            >
+              <ArrowLeft size={16} className="stroke-[2.5]" />
+            </button>
+            <div className="flex items-center gap-2">
+              <ShoppingBag size={18} className="text-gray-950 stroke-[2.5]" />
+              <h2 className="text-base font-extrabold text-gray-950 uppercase tracking-tight">Current Order</h2>
+            </div>
           </div>
           {cartValues.itemsArray.length > 0 && (
             <button
               onClick={handleClearCart}
-              className="text-xs font-bold text-rose-500 hover:text-rose-600 flex items-center gap-1 transition-colors cursor-pointer"
+              className="text-xs font-bold text-rose-500 hover:text-rose-600 flex items-center gap-1 transition-colors cursor-pointer bg-transparent border-none p-1"
             >
               <Trash2 size={13} />
-              Reset Cart
+              <span>Reset Cart</span>
             </button>
           )}
         </div>
 
-        {/* Service Selector Tab Pills */}
-        <div className="bg-gray-100 border border-[#E2E8F0] p-1 rounded-xl grid grid-cols-3 text-center">
-          {(['Dine-In', 'Takeaway', 'Delivery'] as const).map(type => (
+        {/* Service Selector: Dine In vs Takeaway (Delivery removed) */}
+        <div className="bg-gray-100 p-1 rounded-xl grid grid-cols-2 text-center select-none">
+          {(['Dine-In', 'Takeaway'] as const).map(type => (
             <button
               id={`tab_srv_${type}`}
               key={type}
               onClick={() => setSelectedType(type)}
-              className={`py-2 rounded-lg text-[10.5px] font-[800] tracking-wider uppercase transition-all ${
+              className={`py-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all cursor-pointer ${
                 selectedType === type
-                  ? 'bg-white text-[#111111] shadow-2xs border border-gray-200'
-                  : 'text-gray-400 hover:text-gray-600'
+                  ? 'bg-white text-gray-950 shadow-xs font-black'
+                  : 'text-gray-500 hover:text-gray-900'
               }`}
             >
               {type === 'Dine-In' ? 'Dine In' : type}
@@ -539,12 +565,11 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
           ))}
         </div>
 
-        {/* Customer Details & Table Selections (44px height inputs) */}
-        <div className="space-y-3 bg-[#F8FAFC]/75 rounded-xl p-3.5 border border-[#E2E8F0]">
-          
+        {/* Customer Details & Table Selections */}
+        <div className="space-y-3 bg-gray-50/80 rounded-2xl p-3.5 border border-gray-100">
           {/* Customer Mobile Number */}
           <div className="space-y-1">
-            <label className="text-[10px] font-extrabold text-[#111111] uppercase tracking-wide block">Customer Mobile Number</label>
+            <label className="text-[10px] font-extrabold text-gray-700 uppercase tracking-wider block">Customer Mobile Number</label>
             <input
               type="tel"
               placeholder="Enter 10-Digit Mobile Number"
@@ -553,16 +578,16 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
                 const numericVal = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
                 setCustomerPhone(numericVal);
               }}
-              className="w-full h-11 px-3 bg-white border border-[#E2E8F0] rounded-[12px] text-xs font-[500] text-[#111111] focus:outline-none focus:border-[#111111] font-mono"
+              className="w-full h-11 px-3.5 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-950/10 focus:border-gray-950 font-mono transition-all"
               maxLength={10}
             />
             {customerPhone.length > 0 && (
-              <p className={`text-[10px] font-medium ${customerPhone.length === 10 && /^[6-9]/.test(customerPhone) ? 'text-emerald-600' : 'text-rose-600'}`}>
+              <p className={`text-[10px] font-semibold ${customerPhone.length === 10 && /^[6-9]/.test(customerPhone) ? 'text-emerald-600' : 'text-rose-500'}`}>
                 {customerPhone.length < 10 
-                  ? "Please enter a valid 10-digit mobile number." 
+                  ? "Enter 10-digit mobile number" 
                   : (!/^[6-9]/.test(customerPhone) 
-                    ? "Mobile number must start with 6, 7, 8, or 9." 
-                    : "✓ Valid Indian mobile number")}
+                    ? "Must start with 6, 7, 8, or 9" 
+                    : "✓ Valid Mobile Number")}
               </p>
             )}
           </div>
@@ -571,13 +596,13 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
           {selectedType === 'Dine-In' && (
             <div className="space-y-1">
               <div className="flex items-center justify-between mb-0.5">
-                <label className="text-[10px] font-extrabold text-[#111111] uppercase tracking-wide block">Select Table</label>
+                <label className="text-[10px] font-extrabold text-gray-700 uppercase tracking-wider block">Select Table</label>
                 {tableStatuses[selectedTable] === 'Occupied' ? (
-                  <span className="text-[9px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full uppercase tracking-wider border border-amber-200">
+                  <span className="text-[9px] font-black text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full uppercase tracking-wider border border-rose-200">
                     Occupied
                   </span>
                 ) : (
-                  <span className="text-[9px] font-black text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full uppercase tracking-wider border border-sky-200">
+                  <span className="text-[9px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">
                     Available
                   </span>
                 )}
@@ -586,7 +611,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
                 id="select_dest_table"
                 value={selectedTable}
                 onChange={(e) => setSelectedTable(e.target.value)}
-                className="w-full h-11 px-2.5 bg-white border border-[#E2E8F0] rounded-[12px] text-xs font-bold text-[#111111] focus:outline-none focus:border-[#111111]"
+                className="w-full h-11 px-3 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-950/10 focus:border-gray-950 transition-all cursor-pointer"
               >
                 {dynamicTables.map(t => {
                   const isOccupied = tableStatuses[t] === 'Occupied';
@@ -595,7 +620,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
                       key={t} 
                       value={t} 
                       disabled={isOccupied} 
-                      className={isOccupied ? "text-gray-400 bg-gray-100" : "text-[#111111]"}
+                      className={isOccupied ? "text-gray-400 bg-gray-100" : "text-gray-900"}
                     >
                       {t}{isOccupied ? ' (Occupied)' : ' (Available)'}
                     </option>
@@ -604,65 +629,54 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
               </select>
             </div>
           )}
-
-          {/* Delivery Address */}
-          {selectedType === 'Delivery' && (
-            <div className="space-y-1">
-              <label className="text-[10px] font-extrabold text-[#111111] uppercase tracking-wide block">Delivery Address</label>
-              <input
-                type="text"
-                placeholder="Enter Address"
-                value={deliveryAddress}
-                onChange={(e) => setDeliveryAddress(e.target.value)}
-                className="w-full h-11 px-3 bg-white border border-[#E2E8F0] rounded-[12px] text-xs placeholder-gray-400 focus:outline-none focus:border-[#111111]"
-              />
-            </div>
-          )}
         </div>
 
         {/* Scrollable Cart Items rows */}
-        <div className="flex-1 max-h-[220px] overflow-y-auto space-y-2.5 pr-1">
+        <div className="flex-1 max-h-[240px] overflow-y-auto space-y-2 pr-1">
           {cartValues.itemsArray.length === 0 ? (
-            <div className="py-12 text-center text-gray-400 space-y-2 select-none">
-              <span className="text-3xl block">🍽️</span>
-              <p className="text-[12px] font-bold uppercase tracking-widest text-gray-300">No Items Added</p>
-              <p className="text-[11px] text-gray-400">Select dishes from the menu catalog to begin.</p>
+            <div className="py-10 text-center text-gray-400 space-y-2 select-none">
+              <Utensils size={30} className="mx-auto text-gray-300 stroke-[1.5]" />
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-400">No Items Added</p>
+              <p className="text-[11px] text-gray-400">Select dishes from the menu to start order.</p>
             </div>
           ) : (
             cartValues.itemsArray.map(item => (
               <div 
                 key={item.menuItem.id} 
-                className="flex items-center justify-between gap-3 p-2 border border-gray-100 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between gap-3 p-2.5 border border-gray-100 rounded-xl bg-gray-50/60 hover:bg-gray-50 transition-colors"
               >
                 <div className="min-w-0 flex-1">
-                  <span className="font-[702] text-[13px] text-gray-800 truncate block uppercase tracking-tight">{item.menuItem.name}</span>
-                  <span className="text-[11px] text-gray-400 font-mono">
+                  <span className="font-bold text-xs text-gray-900 truncate block">{item.menuItem.name}</span>
+                  <span className="text-[11px] text-gray-500 font-semibold">
                     {currencySymbol}{item.menuItem.price} each
                   </span>
                 </div>
                 
-                {/* Compact Qty update with remove button */}
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <div className="flex items-center border border-[#E2E8F0] rounded-lg bg-white p-0.5 shadow-2xs">
+                {/* Stepper with [ - qty + ] */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center border border-gray-200 rounded-lg bg-white p-0.5 shadow-2xs">
                     <button
+                      type="button"
                       onClick={() => handleUpdateQty(item.menuItem.id, -1)}
-                      className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors cursor-pointer"
+                      className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors cursor-pointer"
                     >
-                      <Minus size={10} className="stroke-[3.5]" />
+                      <Minus size={11} className="stroke-[3]" />
                     </button>
-                    <span className="w-5 text-center font-extrabold text-[11px] text-gray-700 font-mono">{item.quantity}</span>
+                    <span className="w-5 text-center font-black text-xs text-gray-800">{item.quantity}</span>
                     <button
+                      type="button"
                       onClick={() => handleUpdateQty(item.menuItem.id, 1)}
-                      className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-black rounded hover:bg-gray-100 transition-colors cursor-pointer"
+                      className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-black rounded hover:bg-gray-100 transition-colors cursor-pointer"
                     >
-                      <Plus size={10} className="stroke-[3.5]" />
+                      <Plus size={11} className="stroke-[3]" />
                     </button>
                   </div>
 
                   {/* Quick Trash remove */}
                   <button
+                    type="button"
                     onClick={() => handleUpdateQty(item.menuItem.id, -item.quantity)}
-                    className="p-1 text-gray-300 hover:text-rose-500 rounded-md hover:bg-rose-50 transition-all cursor-pointer"
+                    className="p-1.5 text-gray-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-all cursor-pointer"
                     title="Remove item"
                   >
                     <Trash2 size={13} />
@@ -674,39 +688,37 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
         </div>
 
         {/* Dynamic Billing Breakdowns */}
-        <div className="border-t border-gray-100 pt-4 space-y-3 select-none text-xs text-gray-400 font-medium font-sans">
-          <div className="space-y-1.5">
+        <div className="border-t border-gray-100 pt-3 space-y-2 select-none text-xs text-gray-500 font-medium font-sans">
+          <div className="flex justify-between">
+            <span>Subtotal</span>
+            <span className="font-bold text-gray-800">{currencySymbol}{cartValues.subtotal}</span>
+          </div>
+          
+          {taxEnabled && (
             <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span className="font-bold text-gray-700">{currencySymbol}{cartValues.subtotal}</span>
+              <span>Tax ({taxPercentage}%)</span>
+              <span className="font-bold text-gray-800">{currencySymbol}{cartValues.taxes}</span>
             </div>
-            
-            {taxEnabled && (
-              <div className="flex justify-between">
-                <span>Tax ({taxPercentage}%)</span>
-                <span className="font-bold text-gray-700">{currencySymbol}{cartValues.taxes}</span>
-              </div>
-            )}
+          )}
 
-            {/* Total Block */}
-            <div className="border-t border-gray-100 pt-3 flex justify-between items-center">
-              <span className="font-extrabold text-[#111111] text-[11px] uppercase tracking-wider">Grand Total</span>
-              <span id="label_cart_total_price" className="text-[28px] font-[808] text-[#111111] tracking-[-1px] font-sans">
-                {currencySymbol}{cartValues.total}
-              </span>
-            </div>
+          {/* Total Block */}
+          <div className="border-t border-gray-100 pt-2.5 flex justify-between items-baseline">
+            <span className="font-extrabold text-gray-900 text-xs uppercase tracking-wider">Grand Total</span>
+            <span id="label_cart_total_price" className="text-2xl font-black text-gray-950 tracking-tight">
+              {currencySymbol}{cartValues.total}
+            </span>
           </div>
         </div>
 
-        {/* Big Large Touch Target ORDER dispatcher */}
+        {/* ORDER Dispatcher Button */}
         <button
           id="btn_send_kitchen_ticket"
           onClick={handlePlaceOrder}
-          disabled={cartValues.itemsArray.length === 0 || isTableLocked || customerPhone.length !== 10 || !/^[6-9]/.test(customerPhone)}
-          className="w-full h-[56px] rounded-[16px] font-bold text-[16px] bg-[#111111] hover:bg-[#222222] disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed text-white uppercase tracking-wider text-center transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.99] shadow-md hover:shadow-lg cursor-pointer"
+          disabled={cartValues.itemsArray.length === 0 || (selectedType === 'Dine-In' && (isTableLocked || !selectedTable)) || customerPhone.length !== 10 || !/^[6-9]/.test(customerPhone)}
+          className="w-full h-12 rounded-xl font-bold text-sm bg-gray-950 hover:bg-black disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white uppercase tracking-wider text-center transition-all duration-150 flex items-center justify-center gap-2 active:scale-[0.99] shadow-sm hover:shadow-md cursor-pointer"
         >
-          {isTableLocked ? (
-            <span className="flex items-center gap-1">
+          {isTableLocked && selectedType === 'Dine-In' ? (
+            <span className="flex items-center gap-1.5">
               <Lock size={15} /> 
               TABLE OCCUPIED
             </span>
