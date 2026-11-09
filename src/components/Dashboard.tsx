@@ -135,7 +135,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
         { name: 'Dal Makhani', value: 8 },
         { name: 'Paneer Butter Masala', value: 6 },
         { name: 'Cold Coffee', value: 5 },
-        { name: 'Chocolate Brownie', value: 4 },
+        { name: 'Garlic Naan', value: 4 },
         { name: 'Fresh Lime Soda', value: 3 },
       ];
     }

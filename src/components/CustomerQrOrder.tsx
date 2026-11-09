@@ -178,16 +178,14 @@ export default function CustomerQrOrder({ restaurantId, tableId }: CustomerQrOrd
 
     const menuPath = `restaurants/${restaurantId}/menuItems`;
     const unsubMenu = onSnapshot(collection(db, menuPath), (snapshot) => {
-      const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as MenuItem));
-      if (items.length > 0) {
-        setMenuItems(items);
-      } else {
-        setMenuItems(INITIAL_MENU_ITEMS);
-      }
+      const items = snapshot.docs
+        .map(d => ({ id: d.id, ...d.data() } as MenuItem))
+        .filter(it => it.id !== 'm1' && !it.name?.toLowerCase().includes('brownie') && !(it.category === 'Desserts' && it.name?.toLowerCase().includes('cake')));
+      setMenuItems(items);
       setLoading(false);
     }, (error) => {
-      console.warn('Menu load error, fallback to initial items:', error);
-      setMenuItems(INITIAL_MENU_ITEMS);
+      console.warn('Menu load error:', error);
+      setMenuItems([]);
       setLoading(false);
     });
 

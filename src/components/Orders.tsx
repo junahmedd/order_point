@@ -517,221 +517,248 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
         )}
       </div>
 
-      {/* RIGHT COLUMN: Current Order operational panel */}
-      <div className={`w-full xl:w-[360px] bg-white border border-gray-200 xl:rounded-[24px] shadow-sm flex flex-col xl:sticky xl:top-4 h-fit ${
-        isMobileCartOpen 
-          ? 'fixed inset-0 z-50 overflow-y-auto bg-gray-50/70 p-3 sm:p-5' 
-          : 'hidden xl:flex p-4 sm:p-5'
-      }`}>
-        <div className="w-full max-w-md mx-auto space-y-3.5 bg-white rounded-2xl p-4 sm:p-5 border border-gray-100/80 shadow-2xs">
-        
+      {/* RIGHT COLUMN (DESKTOP) & FULL SCREEN CART DRAWER (MOBILE) */}
+      <div className={`
+        ${isMobileCartOpen 
+          ? 'fixed inset-0 z-50 flex flex-col bg-white overflow-hidden' 
+          : 'hidden xl:flex w-full xl:w-[360px] bg-white border border-gray-200 xl:rounded-[24px] shadow-sm p-4 sm:p-5 h-fit flex-col space-y-3.5 xl:sticky xl:top-4'
+        }
+      `}>
         {/* Top Header Box (Full solid black box) */}
-        <div className="bg-black text-white rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm select-none">
-          <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => setIsMobileCartOpen(false)}
-              className="xl:hidden flex items-center justify-center w-7 h-7 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors border-none cursor-pointer active:scale-95"
-              title="Back to Order"
-            >
-              <ArrowLeft size={15} className="stroke-[2.5] text-white" />
-            </button>
-            <div className="flex items-center gap-2">
-              <ShoppingBag size={17} className="text-white stroke-[2.5]" />
-              <h2 className="text-sm font-black text-white uppercase tracking-tight">Current Order</h2>
+        <div className={isMobileCartOpen ? 'p-3.5 pb-2 shrink-0 bg-white border-b border-gray-100' : ''}>
+          <div className="bg-black text-white rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm select-none">
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setIsMobileCartOpen(false)}
+                className="xl:hidden flex items-center justify-center w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 active:scale-95 text-white transition-all border-none cursor-pointer"
+                title="Back to Order"
+              >
+                <ArrowLeft size={16} className="stroke-[2.5] text-white" />
+              </button>
+              <div className="flex items-center gap-2">
+                <ShoppingBag size={17} className="text-white stroke-[2.5]" />
+                <h2 className="text-sm font-black text-white uppercase tracking-wider">CURRENT ORDER</h2>
+              </div>
             </div>
+            {cartValues.itemsArray.length > 0 && (
+              <button
+                type="button"
+                onClick={handleClearCart}
+                className="text-xs font-bold text-red-500 hover:text-red-400 flex items-center gap-1.5 transition-colors cursor-pointer bg-transparent border-none py-1 px-2 rounded-lg hover:bg-red-500/10"
+              >
+                <Trash2 size={13} className="text-red-500" />
+                <span className="text-red-500 font-bold">Reset Cart</span>
+              </button>
+            )}
           </div>
-          {cartValues.itemsArray.length > 0 && (
-            <button
-              onClick={handleClearCart}
-              className="text-xs font-bold text-rose-500 hover:text-rose-400 flex items-center gap-1 transition-colors cursor-pointer bg-transparent border-none p-1"
-            >
-              <Trash2 size={13} className="text-rose-500" />
-              <span className="text-rose-500">Reset Cart</span>
-            </button>
-          )}
         </div>
 
-        {/* Service Selector: Dine In vs Takeaway (Delivery removed) */}
-        <div className="bg-gray-100 p-1 rounded-xl grid grid-cols-2 text-center select-none">
-          {(['Dine-In', 'Takeaway'] as const).map(type => (
-            <button
-              id={`tab_srv_${type}`}
-              key={type}
-              onClick={() => setSelectedType(type)}
-              className={`py-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all cursor-pointer ${
-                selectedType === type
-                  ? 'bg-white text-gray-950 shadow-xs font-black'
-                  : 'text-gray-500 hover:text-gray-900'
-              }`}
-            >
-              {type === 'Dine-In' ? 'Dine In' : type}
-            </button>
-          ))}
-        </div>
+        {/* Scrollable Content Area */}
+        <div className={isMobileCartOpen ? 'flex-1 overflow-y-auto p-3.5 space-y-3' : 'space-y-3'}>
+          {/* Service Selector: Dine In vs Takeaway (Delivery removed) */}
+          <div className="bg-gray-100 p-1 rounded-xl grid grid-cols-2 text-center select-none">
+            {(['Dine-In', 'Takeaway'] as const).map(type => (
+              <button
+                id={`tab_srv_${type}`}
+                key={type}
+                onClick={() => setSelectedType(type)}
+                className={`py-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all cursor-pointer ${
+                  selectedType === type
+                    ? 'bg-white text-gray-950 shadow-xs font-black'
+                    : 'text-gray-500 hover:text-gray-900'
+                }`}
+              >
+                {type === 'Dine-In' ? 'Dine In' : type}
+              </button>
+            ))}
+          </div>
 
-        {/* Customer Details & Table Selections */}
-        <div className="space-y-3 bg-gray-50/80 rounded-2xl p-3.5 border border-gray-100">
-          {/* Customer Mobile Number */}
-          <div className="space-y-1">
-            <label className="text-[10px] font-extrabold text-gray-700 uppercase tracking-wider block">Customer Mobile Number</label>
-            <input
-              type="tel"
-              placeholder="Enter 10-Digit Mobile Number"
-              value={customerPhone}
-              onChange={(e) => {
-                const numericVal = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
-                setCustomerPhone(numericVal);
-              }}
-              className="w-full h-11 px-3.5 bg-white border border-gray-200 rounded-xl text-sm font-medium font-sans text-gray-700 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-gray-950/10 focus:border-gray-950 transition-all"
-              maxLength={10}
-            />
-            {customerPhone.length > 0 && (
-              <p className={`text-[10px] font-semibold ${customerPhone.length === 10 && /^[6-9]/.test(customerPhone) ? 'text-emerald-600' : 'text-rose-500'}`}>
-                {customerPhone.length < 10 
-                  ? "Enter 10-digit mobile number" 
-                  : (!/^[6-9]/.test(customerPhone) 
-                    ? "Must start with 6, 7, 8, or 9" 
-                    : "✓ Valid Mobile Number")}
-              </p>
+          {/* Customer Details & Table Selections */}
+          <div className="space-y-3 bg-gray-50/80 rounded-2xl p-3.5 border border-gray-100">
+            {/* Customer Mobile Number */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-extrabold text-gray-700 uppercase tracking-wider block">Customer Mobile Number</label>
+              <input
+                type="tel"
+                placeholder="Enter 10-Digit Mobile Number"
+                value={customerPhone}
+                onChange={(e) => {
+                  const numericVal = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
+                  setCustomerPhone(numericVal);
+                }}
+                className="w-full h-11 px-3.5 bg-white border border-gray-200 rounded-xl text-sm font-medium font-sans text-gray-700 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-gray-950/10 focus:border-gray-950 transition-all"
+                maxLength={10}
+              />
+              {customerPhone.length > 0 && (
+                <p className={`text-[10px] font-semibold ${customerPhone.length === 10 && /^[6-9]/.test(customerPhone) ? 'text-emerald-600' : 'text-rose-500'}`}>
+                  {customerPhone.length < 10 
+                    ? "Enter 10-digit mobile number" 
+                    : (!/^[6-9]/.test(customerPhone) 
+                      ? "Must start with 6, 7, 8, or 9" 
+                      : "✓ Valid Mobile Number")}
+                </p>
+              )}
+            </div>
+
+            {/* Conditional Table Selector */}
+            {selectedType === 'Dine-In' && (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between mb-0.5">
+                  <label className="text-[10px] font-extrabold text-gray-700 uppercase tracking-wider block">Select Table</label>
+                  {tableStatuses[selectedTable] === 'Occupied' ? (
+                    <span className="text-[9px] font-black text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full uppercase tracking-wider border border-rose-200">
+                      Occupied
+                    </span>
+                  ) : (
+                    <span className="text-[9px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">
+                      Available
+                    </span>
+                  )}
+                </div>
+                <select
+                  id="select_dest_table"
+                  value={selectedTable}
+                  onChange={(e) => setSelectedTable(e.target.value)}
+                  className="w-full h-11 px-3 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-950/10 focus:border-gray-950 transition-all cursor-pointer"
+                >
+                  {dynamicTables.map(t => {
+                    const isOccupied = tableStatuses[t] === 'Occupied';
+                    return (
+                      <option 
+                        key={t} 
+                        value={t} 
+                        disabled={isOccupied} 
+                        className={isOccupied ? "text-gray-400 bg-gray-100" : "text-gray-900"}
+                      >
+                        {t}{isOccupied ? ' (Occupied)' : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
             )}
           </div>
 
-          {/* Conditional Table Selector */}
-          {selectedType === 'Dine-In' && (
-            <div className="space-y-1">
-              <div className="flex items-center justify-between mb-0.5">
-                <label className="text-[10px] font-extrabold text-gray-700 uppercase tracking-wider block">Select Table</label>
-                {tableStatuses[selectedTable] === 'Occupied' ? (
-                  <span className="text-[9px] font-black text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full uppercase tracking-wider border border-rose-200">
-                    Occupied
-                  </span>
-                ) : (
-                  <span className="text-[9px] font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase tracking-wider border border-emerald-200">
-                    Available
-                  </span>
-                )}
+          {/* Cart Items list */}
+          <div className={`space-y-2 ${isMobileCartOpen ? '' : 'max-h-[260px] overflow-y-auto pr-0.5'}`}>
+            {cartValues.itemsArray.length === 0 ? (
+              <div className="py-8 text-center text-gray-400 space-y-2 select-none">
+                <Utensils size={28} className="mx-auto text-gray-300 stroke-[1.5]" />
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-400">No Items Added</p>
+                <p className="text-[11px] text-gray-400">Select dishes from the menu to start order.</p>
               </div>
-              <select
-                id="select_dest_table"
-                value={selectedTable}
-                onChange={(e) => setSelectedTable(e.target.value)}
-                className="w-full h-11 px-3 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-950/10 focus:border-gray-950 transition-all cursor-pointer"
-              >
-                {dynamicTables.map(t => {
-                  const isOccupied = tableStatuses[t] === 'Occupied';
-                  return (
-                    <option 
-                      key={t} 
-                      value={t} 
-                      disabled={isOccupied} 
-                      className={isOccupied ? "text-gray-400 bg-gray-100" : "text-gray-900"}
-                    >
-                      {t}{isOccupied ? ' (Occupied)' : ''}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-          )}
-        </div>
+            ) : (
+              cartValues.itemsArray.map(item => (
+                <div 
+                  key={item.menuItem.id} 
+                  className="flex items-center justify-between gap-3 p-2.5 border border-gray-100 rounded-xl bg-gray-50/60 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <span className="font-bold text-xs text-gray-900 truncate block">{item.menuItem.name}</span>
+                    <span className="text-[11px] text-gray-500 font-semibold">
+                      {currencySymbol}{item.menuItem.price} each
+                    </span>
+                  </div>
+                  
+                  {/* Stepper with [ - qty + ] */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center border border-gray-200 rounded-lg bg-white p-0.5 shadow-2xs">
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateQty(item.menuItem.id, -1)}
+                        className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors cursor-pointer border-none"
+                      >
+                        <Minus size={11} className="stroke-[3]" />
+                      </button>
+                      <span className="w-5 text-center font-black text-xs text-gray-800">{item.quantity}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateQty(item.menuItem.id, 1)}
+                        className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-black rounded hover:bg-gray-100 transition-colors cursor-pointer border-none"
+                      >
+                        <Plus size={11} className="stroke-[3]" />
+                      </button>
+                    </div>
 
-        {/* Cart Items list (Compact, cleanly spaced without artificial gap) */}
-        <div className="space-y-2 max-h-[300px] xl:max-h-[260px] overflow-y-auto pr-0.5">
-          {cartValues.itemsArray.length === 0 ? (
-            <div className="py-8 text-center text-gray-400 space-y-2 select-none">
-              <Utensils size={28} className="mx-auto text-gray-300 stroke-[1.5]" />
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400">No Items Added</p>
-              <p className="text-[11px] text-gray-400">Select dishes from the menu to start order.</p>
-            </div>
-          ) : (
-            cartValues.itemsArray.map(item => (
-              <div 
-                key={item.menuItem.id} 
-                className="flex items-center justify-between gap-3 p-2.5 border border-gray-100 rounded-xl bg-gray-50/60 hover:bg-gray-50 transition-colors"
-              >
-                <div className="min-w-0 flex-1">
-                  <span className="font-bold text-xs text-gray-900 truncate block">{item.menuItem.name}</span>
-                  <span className="text-[11px] text-gray-500 font-semibold">
-                    {currencySymbol}{item.menuItem.price} each
-                  </span>
-                </div>
-                
-                {/* Stepper with [ - qty + ] */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className="flex items-center border border-gray-200 rounded-lg bg-white p-0.5 shadow-2xs">
+                    {/* Quick Trash remove */}
                     <button
                       type="button"
-                      onClick={() => handleUpdateQty(item.menuItem.id, -1)}
-                      className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors cursor-pointer"
+                      onClick={() => handleUpdateQty(item.menuItem.id, -item.quantity)}
+                      className="p-1.5 text-gray-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-all cursor-pointer border-none bg-transparent"
+                      title="Remove item"
                     >
-                      <Minus size={11} className="stroke-[3]" />
-                    </button>
-                    <span className="w-5 text-center font-black text-xs text-gray-800">{item.quantity}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleUpdateQty(item.menuItem.id, 1)}
-                      className="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-black rounded hover:bg-gray-100 transition-colors cursor-pointer"
-                    >
-                      <Plus size={11} className="stroke-[3]" />
+                      <Trash2 size={13} />
                     </button>
                   </div>
-
-                  {/* Quick Trash remove */}
-                  <button
-                    type="button"
-                    onClick={() => handleUpdateQty(item.menuItem.id, -item.quantity)}
-                    className="p-1.5 text-gray-400 hover:text-rose-600 rounded-md hover:bg-rose-50 transition-all cursor-pointer"
-                    title="Remove item"
-                  >
-                    <Trash2 size={13} />
-                  </button>
                 </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        {/* Dynamic Billing Breakdowns */}
-        <div className="border-t border-gray-100 pt-3 space-y-2 select-none text-xs text-gray-500 font-medium font-sans">
-          <div className="flex justify-between">
-            <span>Subtotal</span>
-            <span className="font-bold text-gray-800">{currencySymbol}{cartValues.subtotal}</span>
+              ))
+            )}
           </div>
-          
-          {taxEnabled && (
+
+          {/* Dynamic Billing Breakdowns */}
+          <div className="border-t border-gray-100 pt-3 space-y-2 select-none text-xs text-gray-500 font-medium font-sans">
             <div className="flex justify-between">
-              <span>Tax ({taxPercentage}%)</span>
-              <span className="font-bold text-gray-800">{currencySymbol}{cartValues.taxes}</span>
+              <span>Subtotal</span>
+              <span className="font-bold text-gray-800">{currencySymbol}{cartValues.subtotal}</span>
             </div>
-          )}
+            
+            {taxEnabled && (
+              <div className="flex justify-between">
+                <span>Tax ({taxPercentage}%)</span>
+                <span className="font-bold text-gray-800">{currencySymbol}{cartValues.taxes}</span>
+              </div>
+            )}
 
-          {/* Total Block */}
-          <div className="border-t border-gray-100 pt-2.5 flex justify-between items-baseline">
-            <span className="font-extrabold text-gray-900 text-xs uppercase tracking-wider">Grand Total</span>
-            <span id="label_cart_total_price" className="text-2xl font-black text-gray-950 tracking-tight">
-              {currencySymbol}{cartValues.total}
-            </span>
+            {/* Total Block */}
+            <div className="border-t border-gray-100 pt-2.5 flex justify-between items-baseline">
+              <span className="font-extrabold text-gray-900 text-xs uppercase tracking-wider">Grand Total</span>
+              <span id="label_cart_total_price" className="text-2xl font-black text-gray-950 tracking-tight">
+                {currencySymbol}{cartValues.total}
+              </span>
+            </div>
+          </div>
+
+          {/* On Desktop: ORDER Dispatcher Button */}
+          <div className="hidden xl:block pt-1">
+            <button
+              id="btn_send_kitchen_ticket_desktop"
+              onClick={handlePlaceOrder}
+              disabled={cartValues.itemsArray.length === 0 || (selectedType === 'Dine-In' && (isTableLocked || !selectedTable)) || customerPhone.length !== 10 || !/^[6-9]/.test(customerPhone)}
+              className="w-full h-12 rounded-xl font-bold text-sm bg-black hover:bg-neutral-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white uppercase tracking-wider text-center transition-all duration-150 flex items-center justify-center gap-2 active:scale-[0.99] shadow-sm hover:shadow-md cursor-pointer border-none"
+            >
+              {isTableLocked && selectedType === 'Dine-In' ? (
+                <span className="flex items-center gap-1.5">
+                  <Lock size={15} /> 
+                  TABLE OCCUPIED
+                </span>
+              ) : (
+                <span>ORDER</span>
+              )}
+            </button>
           </div>
         </div>
 
-        {/* ORDER Dispatcher Button */}
-        <button
-          id="btn_send_kitchen_ticket"
-          onClick={handlePlaceOrder}
-          disabled={cartValues.itemsArray.length === 0 || (selectedType === 'Dine-In' && (isTableLocked || !selectedTable)) || customerPhone.length !== 10 || !/^[6-9]/.test(customerPhone)}
-          className="w-full h-12 rounded-xl font-bold text-sm bg-gray-950 hover:bg-black disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white uppercase tracking-wider text-center transition-all duration-150 flex items-center justify-center gap-2 active:scale-[0.99] shadow-sm hover:shadow-md cursor-pointer"
-        >
-          {isTableLocked && selectedType === 'Dine-In' ? (
-            <span className="flex items-center gap-1.5">
-              <Lock size={15} /> 
-              TABLE OCCUPIED
-            </span>
-          ) : (
-            <span>ORDER</span>
-          )}
-        </button>
-        </div>
+        {/* ON MOBILE: Docked bottom action bar with ORDER button (ZERO dead space at bottom) */}
+        {isMobileCartOpen && (
+          <div className="xl:hidden shrink-0 bg-white border-t border-gray-200/90 p-3.5 pb-4 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+            <button
+              id="btn_send_kitchen_ticket"
+              onClick={handlePlaceOrder}
+              disabled={cartValues.itemsArray.length === 0 || (selectedType === 'Dine-In' && (isTableLocked || !selectedTable)) || customerPhone.length !== 10 || !/^[6-9]/.test(customerPhone)}
+              className="w-full h-12 rounded-xl font-bold text-sm bg-black hover:bg-neutral-800 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white uppercase tracking-wider text-center transition-all duration-150 flex items-center justify-center gap-2 active:scale-[0.99] shadow-sm cursor-pointer border-none"
+            >
+              {isTableLocked && selectedType === 'Dine-In' ? (
+                <span className="flex items-center gap-1.5">
+                  <Lock size={15} /> 
+                  TABLE OCCUPIED
+                </span>
+              ) : (
+                <span>ORDER</span>
+              )}
+            </button>
+          </div>
+        )}
 
       </div>
 

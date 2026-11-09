@@ -135,32 +135,47 @@ export function useLiveAppData() {
     const currentRestId = activeUserId;
 
     const runSeederIfEmpty = async () => {
-       const menuRef = collection(db, `restaurants/${currentRestId}/menuItems`);
+       const restDocRef = doc(db, 'restaurants', currentRestId);
+       const localSeedKey = `orderpoint_seeded_${currentRestId}`;
+       // If restaurant was already seeded in this workspace, NEVER re-seed
+       if (localStorage.getItem(localSeedKey) === 'true') {
+         return;
+       }
        try {
-         const snap = await getDocs(menuRef);
-         if(snap.empty) {
-            console.log("Seeding initial live database data...");
-            // Seed Menu
-            for (const item of INITIAL_MENU_ITEMS) {
-              await setDoc(doc(db, `restaurants/${currentRestId}/menuItems`, item.id), cleanUndefined(item));
-            }
-            // Seed Inventory
-            for (const item of INITIAL_INVENTORY_ITEMS) {
-              await setDoc(doc(db, `restaurants/${currentRestId}/inventoryItems`, item.id), cleanUndefined(item));
-            }
-            // Seed Staff
-            for (const item of INITIAL_STAFF_MEMBERS) {
-              await setDoc(doc(db, `restaurants/${currentRestId}/staffMembers`, item.id), cleanUndefined(item));
-            }
-            // Seed Customers
-            for (const item of INITIAL_CUSTOMERS) {
-              await setDoc(doc(db, `restaurants/${currentRestId}/customers`, item.id), cleanUndefined(item));
-            }
-            // Seed Orders
-            for (const item of INITIAL_ORDERS) {
-              await setDoc(doc(db, `restaurants/${currentRestId}/orders`, item.id), cleanUndefined(item));
-            }
+         const restSnap = await getDoc(restDocRef);
+         if (restSnap.exists() && restSnap.data()?.hasSeededInitialData) {
+           localStorage.setItem(localSeedKey, 'true');
+           return;
          }
+
+         const menuRef = collection(db, `restaurants/${currentRestId}/menuItems`);
+         const snap = await getDocs(menuRef);
+         if (!snap.empty) {
+           // Restaurant already has menu items; record seed completion and do not overwrite
+           await setDoc(restDocRef, { hasSeededInitialData: true }, { merge: true });
+           localStorage.setItem(localSeedKey, 'true');
+           return;
+         }
+
+         // Seed initial live database data only once for a brand-new restaurant workspace
+         console.log("Seeding initial live database data for fresh restaurant workspace...");
+         for (const item of INITIAL_MENU_ITEMS) {
+           await setDoc(doc(db, `restaurants/${currentRestId}/menuItems`, item.id), cleanUndefined(item));
+         }
+         for (const item of INITIAL_INVENTORY_ITEMS) {
+           await setDoc(doc(db, `restaurants/${currentRestId}/inventoryItems`, item.id), cleanUndefined(item));
+         }
+         for (const item of INITIAL_STAFF_MEMBERS) {
+           await setDoc(doc(db, `restaurants/${currentRestId}/staffMembers`, item.id), cleanUndefined(item));
+         }
+         for (const item of INITIAL_CUSTOMERS) {
+           await setDoc(doc(db, `restaurants/${currentRestId}/customers`, item.id), cleanUndefined(item));
+         }
+         for (const item of INITIAL_ORDERS) {
+           await setDoc(doc(db, `restaurants/${currentRestId}/orders`, item.id), cleanUndefined(item));
+         }
+         await setDoc(restDocRef, { hasSeededInitialData: true }, { merge: true });
+         localStorage.setItem(localSeedKey, 'true');
        } catch (error) {
          console.warn('Seeder notice:', error);
        }
@@ -190,18 +205,39 @@ export function useLiveAppData() {
 
     const menuPath = `restaurants/${currentRestId}/menuItems`;
     const unsubMenu = onSnapshot(collection(db, menuPath), (snapshot) => {
-      const allItems = snapshot.docs.map(doc => doc.data() as MenuItem);
-      // Auto-purge any legacy "Brownie" items if present in the database
-      const brownieDocs = snapshot.docs.filter(d => {
+      let deletedIds: string[] = [];
+      try {
+        const key = `orderpoint_deleted_menu_${currentRestId}`;
+        deletedIds = JSON.parse(localStorage.getItem(key) || '[]');
+      } catch (e) {}
+
+      // Auto-purge any legacy "Brownie" or user-deleted items if present in the database
+      const purgeDocs = snapshot.docs.filter(d => {
         const dData = d.data();
-        return d.id === 'm1' || (dData.name && dData.name.toLowerCase().includes('brownie'));
+        const isBrownie = d.id === 'm1' || 
+                          (dData.name && dData.name.toLowerCase().includes('brownie')) || 
+                          (dData.category === 'Desserts' && dData.name && dData.name.toLowerCase().includes('cake'));
+        const isDeleted = deletedIds.includes(d.id);
+        return isBrownie || isDeleted;
       });
-      if (brownieDocs.length > 0) {
-        brownieDocs.forEach(d => {
+
+      if (purgeDocs.length > 0) {
+        purgeDocs.forEach(d => {
           deleteDoc(doc(db, menuPath, d.id)).catch(() => {});
         });
       }
-      setMenuItems(allItems.filter(it => it.id !== 'm1' && !it.name?.toLowerCase().includes('brownie')));
+
+      const allItems = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() } as MenuItem))
+        .filter(it => {
+          const isBrownie = it.id === 'm1' || 
+                            it.name?.toLowerCase().includes('brownie') || 
+                            (it.category === 'Desserts' && it.name?.toLowerCase().includes('cake'));
+          const isDeleted = deletedIds.includes(it.id);
+          return !isBrownie && !isDeleted;
+        });
+
+      setMenuItems(allItems);
     }, (error) => {
       console.warn('Firestore menu listener warning:', error);
     });
@@ -346,6 +382,18 @@ export function useLiveAppData() {
     if (!activeUserId) return;
     const path = `restaurants/${activeUserId}/menuItems`;
     try {
+      // Record deleted id in localStorage so it can never resurrect or be re-seeded
+      try {
+        const key = `orderpoint_deleted_menu_${activeUserId}`;
+        const deletedIds = JSON.parse(localStorage.getItem(key) || '[]');
+        if (!deletedIds.includes(id)) {
+          deletedIds.push(id);
+          localStorage.setItem(key, JSON.stringify(deletedIds));
+        }
+      } catch (e) {}
+
+      // Immediately remove from local state
+      setMenuItems(prev => prev.filter(item => item.id !== id));
       await deleteDoc(doc(db, path, id));
     } catch (error) {
       console.warn('Error deleting menu item:', error);
