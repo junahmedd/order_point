@@ -285,7 +285,7 @@ export default function App() {
         setActiveTab('Orders');
       }
     } else if (r === 'cashier') {
-      if (activeTab !== 'Orders' && activeTab !== 'Billing' && activeTab !== 'ScanGo') {
+      if (activeTab !== 'Orders' && activeTab !== 'Billing') {
         setActiveTab('Orders');
       }
     }

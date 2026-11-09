@@ -144,31 +144,12 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
 
   return (
     <PageLayout
-      title="Kitchen Display System"
+      title="Kitchen"
       subtitle="Track live kitchen orders and preparation status."
       id="kitchen_view"
       activeTab="Kitchen"
       onTabChange={onNavigateToTab}
-      actions={
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="bg-sky-50 text-sky-700 text-[11px] font-bold px-3 py-1.5 rounded-full border border-sky-200 flex items-center gap-1.5 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
-            <span>🔵 Kitchen Online</span>
-          </div>
-          <div className="bg-blue-50 text-blue-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-blue-100">
-            Active: {activeOrdersCount}
-          </div>
-          <div className="bg-amber-50 text-amber-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-amber-100">
-            Preparing: {preparingCount}
-          </div>
-          <div className="bg-sky-50 text-sky-700 text-[11px] font-bold px-3 py-1.5 rounded-full border border-sky-200">
-            Ready: {readyCount}
-          </div>
-          <div className="bg-purple-50 text-purple-600 text-[11px] font-bold px-3 py-1.5 rounded-full border border-purple-100">
-            Avg Time: {avgPrepTimeStr}
-          </div>
-        </div>
-      }
+      pillVariant="green"
     >
       {/* KEYFRAMES FOR OPERATIONAL EFFECTS */}
       <style>{`

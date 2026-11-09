@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { Order, MenuItem, InventoryItem } from '../types';
+import { isTodayIST, getISTDateString } from '../lib/dateUtils';
 
 interface DashboardProps {
   orders: Order[];
@@ -26,47 +27,48 @@ interface DashboardProps {
 export default function Dashboard({ orders, menuItems, inventoryItems, onNavigateToTab, restaurantName, settings }: DashboardProps) {
   const currencySymbol = settings?.prefCurrency || '₹';
   const stats = useMemo(() => {
-    const paidOrders = orders.filter(o => o.isPaid);
-    const todayRevenue = paidOrders.reduce((sum, o) => sum + o.totalAmount, 0);
-
-    const ordersToday = orders.length;
+    // Only count today's business day orders in IST for daily sales KPIs
+    const todayOrders = orders.filter(o => isTodayIST(o.timestamp || o.createdAt));
+    const todayPaidOrders = todayOrders.filter(o => o.isPaid);
+    const todayRevenue = todayPaidOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+    const ordersToday = todayOrders.length;
 
     const activeTables = new Set(
       orders
-        .filter(o => o.status !== 'Completed' && o.status !== 'Delivered' && o.tableNo)
+        .filter(o => o.status !== 'Completed' && o.status !== 'Delivered' && o.status !== 'Cancelled' && o.tableNo)
         .map(o => o.tableNo)
     ).size;
 
-    const cashSales = paidOrders
+    const cashSales = todayPaidOrders
       .filter(o => o.paymentMethod?.toLowerCase() === 'cash')
-      .reduce((sum, o) => sum + o.totalAmount, 0);
+      .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-    const upiSales = paidOrders
+    const upiSales = todayPaidOrders
       .filter(o => {
         const m = o.paymentMethod?.toLowerCase() || '';
         return m.includes('upi') || m.includes('gpay') || m.includes('google pay');
       })
-      .reduce((sum, o) => sum + o.totalAmount, 0);
+      .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-    const cardSales = paidOrders
+    const cardSales = todayPaidOrders
       .filter(o => o.paymentMethod?.toLowerCase() === 'card')
-      .reduce((sum, o) => sum + o.totalAmount, 0);
+      .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
     // Channel specific metrics
-    const swiggyOrders = orders.filter(o => o.orderSource === 'Swiggy');
+    const swiggyOrders = todayOrders.filter(o => o.orderSource === 'Swiggy');
     const swiggyRevenue = swiggyOrders.filter(o => o.isPaid).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-    const zomatoOrders = orders.filter(o => o.orderSource === 'Zomato');
+    const zomatoOrders = todayOrders.filter(o => o.orderSource === 'Zomato');
     const zomatoRevenue = zomatoOrders.filter(o => o.isPaid).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-    const scangoOrders = orders.filter(o => 
+    const scangoOrders = todayOrders.filter(o => 
       o.orderSource === 'QR' || 
       o.orderSource === 'QR Order' || 
       (o.type === 'Dine-In' && (o.id?.startsWith('so_') || (o as any).isSelfOrder || o.customerName?.toLowerCase().includes('self')))
     );
     const scangoRevenue = scangoOrders.filter(o => o.isPaid).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-    const dineInOrders = orders.filter(o => 
+    const dineInOrders = todayOrders.filter(o => 
       o.type === 'Dine-In' && 
       o.orderSource !== 'QR' && 
       o.orderSource !== 'QR Order' && 
@@ -74,7 +76,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
     );
     const dineInRevenue = dineInOrders.filter(o => o.isPaid).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
-    const takeawayOrders = orders.filter(o => o.type === 'Takeaway');
+    const takeawayOrders = todayOrders.filter(o => o.type === 'Takeaway');
     const takeawayRevenue = takeawayOrders.filter(o => o.isPaid).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
     const itemCounts: Record<string, number> = {};
@@ -149,13 +151,13 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       const dayStr = days[d.getDay()];
-      const dateStr = d.toDateString();
+      const targetISTDate = getISTDateString(d);
 
       const dayRevenue = orders
         .filter(o => {
           if (!o.isPaid) return false;
-          const orderDate = o.createdAt ? new Date(o.createdAt).toDateString() : (o.timestamp ? new Date(o.timestamp).toDateString() : '');
-          return orderDate === dateStr;
+          const orderISTDate = getISTDateString(o.timestamp || o.createdAt);
+          return orderISTDate === targetISTDate;
         })
         .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
@@ -191,6 +193,7 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
       id="dashboard_view"
       activeTab="Dashboard"
       onTabChange={onNavigateToTab}
+      pillVariant="green"
     >
 
       {/* KPI Cards Row (5-Column Grid) */}
@@ -384,14 +387,14 @@ export default function Dashboard({ orders, menuItems, inventoryItems, onNavigat
             </div>
           </div>
 
-          {/* Scan & Go channel card */}
+          {/* Digital QR Orders channel card */}
           <div 
-            onClick={() => onNavigateToTab('ScanGo')}
-            className="p-4 rounded-[16px] border border-purple-100 bg-purple-50/15 hover:shadow-md hover:border-purple-350 hover:scale-[1.01] transition-all duration-300 cursor-pointer"
+            onClick={() => onNavigateToTab('Orders')}
+            className="p-4 rounded-[16px] border border-sky-100 bg-sky-50/20 hover:shadow-md hover:border-sky-300 hover:scale-[1.01] transition-all duration-300 cursor-pointer"
           >
             <div className="flex items-center gap-2 mb-2">
-              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-              <span className="text-[10px] font-black tracking-widest text-purple-600 uppercase">SCAN NOW QR</span>
+              <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
+              <span className="text-[10px] font-black tracking-widest text-sky-700 uppercase">DIGITAL QR ORDERS</span>
             </div>
             <div className="space-y-1 mt-3">
               <div className="flex justify-between items-baseline">

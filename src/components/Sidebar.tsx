@@ -87,7 +87,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const [settingsExpanded, setSettingsExpanded] = useState(true);
 
-  // Clean, simple navigation list: Scan Now positioned right above Settings
+  // Clean, simple navigation list
   const navigationItems: { id: SidebarTab; label: string; icon: any; isLocked?: boolean }[] = [
     { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'Orders', label: 'Orders', icon: ShoppingCart },
@@ -96,7 +96,6 @@ export default function Sidebar({
     { id: 'Menu', label: 'Menu', icon: UtensilsCrossed },
     { id: 'Inventory', label: 'Inventory', icon: Package },
     { id: 'Reports', label: 'Reports', icon: LineChart },
-    { id: 'ScanGo', label: 'Scan Now', icon: QrCode },
     { id: 'Settings', label: 'Settings', icon: Settings },
   ];
 
@@ -106,13 +105,13 @@ export default function Sidebar({
   }
 
   const roleNormalized = (userRole || 'RestaurantOwner').toLowerCase();
-  let allowedTabIds: SidebarTab[] = ['Dashboard', 'Orders', 'Kitchen', 'Billing', 'Menu', 'Inventory', 'Reports', 'ScanGo', 'Settings'];
+  let allowedTabIds: SidebarTab[] = ['Dashboard', 'Orders', 'Kitchen', 'Billing', 'Menu', 'Inventory', 'Reports', 'Settings'];
   if (roleNormalized === 'kitchen' || roleNormalized === 'chef') {
     allowedTabIds = ['Kitchen'];
   } else if (roleNormalized === 'waiter') {
     allowedTabIds = ['Orders', 'Kitchen'];
   } else if (roleNormalized === 'cashier') {
-    allowedTabIds = ['Orders', 'Billing', 'ScanGo'];
+    allowedTabIds = ['Orders', 'Billing'];
   }
 
   const filteredNavigationItems = navigationItems.filter(item =>

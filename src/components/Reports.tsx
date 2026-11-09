@@ -6,6 +6,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import PageLayout from './PageLayout';
 import { db, auth } from '../firebase';
+import { isTodayIST, getISTDateString } from '../lib/dateUtils';
 import { collection, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { 
   DollarSign, 
@@ -375,9 +376,7 @@ export default function Reports({
       const diffMs = now - orderTime;
       
       if (filter === 'TODAY') {
-        const todayStr = new Date().toDateString();
-        const orderDateStr = o.createdAt ? new Date(o.createdAt).toDateString() : new Date(o.timestamp || now).toDateString();
-        return orderDateStr === todayStr;
+        return isTodayIST(o.timestamp || o.createdAt);
       }
       if (filter === 'WEEK') {
         return diffMs <= 7 * 24 * 60 * 60 * 1000;
@@ -541,6 +540,7 @@ export default function Reports({
       id="reports_view"
       activeTab="Reports"
       onTabChange={onNavigateToTab}
+      pillVariant="green"
     >
       {/* Controls Filter Row */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-gray-100">

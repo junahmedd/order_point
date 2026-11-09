@@ -933,6 +933,7 @@ Thank you for choosing ${restName}. We look forward to serving you again!`;
       customPadding="p-3 sm:p-6 flex-1 flex flex-col min-h-0 overflow-hidden"
       activeTab="Billing"
       onTabChange={onNavigateToTab}
+      pillVariant="green"
     >
       
       {/* KEYFRAMES FOR ANIMATIONS */}
@@ -1008,64 +1009,6 @@ Thank you for choosing ${restName}. We look forward to serving you again!`;
             >
               Paid History ({paidOrders.length})
             </button>
-          </div>
-
-          <div className="flex justify-between items-center bg-gray-50/50 p-2 rounded-[10px] border border-gray-100 shrink-0">
-            <div className="flex flex-col">
-              <span className="text-[10px] font-extrabold uppercase text-gray-400 tracking-wider">
-                {billingTab === 'pending' ? 'Settlement Queue' : 'Completed Invoices'}
-              </span>
-              <span className="text-[13px] font-black text-gray-800">
-                {billingTab === 'pending' ? `${unpaidOrders.length} Pending Tickets` : `${paidOrders.length} Settled Logs`}
-              </span>
-            </div>
-
-            {/* Oldest First / Amount sorting dropdown/chips */}
-            <div className="flex bg-white p-0.5 rounded-[6px] border border-gray-200">
-              <button
-                id="btn_sort_oldest"
-                title="Settle oldest first"
-                onClick={() => setSortBy('oldest')}
-                className={`px-2 py-1 rounded-[4px] text-[9.5px] font-bold uppercase tracking-tight transition-all cursor-pointer ${
-                  sortBy === 'oldest' ? 'bg-[#111111] text-white' : 'text-gray-400 hover:text-gray-700'
-                }`}
-              >
-                Oldest
-              </button>
-              <button
-                id="btn_sort_highest"
-                title="Prioritize largest invoices"
-                onClick={() => setSortBy('highest')}
-                className={`px-2 py-1 rounded-[4px] text-[9.5px] font-bold uppercase tracking-tight transition-all cursor-pointer ${
-                  sortBy === 'highest' ? 'bg-[#111111] text-white' : 'text-gray-400 hover:text-gray-700'
-                }`}
-              >
-                Highest {currencySymbol}
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Find Search box for rapid filtering on busy peak nights */}
-          <div className="relative shrink-0">
-            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400">
-              <Search size={13} className="stroke-[2.5]" />
-            </span>
-            <input
-              id="settle_search_bar"
-              type="text"
-              placeholder="Search table or ticket #..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-[32px] pl-8 pr-7 bg-white border border-gray-200 rounded-[8px] text-[11px] font-semibold focus:outline-none focus:border-black transition-all"
-            />
-            {searchQuery && (
-              <button 
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 font-bold"
-              >
-                <X size={12} />
-              </button>
-            )}
           </div>
 
           {/* PENDING TICKETS CARD ROLL / HISTORIC BILLS ROLL */}

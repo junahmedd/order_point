@@ -1,10 +1,13 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 import React, { useState } from 'react';
 import PageLayout from './PageLayout';
 import { useSettings } from '../hooks/useSettings';
-import { Button, Input } from './UI';
-import { Store, LayoutDashboard, MonitorDot, Trash2, Plus, CheckCircle } from 'lucide-react';
+import { Store, LayoutDashboard, MonitorDot, Trash2, Plus, CheckCircle, Save, Receipt, Phone, Mail, MapPin, Hash, IndianRupee } from 'lucide-react';
 import { TableConfig, Order, MenuItem } from '../types';
-import toast from 'react-hot-toast';
 import { motion } from 'motion/react';
 
 type SettingsTab = 'profile' | 'tables' | 'system';
@@ -57,283 +60,386 @@ export default function SettingsView({
   };
 
   if (loading) {
-     return (
-       <div className="flex flex-col items-center justify-center p-12 h-64 text-emerald-600 gap-4">
-          <div className="w-8 h-8 border-4 border-current border-t-transparent rounded-full animate-spin" />
-          <p className="font-medium text-gray-500">Loading settings...</p>
-       </div>
-     );
+    return (
+      <div className="flex flex-col items-center justify-center p-12 h-64 text-emerald-600 gap-4">
+        <div className="w-8 h-8 border-4 border-current border-t-transparent rounded-full animate-spin" />
+        <p className="font-semibold text-xs text-gray-500">Loading settings...</p>
+      </div>
+    );
   }
 
   const tabs: { id: SettingsTab; label: string; icon: React.FC<any> }[] = [
-    { id: 'profile', label: 'General Settings', icon: Store },
-    { id: 'tables', label: 'Table Management', icon: LayoutDashboard },
-    { id: 'system', label: 'System Preferences', icon: MonitorDot },
+    { id: 'profile', label: 'Restaurant Profile', icon: Store },
+    { id: 'tables', label: 'Tables & Seating', icon: LayoutDashboard },
+    { id: 'system', label: 'Preferences & Tax', icon: MonitorDot },
   ];
 
   return (
     <PageLayout
       title="Settings"
-      subtitle="Manage your restaurant profile, table layouts, and system preferences."
-      customPadding="p-3 sm:p-6 flex-1 flex flex-col min-h-0 overflow-hidden"
+      subtitle="Manage restaurant profile, dining tables, and system preferences."
+      id="settings_master_view"
+      customPadding="p-3 sm:p-6 flex-1 flex flex-col min-h-0 overflow-y-auto"
       activeTab="Settings"
       onTabChange={onNavigateToTab}
+      pillVariant="green"
       actions={
         <button
           onClick={() => onNavigateToTab?.('Dashboard')}
-          className="h-10 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer border border-gray-200 select-none"
+          className="h-8.5 px-3.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer border border-gray-200"
         >
-          <LayoutDashboard size={14} className="stroke-[2.5]" />
+          <LayoutDashboard size={13} className="stroke-[2.5]" />
           <span>Dashboard</span>
         </button>
       }
     >
-
-      <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0 overflow-hidden">
+      <div className="w-full max-w-4xl mx-auto space-y-4 pb-12">
         
-        {/* Navigation Panel */}
-        <div className="w-full lg:w-[280px] lg:flex-shrink-0 bg-white rounded-[20px] shadow-sm border border-gray-100 overflow-y-auto">
-          <nav className="p-3 space-y-1">
-            {tabs.map(tab => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer
-                    ${isActive 
-                      ? 'bg-sky-50 text-sky-800 border-l-[3px] border-sky-500 shadow-xs font-semibold' 
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                >
-                  <Icon className={`w-5 h-5 ${isActive ? 'text-sky-600' : 'text-gray-400'}`} />
-                  {tab.label}
-                </button>
-              );
-            })}
-          </nav>
+        {/* Sleek Segmented Navigation Pills */}
+        <div className="bg-white p-1 rounded-2xl border border-gray-200 shadow-2xs flex items-center gap-1 overflow-x-auto scrollbar-none">
+          {tabs.map(tab => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 border-none ${
+                  isActive
+                    ? 'bg-[#091E42] text-white shadow-xs'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50 bg-transparent'
+                }`}
+              >
+                <Icon size={14} className={isActive ? 'text-white' : 'text-gray-400'} />
+                <span className="truncate">{tab.label}</span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Configuration Panel */}
-        <div className="flex-1 bg-white rounded-[20px] shadow-sm border border-gray-100 p-6 sm:p-8 overflow-y-auto hidden-scrollbar">
+        {/* Configuration Card */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-xs p-4 sm:p-6">
           
+          {/* 1. RESTAURANT PROFILE TAB */}
           {activeTab === 'profile' && (
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.15 }}
-              className="space-y-6 max-w-2xl"
+              className="space-y-5"
             >
-              <h2 className="font-semibold text-lg border-b border-gray-100 pb-2 text-gray-900">General Settings</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <Input 
-                  label="Restaurant Name" 
-                  value={data.restaurantInfo.name} 
-                  onChange={(e: any) => updateData('restaurantInfo', 'name', e.target.value)} 
-                />
-                <Input 
-                  label="Owner Name" 
-                  value={data.restaurantInfo.ownerName} 
-                  onChange={(e: any) => updateData('restaurantInfo', 'ownerName', e.target.value)} 
-                />
-                <Input 
-                  label="Phone Number" 
-                  value={data.restaurantInfo.phone} 
-                  onChange={(e: any) => updateData('restaurantInfo', 'phone', e.target.value)} 
-                />
-                <Input 
-                  label="Email Address" 
-                  value={data.restaurantInfo.email} 
-                  onChange={(e: any) => updateData('restaurantInfo', 'email', e.target.value)} 
-                />
-                <Input 
-                  label="Restaurant Address" 
-                  value={data.restaurantInfo.address || ''} 
-                  onChange={(e: any) => updateData('restaurantInfo', 'address', e.target.value)} 
-                />
-                <Input 
-                  label="FSSAI / Reg. Number" 
-                  value={data.restaurantInfo.regNumber || ''} 
-                  onChange={(e: any) => updateData('restaurantInfo', 'regNumber', e.target.value)} 
-                />
+              <div className="border-b border-gray-100 pb-3">
+                <h2 className="text-base font-black text-gray-900 tracking-tight">General Restaurant Information</h2>
+                <p className="text-xs text-gray-400 font-medium">Used on customer bills, digital QR ordering, and tax invoices.</p>
               </div>
-              <div className="pt-4 flex gap-3">
-                <Button 
-                  disabled={!!savingSection} 
-                  onClick={() => handleSave('restaurantInfo', 'Restaurant profile')}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {/* Restaurant Name */}
+                <div className="space-y-1">
+                  <label className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+                    <Store size={12} className="text-gray-400" />
+                    <span>Restaurant Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={data.restaurantInfo.name || ''}
+                    onChange={(e) => updateData('restaurantInfo', 'name', e.target.value)}
+                    placeholder="e.g. Tropical Cafe"
+                    className="w-full h-9.5 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-black focus:bg-white transition-all"
+                  />
+                </div>
+
+                {/* Owner Name */}
+                <div className="space-y-1">
+                  <label className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+                    <span>Owner / Manager Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={data.restaurantInfo.ownerName || ''}
+                    onChange={(e) => updateData('restaurantInfo', 'ownerName', e.target.value)}
+                    placeholder="e.g. Mohammed Zaid"
+                    className="w-full h-9.5 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-black focus:bg-white transition-all"
+                  />
+                </div>
+
+                {/* Phone Number */}
+                <div className="space-y-1">
+                  <label className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+                    <Phone size={12} className="text-gray-400" />
+                    <span>Contact Phone</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={data.restaurantInfo.phone || ''}
+                    onChange={(e) => updateData('restaurantInfo', 'phone', e.target.value)}
+                    placeholder="+91 98765 43210"
+                    className="w-full h-9.5 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-black focus:bg-white transition-all"
+                  />
+                </div>
+
+                {/* Email Address */}
+                <div className="space-y-1">
+                  <label className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+                    <Mail size={12} className="text-gray-400" />
+                    <span>Email Address</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={data.restaurantInfo.email || ''}
+                    onChange={(e) => updateData('restaurantInfo', 'email', e.target.value)}
+                    placeholder="contact@restaurant.com"
+                    className="w-full h-9.5 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-black focus:bg-white transition-all"
+                  />
+                </div>
+
+                {/* Restaurant Address */}
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+                    <MapPin size={12} className="text-gray-400" />
+                    <span>Restaurant Physical Address</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={data.restaurantInfo.address || ''}
+                    onChange={(e) => updateData('restaurantInfo', 'address', e.target.value)}
+                    placeholder="Shop #12, High Street, Commercial Area, City"
+                    className="w-full h-9.5 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-black focus:bg-white transition-all"
+                  />
+                </div>
+
+                {/* FSSAI / Reg. Number */}
+                <div className="space-y-1">
+                  <label className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+                    <Hash size={12} className="text-gray-400" />
+                    <span>FSSAI License / GSTIN</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={data.restaurantInfo.regNumber || ''}
+                    onChange={(e) => updateData('restaurantInfo', 'regNumber', e.target.value)}
+                    placeholder="e.g. 10020042000123"
+                    className="w-full h-9.5 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-black focus:bg-white transition-all"
+                  />
+                </div>
+
+                {/* UPI Payment ID */}
+                <div className="space-y-1">
+                  <label className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+                    <IndianRupee size={12} className="text-gray-400" />
+                    <span>Google Pay / UPI ID</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={data.payment?.upiId || ''}
+                    onChange={(e) => updateData('payment', 'upiId', e.target.value)}
+                    placeholder="e.g. restaurant@okaxis"
+                    className="w-full h-9.5 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-black focus:bg-white transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-gray-100 flex justify-end">
+                <button
+                  disabled={!!savingSection}
+                  onClick={() => handleSaveMultiple(['restaurantInfo', 'payment'], 'Restaurant profile & UPI details')}
+                  className="h-10 px-5 bg-[#091E42] hover:bg-[#071735] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition-all flex items-center gap-1.5 border-none cursor-pointer disabled:opacity-60 active:scale-[0.99]"
                 >
-                  {savingSection === 'restaurantInfo' ? 'Saving...' : 'Save Profile'}
-                </Button>
+                  <Save size={13} />
+                  <span>{savingSection ? 'Saving...' : 'Save Profile Changes'}</span>
+                </button>
               </div>
             </motion.div>
           )}
 
+          {/* 2. TABLE MANAGEMENT TAB */}
           {activeTab === 'tables' && (
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.15 }}
-              className="space-y-6 max-w-2xl"
+              className="space-y-5"
             >
-              <h2 className="font-semibold text-lg border-b border-gray-100 pb-2 text-gray-900">Table Management</h2>
-              
-              <div className="flex justify-between items-end mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 pb-3">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 block mb-1">Total Tables: {data.tables?.length || 0}</label>
+                  <h2 className="text-base font-black text-gray-900 tracking-tight">Dine-In Tables Configuration</h2>
+                  <p className="text-xs text-gray-400 font-medium">Configure tables for POS dining orders and QR customer ordering.</p>
                 </div>
-                <Button 
-                  variant="secondary" 
+                <button
+                  type="button"
                   onClick={() => {
-                    const newTable = { id: `t${Date.now()}`, name: `Table ${(data.tables?.length || 0) + 1}` };
+                    const nextNum = (data.tables?.length || 0) + 1;
+                    const nextName = nextNum < 10 ? `Table 0${nextNum}` : `Table ${nextNum}`;
+                    const newTable = { id: `t${Date.now()}`, name: nextName };
                     updateData('tables', '', [...(data.tables || []), newTable]);
                   }}
-                  className="!py-1.5"
+                  className="h-8.5 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all border-none cursor-pointer self-start sm:self-auto shrink-0 shadow-2xs"
                 >
-                  <Plus className="w-4 h-4 mr-1" /> Add Table
-                </Button>
+                  <Plus size={14} className="stroke-[3]" />
+                  <span>Add Table</span>
+                </button>
               </div>
 
-              {/* Direct handling of tables state */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {/* Table Badges Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
                 {data.tables?.map((table: TableConfig, index: number) => (
-                  <div key={table.id} className="bg-gray-50 flex items-center justify-between p-2.5 rounded-xl border border-gray-200">
-                    <div className="flex-1 mr-2">
-                       <input 
-                         className="bg-transparent text-sm font-medium text-gray-900 w-full outline-none focus:border-b focus:border-emerald-500"
-                         value={table.name}
-                         onChange={(e) => {
-                           const newTables = [...data.tables];
-                           newTables[index] = { ...table, name: e.target.value };
-                           updateData('tables' as any, '', newTables);
-                         }}
-                       />
-                    </div>
-                    <button 
-                       className="text-gray-400 hover:text-rose-500 p-1 cursor-pointer transition-colors" 
-                       title="Delete Table"
-                       onClick={() => {
-                         const newTables = data.tables.filter((_, i) => i !== index);
-                         updateData('tables' as any, '', newTables);
-                       }}
+                  <div
+                    key={table.id}
+                    className="p-2.5 bg-gray-50 hover:bg-white border border-gray-200 rounded-xl flex items-center justify-between gap-2 shadow-2xs transition-all"
+                  >
+                    <input
+                      type="text"
+                      className="bg-transparent text-xs font-bold text-gray-900 flex-1 outline-none min-w-0 border-b border-transparent focus:border-blue-500 focus:bg-white rounded px-1 py-0.5"
+                      value={table.name}
+                      onChange={(e) => {
+                        const newTables = [...data.tables];
+                        newTables[index] = { ...table, name: e.target.value };
+                        updateData('tables' as any, '', newTables);
+                      }}
+                    />
+                    <button
+                      className="text-gray-300 hover:text-rose-600 p-1 cursor-pointer transition-colors bg-transparent border-none shrink-0"
+                      title="Delete Table"
+                      onClick={() => {
+                        const newTables = data.tables.filter((_: any, i: number) => i !== index);
+                        updateData('tables' as any, '', newTables);
+                      }}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 ))}
               </div>
 
-              <div className="pt-4 flex gap-3">
-                <Button 
-                   disabled={!!savingSection}
-                   onClick={() => handleSave('tables' as any, 'Table configurations')}
+              <div className="pt-3 border-t border-gray-100 flex items-center justify-between">
+                <span className="text-xs text-gray-500 font-semibold">Total active tables: {data.tables?.length || 0}</span>
+                <button
+                  disabled={!!savingSection}
+                  onClick={() => handleSave('tables' as any, 'Table seating list')}
+                  className="h-10 px-5 bg-[#091E42] hover:bg-[#071735] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition-all flex items-center gap-1.5 border-none cursor-pointer disabled:opacity-60 active:scale-[0.99]"
                 >
-                  {savingSection === 'tables' ? 'Saving...' : 'Save Tables'}
-                </Button>
+                  <Save size={13} />
+                  <span>{savingSection === 'tables' ? 'Saving...' : 'Save Tables'}</span>
+                </button>
               </div>
             </motion.div>
           )}
 
+          {/* 3. SYSTEM PREFERENCES & TAX TAB */}
           {activeTab === 'system' && (
             <motion.div
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.15 }}
-              className="space-y-6 max-w-2xl"
+              className="space-y-5"
             >
-              <h2 className="font-semibold text-lg border-b border-gray-100 pb-2 text-gray-900">System Preferences</h2>
-              <div className="space-y-3">
-                   <div className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        id="pref_autoprint"
-                        checked={data.preferences.autoPrint}
-                        onChange={(e) => updateData('preferences', 'autoPrint', e.target.checked)}
-                        className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                      />
-                      <label htmlFor="pref_autoprint" className="text-sm font-medium text-gray-700 select-none">Automatically Print Bill on Settlement</label>
-                   </div>
-                   <div className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        id="pref_compact"
-                        checked={data.preferences.compactMode}
-                        onChange={(e) => updateData('preferences', 'compactMode', e.target.checked)}
-                        className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                      />
-                      <label htmlFor="pref_compact" className="text-sm font-medium text-gray-700 select-none">Compact Layout Mode</label>
-                   </div>
-                   <div className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        id="pref_dark"
-                        checked={data.preferences.darkMode}
-                        onChange={(e) => updateData('preferences', 'darkMode', e.target.checked)}
-                        className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                      />
-                      <label htmlFor="pref_dark" className="text-sm font-medium text-gray-700 select-none">Dark Mode (Experimental)</label>
-                   </div>
+              <div className="border-b border-gray-100 pb-3">
+                <h2 className="text-base font-black text-gray-900 tracking-tight">Billing, Taxes &amp; Preferences</h2>
+                <p className="text-xs text-gray-400 font-medium">Configure GST rates, currency symbols, and receipts.</p>
               </div>
 
-              <h2 className="font-semibold text-lg border-b border-gray-100 pb-2 pt-4 text-gray-900">WhatsApp Integration</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <Input 
-                  label="WhatsApp Business Phone" 
-                  value={data.whatsapp?.number || ''} 
-                  onChange={(e: any) => updateData('whatsapp', 'number', e.target.value)} 
-                />
-                <Input 
-                  label="Business Display Name" 
-                  value={data.whatsapp?.businessName || ''} 
-                  onChange={(e: any) => updateData('whatsapp', 'businessName', e.target.value)} 
-                />
-              </div>
-              <div className="flex items-center gap-2 mt-2">
-                <input 
-                  type="checkbox" 
-                  id="wa_autobill"
-                  checked={data.whatsapp?.autoSendBills || false}
-                  onChange={(e) => updateData('whatsapp', 'autoSendBills', e.target.checked)}
-                  className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
-                />
-                <label htmlFor="wa_autobill" className="text-sm font-medium text-gray-700 select-none">Automatically Send WhatsApp Receipts to Customers</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                {/* Preferred Currency */}
+                <div className="space-y-1">
+                  <label className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 block">Currency Symbol</label>
+                  <select
+                    value={data.prefCurrency || '₹'}
+                    onChange={(e) => updateData('prefCurrency' as any, '', e.target.value)}
+                    className="w-full h-9.5 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:bg-white"
+                  >
+                    <option value="₹">₹ (INR - Indian Rupee)</option>
+                    <option value="$">$ (USD - US Dollar)</option>
+                    <option value="€">€ (EUR - Euro)</option>
+                    <option value="£">£ (GBP - British Pound)</option>
+                    <option value="AED">AED (UAE Dirham)</option>
+                  </select>
+                </div>
+
+                {/* GST Tax Rate */}
+                <div className="space-y-1">
+                  <label className="text-[10.5px] font-black uppercase tracking-wider text-gray-500 block">GST / Tax Rate (%)</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={data.gstTax?.gstRate !== undefined ? data.gstTax.gstRate : 5}
+                      onChange={(e) => updateData('gstTax', 'gstRate', Number(e.target.value))}
+                      className="w-full h-9.5 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:bg-white"
+                    />
+                    <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-gray-700 shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={data.gstTax?.taxEnabled !== false}
+                        onChange={(e) => updateData('gstTax', 'taxEnabled', e.target.checked)}
+                        className="w-4 h-4 rounded text-blue-600"
+                      />
+                      <span>Apply Tax</span>
+                    </label>
+                  </div>
+                </div>
+
               </div>
 
-              <div className="pt-4 flex gap-3">
-                <Button 
-                  disabled={!!savingSection} 
-                  onClick={() => handleSaveMultiple(['preferences', 'whatsapp'], 'System and WhatsApp preferences')}
+              {/* Toggles List */}
+              <div className="space-y-2 pt-2 border-t border-gray-100">
+                <label className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    id="pref_autoprint"
+                    checked={data.preferences?.autoPrint || false}
+                    onChange={(e) => updateData('preferences', 'autoPrint', e.target.checked)}
+                    className="w-4 h-4 text-emerald-600 rounded"
+                  />
+                  <span className="text-xs font-semibold text-gray-800">Prompt browser printing automatically upon bill payment</span>
+                </label>
+
+                <label className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    id="pref_compact"
+                    checked={data.preferences?.compactMode || false}
+                    onChange={(e) => updateData('preferences', 'compactMode', e.target.checked)}
+                    className="w-4 h-4 text-emerald-600 rounded"
+                  />
+                  <span className="text-xs font-semibold text-gray-800">Compact high-density cards for tablets &amp; compact screens</span>
+                </label>
+              </div>
+
+              <div className="pt-3 border-t border-gray-100 flex justify-end">
+                <button
+                  disabled={!!savingSection}
+                  onClick={() => handleSaveMultiple(['preferences', 'gstTax', 'prefCurrency'], 'System preferences & GST tax')}
+                  className="h-10 px-5 bg-[#091E42] hover:bg-[#071735] text-white rounded-xl text-xs font-bold uppercase tracking-wider shadow-sm transition-all flex items-center gap-1.5 border-none cursor-pointer disabled:opacity-60 active:scale-[0.99]"
                 >
-                  {savingSection === 'preferences_whatsapp' ? 'Saving...' : 'Save System Preferences'}
-                </Button>
+                  <Save size={13} />
+                  <span>{savingSection ? 'Saving...' : 'Save Preferences'}</span>
+                </button>
               </div>
             </motion.div>
           )}
 
         </div>
+
       </div>
 
-      {/* Premium Success Popup Modal */}
+      {/* Success Popup Modal */}
       {showSuccessPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-xs z-[9999] animate-fade-in">
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-xs z-[9999] animate-fade-in p-4">
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 15 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 15 }}
-            className="bg-white border border-sky-100 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center max-w-xs w-full mx-4 text-center border-t-4 border-t-sky-500"
+            className="bg-white border border-emerald-100 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center max-w-xs w-full text-center border-t-4 border-t-emerald-500"
           >
-            <div className="w-14 h-14 bg-sky-50 rounded-full flex items-center justify-center mb-4 text-sky-500 animate-bounce">
-              <CheckCircle size={32} className="stroke-[2.5]" />
+            <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mb-3 text-emerald-500">
+              <CheckCircle size={28} className="stroke-[2.5]" />
             </div>
-            <h3 className="text-gray-950 font-black text-lg tracking-tight mb-1">
-              Changes Saved!
+            <h3 className="text-gray-950 font-black text-base tracking-tight mb-1">
+              Settings Updated!
             </h3>
-            <p className="text-gray-500 text-xs font-semibold px-2 leading-relaxed">
+            <p className="text-gray-500 text-xs font-medium px-2 leading-relaxed">
               {successMessage}
             </p>
-            <div className="mt-4 w-full bg-gray-100 h-1 rounded-full overflow-hidden">
-              <div className="bg-sky-500 h-1 rounded-full w-full animate-pulse" />
-            </div>
           </motion.div>
         </div>
       )}

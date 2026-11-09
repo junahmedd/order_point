@@ -374,6 +374,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
       subtitle="Manage customer orders, monitor order status and process payments."
       id="orders_view"
       customPadding="p-0"
+      pillVariant="green"
     >
       <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 p-3 sm:p-6 items-start">
         

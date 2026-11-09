@@ -378,7 +378,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         isSigningUpRef.current = false;
 
         if (createErr.code === 'auth/email-already-in-use') {
-          const registeredMsg = 'This email is already registered. Please log in.';
+          const registeredMsg = 'Email already registered. Tap to login';
           toast.error(registeredMsg);
           setErrors({
             emailAlreadyInUse: registeredMsg,
@@ -762,10 +762,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
                   <form onSubmit={handleSignUpSubmit} className="space-y-3.5">
                     {errors.emailAlreadyInUse && (
-                      <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-amber-900 text-xs shadow-sm">
-                        <div className="flex items-center gap-2 font-medium">
-                          <AlertTriangle size={16} className="text-amber-600 shrink-0" />
-                          <span>This email is already registered. Please log in.</span>
+                      <div className="py-2 px-3 bg-amber-50/90 border border-amber-200 rounded-lg flex items-center justify-between gap-2 text-amber-900 text-[11px] font-semibold animate-fade-in shadow-2xs">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                          <span className="truncate">Email already registered.</span>
                         </div>
                         <button
                           type="button"
@@ -775,9 +775,9 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                             setConfirmPassword('');
                             setMode('login');
                           }}
-                          className="px-3 py-1.5 bg-[#091E42] text-white hover:bg-[#071735] font-bold rounded-lg text-xs transition-all shrink-0 cursor-pointer shadow-sm border-none flex items-center gap-1"
+                          className="text-blue-600 hover:text-blue-800 font-bold underline bg-transparent border-none p-0 cursor-pointer text-[11px] shrink-0"
                         >
-                          <span>Go to Login page →</span>
+                          Login here →
                         </button>
                       </div>
                     )}

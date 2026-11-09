@@ -185,6 +185,7 @@ export default function MenuCatalog({
       id="menucatalog_view"
       activeTab="Menu"
       onTabChange={onNavigateToTab}
+      pillVariant="green"
       actions={
         <button
           id="btn_open_add_dish"
@@ -229,17 +230,17 @@ export default function MenuCatalog({
         </div>
       </div>
 
-      {/* Grid Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      {/* Grid Cards - 5 Cards Per Row on Standard Screens */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {filteredItems.map(item => {
             return (
               <div
                 id={`menu_card_${item.id}`}
                 key={item.id}
-                className="bg-white border border-[#EDEDED] rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-300 w-full mx-auto overflow-hidden flex flex-col"
+                className="bg-white border border-[#EDEDED] rounded-xl shadow-[0_2px_12px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_18px_rgba(0,0,0,0.06)] transition-all duration-200 w-full overflow-hidden flex flex-col justify-between"
               >
                 {/* Dish Image Banner */}
-                <div className="w-full h-32 bg-gray-50 relative overflow-hidden flex-shrink-0 border-b border-gray-100 flex items-center justify-center">
+                <div className="w-full h-24 bg-gray-50 relative overflow-hidden flex-shrink-0 border-b border-gray-100 flex items-center justify-center">
                   {item.imageUrl ? (
                     <img
                       src={item.imageUrl}
@@ -257,69 +258,48 @@ export default function MenuCatalog({
                       }}
                     />
                   ) : null}
-                  <div className={`fallback-placeholder-card absolute inset-0 bg-gray-50 flex flex-col items-center justify-center text-center p-3 ${item.imageUrl ? 'hidden' : ''}`}>
-                    <Utensils size={20} className="text-gray-300 mb-1" />
-                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none">No Image</span>
+                  <div className={`fallback-placeholder-card absolute inset-0 bg-gray-50 flex flex-col items-center justify-center text-center p-2 ${item.imageUrl ? 'hidden' : ''}`}>
+                    <Utensils size={16} className="text-gray-300 mb-0.5" />
+                    <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-none">No Image</span>
                   </div>
                 </div>
 
-                <div className="p-3.5 flex-1 flex flex-col justify-between">
+                <div className="p-2.5 flex-1 flex flex-col justify-between">
                   {/* Category and Price Row */}
-                  <div className="flex justify-between items-center mb-2">
-                    <span className={`px-2 py-0.5 text-[9px] font-extrabold tracking-widest uppercase rounded-full ${handleCategoryPillBg(item.category)}`}>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className={`px-1.5 py-0.5 text-[8px] font-extrabold tracking-widest uppercase rounded-full ${handleCategoryPillBg(item.category)}`}>
                       {item.category}
                     </span>
-                    <span className="text-sm font-black text-[#111111] tracking-tight">
-                      <span>{currencySymbol}{(item.price / 2).toFixed(0)} - {currencySymbol}{item.price}</span>
+                    <span className="text-xs font-black text-[#111111] tracking-tight">
+                      <span>{currencySymbol}{item.price}</span>
                     </span>
                   </div>
 
                   {/* Name and Description */}
-                  <h3 className="text-sm font-black text-[#111111] mb-1 leading-tight tracking-tight line-clamp-1" title={item.name}>
+                  <h3 className="text-xs font-black text-[#111111] mb-0.5 leading-tight tracking-tight line-clamp-1" title={item.name}>
                     {item.name}
                   </h3>
-                  <p className="text-[11px] text-gray-500 font-medium leading-normal mb-2 line-clamp-2 h-7" title={item.description}>
+                  <p className="text-[10px] text-gray-400 font-medium leading-normal mb-1.5 line-clamp-1" title={item.description}>
                     {item.description}
                   </p>
 
-                  {/* Portion details block */}
-                  <div className="my-2 p-2 bg-[#F8FAFC] rounded-lg border border-slate-100 text-[10px] space-y-1.5 shrink-0 select-none">
-                    <span className="font-extrabold text-slate-400 block uppercase tracking-widest text-[8px] mb-0.5">Portions</span>
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-slate-600">Half portion</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-extrabold text-slate-800">{currencySymbol}{(item.price / 2).toFixed(0)}</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                        <span className="text-[8.5px] font-[800] uppercase tracking-wide text-sky-700">Avail</span>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-slate-600">Full portion</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-extrabold text-slate-800">{currencySymbol}{item.price}</span>
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                        <span className="text-[8.5px] font-[800] uppercase tracking-wide text-sky-700">Avail</span>
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Availability Row */}
-                  <div className="flex justify-between items-center mb-3 mt-auto">
-                    <div className="flex items-center gap-1.5">
+                  <div className="flex justify-between items-center mb-2 mt-auto pt-1 border-t border-gray-100">
+                    <div className="flex items-center gap-1">
                        {(() => {
                          const isAvail = item.isAvailableForOrder !== undefined ? item.isAvailableForOrder : item.isAvailable;
                          if (!isAvail) {
                            return (
                              <>
                                <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                               <span className="text-[9px] font-extrabold tracking-widest uppercase text-rose-500">UNAVAILABLE</span>
+                               <span className="text-[8px] font-extrabold tracking-wider uppercase text-rose-500">OFF</span>
                              </>
                            );
                          }
                          return (
                            <>
-                             <div className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                             <span className="text-[9px] font-extrabold tracking-widest uppercase text-sky-700">AVAILABLE</span>
+                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                             <span className="text-[8px] font-extrabold tracking-wider uppercase text-emerald-600">ACTIVE</span>
                            </>
                          );
                        })()}
@@ -328,25 +308,25 @@ export default function MenuCatalog({
                     <button
                       id={`btn_toggle_avail_${item.id}`}
                       onClick={() => handleToggleAvailable(item)}
-                      className={`w-[36px] h-[18px] rounded-full p-0.5 transition-colors duration-200 flex items-center shrink-0 cursor-pointer ${
+                      className={`w-[30px] h-[16px] rounded-full p-0.5 transition-colors duration-200 flex items-center shrink-0 cursor-pointer ${
                         (item.isAvailableForOrder !== undefined ? item.isAvailableForOrder : item.isAvailable) ? 'bg-[#22C55E]' : 'bg-gray-200'
                       }`}
                     >
                       <div
-                        className={`w-[14px] h-[14px] rounded-full bg-white shadow-sm transform transition-transform duration-200 ${
-                          (item.isAvailableForOrder !== undefined ? item.isAvailableForOrder : item.isAvailable) ? 'translate-x-[18px]' : 'translate-x-0'
+                        className={`w-[12px] h-[12px] rounded-full bg-white shadow-xs transform transition-transform duration-200 ${
+                          (item.isAvailableForOrder !== undefined ? item.isAvailableForOrder : item.isAvailable) ? 'translate-x-[14px]' : 'translate-x-0'
                         }`}
                       />
                     </button>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-1.5">
                     <button
                       onClick={() => openEditModal(item)}
-                      className="flex-1 h-8 rounded-lg border border-gray-100 bg-white text-[#111111] hover:bg-gray-50 flex items-center justify-center gap-1.5 text-[9px] font-extrabold tracking-widest uppercase transition-colors"
+                      className="flex-1 h-7 rounded-lg border border-gray-200 bg-white text-[#111111] hover:bg-gray-50 flex items-center justify-center gap-1 text-[8.5px] font-extrabold tracking-wider uppercase transition-colors"
                     >
-                      <Edit2 size={11} className="text-gray-500"/> EDIT
+                      <Edit2 size={10} className="text-gray-500"/> EDIT
                     </button>
                     <button
                       onClick={() => {
@@ -355,9 +335,9 @@ export default function MenuCatalog({
                           onShowToast(`Deleted ${item.name} from manual registry`);
                         }
                       }}
-                      className="flex-1 h-8 rounded-lg border border-rose-50 bg-white text-rose-500 hover:bg-rose-50 flex items-center justify-center gap-1.5 text-[9px] font-extrabold tracking-widest uppercase transition-colors"
+                      className="flex-1 h-7 rounded-lg border border-rose-100 bg-white text-rose-500 hover:bg-rose-50 flex items-center justify-center gap-1 text-[8.5px] font-extrabold tracking-wider uppercase transition-colors"
                     >
-                      <Trash2 size={11} className="text-rose-400"/> DELETE
+                      <Trash2 size={10} className="text-rose-400"/> DEL
                     </button>
                   </div>
                 </div>
@@ -369,13 +349,13 @@ export default function MenuCatalog({
 
       {/* Add Item Modal Overlay Drawer */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[28px] max-w-md w-full p-6 shadow-xl border border-[#EEEEEE] animate-fade-in space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-3 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-4.5 shadow-2xl border border-gray-100 animate-fade-in space-y-3.5">
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
               <div className="flex items-center gap-2">
-                <Utensils className="text-[#111111]" size={18} />
-                <h3 className="text-lg font-bold text-[#111111]">
-                  {editingItem ? 'Edit Menu Catalog Dish' : 'Add Menu Catalog Dish'}
+                <Utensils className="text-[#111111]" size={16} />
+                <h3 className="text-sm font-black text-[#111111] uppercase tracking-wide">
+                  {editingItem ? 'Edit Menu' : 'Add Menu'}
                 </h3>
               </div>
               <button
@@ -383,100 +363,78 @@ export default function MenuCatalog({
                   setEditingItem(null);
                   setIsAddModalOpen(false);
                 }}
-                className="text-gray-400 hover:text-gray-600 focus:outline-[#111111]"
+                className="text-gray-400 hover:text-gray-600 border-none bg-transparent cursor-pointer p-1"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveItem} className="space-y-4">
+            <form onSubmit={handleSaveItem} className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs font-bold text-[#8A8A8A] uppercase block">Dish Name</label>
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider block">Dish Name</label>
                 <input
                   id="modal_dish_name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Garlic Naan"
-                  className="w-full h-11 px-4 bg-[#F8F8F8] border border-[#EEEEEE] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#111111] focus:bg-white"
+                  className="w-full h-9 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-black focus:bg-white"
                   required
                 />
               </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-[#8A8A8A] uppercase block">Category</label>
-                    <select
-                      id="modal_dish_category"
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value as Category)}
-                      className="w-full h-11 px-3 bg-[#F8F8F8] border border-[#EEEEEE] rounded-xl text-xs text-[#111111] focus:outline-none"
-                    >
-                      <option value="Veg">Veg</option>
-                      <option value="Non-Veg">Non-Veg</option>
-                      <option value="Drinks">Drinks</option>
-                      <option value="Desserts">Desserts</option>
-                    </select>
-                  </div>
-
-                  {/* Available for Orders Toggle */}
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-[#8A8A8A] uppercase block">Available for Orders</label>
-                    <button
-                      type="button"
-                      onClick={() => setIsAvailableForOrder(!isAvailableForOrder)}
-                      className={`w-full h-11 px-4 bg-[#F8F8F8] border border-[#EEEEEE] rounded-xl text-xs font-bold transition-all flex items-center justify-between cursor-pointer border-solid ${
-                        isAvailableForOrder ? 'text-emerald-600 border-emerald-200 bg-emerald-50/20' : 'text-gray-400'
-                      }`}
-                    >
-                      <span>{isAvailableForOrder ? '🟢 ON' : '🔴 OFF'}</span>
-                      <div className={`w-8 h-4 rounded-full p-0.5 transition-colors duration-200 flex items-center ${
-                        isAvailableForOrder ? 'bg-emerald-500' : 'bg-gray-200'
-                      }`}>
-                        <div className={`w-3 h-3 rounded-full bg-white shadow-xs transform transition-transform duration-200 ${
-                          isAvailableForOrder ? 'translate-x-4' : 'translate-x-0'
-                        }`} />
-                      </div>
-                    </button>
-                  </div>
+              {/* Category & Price in 2 Columns */}
+              <div className="grid grid-cols-2 gap-2.5">
+                <div className="space-y-1">
+                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider block">Category</label>
+                  <select
+                    id="modal_dish_category"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value as Category)}
+                    className="w-full h-9 px-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:bg-white"
+                  >
+                    <option value="Veg">Veg</option>
+                    <option value="Non-Veg">Non-Veg</option>
+                    <option value="Drinks">Drinks</option>
+                    <option value="Desserts">Desserts</option>
+                  </select>
                 </div>
 
-                {/* Price Input block */}
                 <div className="space-y-1 text-left">
-                  <label className="text-xs font-bold text-[#8A8A8A] uppercase block">Price (Full Price) ({currencySymbol})</label>
+                  <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider block">Price ({currencySymbol})</label>
                   <input
                     id="modal_dish_price"
                     type="number"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    className="w-full h-11 px-4 bg-[#F8F8F8] border border-[#EEEEEE] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#111111] focus:bg-white"
+                    placeholder="150"
+                    className="w-full h-9 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-black focus:bg-white"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-[#8A8A8A] uppercase block">Dish Image URL</label>
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider block">Dish Image URL</label>
                 <input
                   id="modal_dish_image_url"
                   type="url"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="e.g. https://images.unsplash.com/photo-..."
-                  className="w-full h-11 px-4 bg-[#F8F8F8] border border-[#EEEEEE] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#111111] focus:bg-white"
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full h-9 px-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-black focus:bg-white"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-[#8A8A8A] uppercase block">Description</label>
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-wider block">Description</label>
                 <textarea
                   id="modal_dish_desc"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Short description of the item"
+                  placeholder="Short description of the dish"
                   rows={2}
-                  className="w-full p-4 bg-[#F8F8F8] border border-[#EEEEEE] rounded-xl text-xs text-[#111111] focus:outline-none focus:border-[#111111] focus:bg-white resize-none"
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:border-black focus:bg-white resize-none"
                   required
                 />
               </div>
@@ -484,7 +442,7 @@ export default function MenuCatalog({
               <button
                 id="modal_save_dish_btn"
                 type="submit"
-                className="w-full h-[52px] bg-[#111111] hover:bg-[#222222] text-white rounded-[16px] text-sm font-bold uppercase tracking-wider shadow-sm transition-all active:scale-[0.99]"
+                className="w-full h-9.5 bg-[#111111] hover:bg-black text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-sm transition-all active:scale-[0.99] border-none cursor-pointer mt-1"
               >
                 {editingItem ? 'Update Menu Item' : 'Save Menu Item'}
               </button>
