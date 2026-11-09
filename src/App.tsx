@@ -440,7 +440,7 @@ export default function App() {
       timestamp: Date.now()
     });
 
-    toast.success(`Payment & Invoice processed securely for OP-${order.orderNumber}`);
+    // Notification handled by caller with exact INV and TK
   };
 
   const generateOrderId = () => `o${Date.now()}`;
