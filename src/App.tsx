@@ -813,7 +813,7 @@ export default function App() {
           </div>
           <div className="space-y-2">
             <h2 className="text-2xl font-black tracking-tight text-white leading-none">OrderPoint Pro</h2>
-            <p className="text-blue-300 text-[10px] font-black tracking-widest uppercase font-mono">POS &amp; Restaurant OS</p>
+
           </div>
           <div className="w-24 h-1.5 bg-blue-950/80 rounded-full overflow-hidden relative shadow-inner border border-blue-500/20">
             <div className="absolute inset-y-0 bg-blue-400 rounded-full animate-[loading_1.5s_infinite_ease-in-out]" />
@@ -1166,7 +1166,7 @@ export default function App() {
           <div className="h-16 flex items-center justify-around px-1">
             {[
               { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard },
-              { id: 'Orders', label: 'POS Order', icon: ShoppingCart },
+              { id: 'Orders', label: 'Order', icon: ShoppingCart },
               { id: 'Kitchen', label: 'Kitchen', icon: ChefHat },
               { id: 'Billing', label: 'Billing', icon: Receipt },
               { id: 'more', label: 'More', icon: Layers }

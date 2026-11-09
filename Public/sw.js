@@ -1,4 +1,4 @@
-const CACHE_NAME = 'orderpoint-pro-cache-v22';
+const CACHE_NAME = 'orderpoint-pro-cache-v23';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

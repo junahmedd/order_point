@@ -532,8 +532,8 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
               <ArrowLeft size={16} className="stroke-[2.5]" />
             </button>
             <div className="flex items-center gap-2">
-              <ShoppingBag size={18} className="text-gray-950 stroke-[2.5]" />
-              <h2 className="text-base font-extrabold text-gray-950 uppercase tracking-tight">Current Order</h2>
+              <ShoppingBag size={18} className="text-black stroke-[2.5]" />
+              <h2 className="text-base font-black text-black uppercase tracking-tight">Current Order</h2>
             </div>
           </div>
           {cartValues.itemsArray.length > 0 && (
@@ -578,7 +578,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
                 const numericVal = e.target.value.replace(/[^0-9]/g, '').slice(0, 10);
                 setCustomerPhone(numericVal);
               }}
-              className="w-full h-11 px-3.5 bg-white border border-gray-200 rounded-xl text-xs font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-950/10 focus:border-gray-950 font-mono transition-all"
+              className="w-full h-11 px-3.5 bg-white border border-gray-200 rounded-xl text-sm font-medium font-sans text-gray-700 placeholder:text-gray-400 placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-gray-950/10 focus:border-gray-950 transition-all"
               maxLength={10}
             />
             {customerPhone.length > 0 && (
@@ -622,7 +622,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
                       disabled={isOccupied} 
                       className={isOccupied ? "text-gray-400 bg-gray-100" : "text-gray-900"}
                     >
-                      {t}{isOccupied ? ' (Occupied)' : ' (Available)'}
+                      {t}{isOccupied ? ' (Occupied)' : ''}
                     </option>
                   );
                 })}
@@ -733,8 +733,8 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
       {cartValues.itemsArray.length > 0 && !isMobileCartOpen && (
         <div className="xl:hidden fixed bottom-16 inset-x-0 h-16 bg-black border-t border-neutral-900 text-white px-5 flex items-center justify-between z-35 shadow-lg select-none">
           <div className="flex flex-col text-left">
-            <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 leading-none">POS Order</span>
-            <span className="text-sm font-extrabold leading-none pt-1">
+
+            <span className="text-sm font-black text-white leading-none">
               {cartValues.itemsArray.reduce((acc, i) => acc + i.quantity, 0)} Items • {currencySymbol}{cartValues.total}
             </span>
           </div>
