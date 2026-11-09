@@ -228,10 +228,6 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
       const available = item.isAvailableForOrder !== undefined ? item.isAvailableForOrder : item.isAvailable;
       if (available === false) return false;
 
-      // Hide if stock is insufficient
-      const stockStatus = isDishStockAvailable(item, inventoryItems, 'Full', 1);
-      if (!stockStatus.available) return false;
-
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             item.description.toLowerCase().includes(searchQuery.toLowerCase());
       
@@ -415,12 +411,14 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
             {filteredMenuItems.map(dish => {
               const inCartQty = cart[dish.id]?.quantity || 0;
               const badge = getCategoryBadgeDetails(dish.category);
+              const stockStatus = isDishStockAvailable(dish, inventoryItems, 'Full', 1);
+              const isOutOfStock = !stockStatus.available || dish.isAvailable === false;
 
               return (
                 <div
                   id={`dish_selection_card_${dish.id}`}
                   key={dish.id}
-                  onClick={() => { if (inCartQty === 0) { handleAddToCart(dish); } }}
+                  onClick={() => { if (inCartQty === 0 && !isOutOfStock) { handleAddToCart(dish); } }}
                   className="group flex flex-col rounded-[16px] border border-[#E2E8F0] bg-white overflow-hidden shadow-sm transition-all duration-300 hover:border-[#111111] hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] cursor-pointer select-none h-[230px] flex-shrink-0"
                 >
                   {/* Food Image (reduced to 116px height) */}
@@ -500,14 +498,19 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
                         <button
                           type="button"
                           id={`btn_add_dish_${dish.id}`}
+                          disabled={isOutOfStock}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleAddToCart(dish);
+                            if (!isOutOfStock) handleAddToCart(dish);
                           }}
-                          className="h-7 px-3 rounded-full bg-gray-950 hover:bg-black text-white text-[11px] font-bold tracking-wider flex items-center gap-1 shadow-xs active:scale-95 transition-all cursor-pointer"
+                          className={`h-7 px-3 rounded-full text-[11px] font-bold tracking-wider flex items-center gap-1 shadow-xs transition-all border-none ${
+                            isOutOfStock 
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                              : 'bg-gray-950 hover:bg-black text-white active:scale-95 cursor-pointer'
+                          }`}
                         >
-                          <span>ADD</span>
-                          <Plus size={10} className="stroke-[3]" />
+                          <span>{isOutOfStock ? 'OUT' : 'ADD'}</span>
+                          {!isOutOfStock && <Plus size={10} className="stroke-[3]" />}
                         </button>
                       )}
                     </div>

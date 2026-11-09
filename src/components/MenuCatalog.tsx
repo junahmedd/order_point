@@ -266,46 +266,9 @@ export default function MenuCatalog({
                   <h3 className="text-xs font-black text-[#111111] mb-0.5 leading-tight tracking-tight line-clamp-1" title={item.name}>
                     {item.name}
                   </h3>
-                  <p className="text-[10px] text-gray-400 font-medium leading-normal mb-1.5 line-clamp-1" title={item.description}>
+                  <p className="text-[10px] text-gray-400 font-medium leading-normal mb-2.5 line-clamp-1" title={item.description}>
                     {item.description}
                   </p>
-
-                  {/* Availability Row */}
-                  <div className="flex justify-between items-center mb-2 mt-auto pt-1 border-t border-gray-100">
-                    <div className="flex items-center gap-1">
-                       {(() => {
-                         const isAvail = item.isAvailableForOrder !== undefined ? item.isAvailableForOrder : item.isAvailable;
-                         if (!isAvail) {
-                           return (
-                             <>
-                               <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                               <span className="text-[8px] font-extrabold tracking-wider uppercase text-rose-500">OFF</span>
-                             </>
-                           );
-                         }
-                         return (
-                           <>
-                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                             <span className="text-[8px] font-extrabold tracking-wider uppercase text-emerald-600">ACTIVE</span>
-                           </>
-                         );
-                       })()}
-                    </div>
-                    {/* Custom Toggle Switch */}
-                    <button
-                      id={`btn_toggle_avail_${item.id}`}
-                      onClick={() => handleToggleAvailable(item)}
-                      className={`w-[30px] h-[16px] rounded-full p-0.5 transition-colors duration-200 flex items-center shrink-0 cursor-pointer ${
-                        (item.isAvailableForOrder !== undefined ? item.isAvailableForOrder : item.isAvailable) ? 'bg-[#22C55E]' : 'bg-gray-200'
-                      }`}
-                    >
-                      <div
-                        className={`w-[12px] h-[12px] rounded-full bg-white shadow-xs transform transition-transform duration-200 ${
-                          (item.isAvailableForOrder !== undefined ? item.isAvailableForOrder : item.isAvailable) ? 'translate-x-[14px]' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                  </div>
 
                   {/* Action Buttons */}
                   <div className="flex gap-1.5">

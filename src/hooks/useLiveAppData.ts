@@ -168,17 +168,12 @@ export function useLiveAppData() {
          for (const item of INITIAL_STAFF_MEMBERS) {
            await setDoc(doc(db, `restaurants/${currentRestId}/staffMembers`, item.id), cleanUndefined(item));
          }
-         for (const item of INITIAL_CUSTOMERS) {
-           await setDoc(doc(db, `restaurants/${currentRestId}/customers`, item.id), cleanUndefined(item));
-         }
-         for (const item of INITIAL_ORDERS) {
-           await setDoc(doc(db, `restaurants/${currentRestId}/orders`, item.id), cleanUndefined(item));
-         }
-         await setDoc(restDocRef, { hasSeededInitialData: true }, { merge: true });
-         localStorage.setItem(localSeedKey, 'true');
-       } catch (error) {
-         console.warn('Seeder notice:', error);
-       }
+          // No fake demo orders or customers seeded; 100% real live Firebase data
+          await setDoc(restDocRef, { hasSeededInitialData: true }, { merge: true });
+          localStorage.setItem(localSeedKey, 'true');
+        } catch (error) {
+          console.warn('Seeder notice:', error);
+        }
     };
 
     runSeederIfEmpty();

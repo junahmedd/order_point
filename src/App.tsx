@@ -440,6 +440,110 @@ export default function App() {
   const generateOrderId = () => `o${Date.now()}`;
   const generateOrderNumber = () => `OP-${Math.floor(1000 + Math.random() * 9000)}`;
 
+
+  // Centralized Inventory Auto-Depletion Engine
+  const deductInventoryForOrder = async (ord: Order) => {
+    try {
+      for (const item of ord.items) {
+        const qtyOrdered = item.quantity || 1;
+        const isHalf = item.size === 'Half';
+        const sizeMultiplier = isHalf ? 0.5 : 1.0;
+
+        let recipe = item.menuItem?.recipe;
+        if (!recipe || recipe.length === 0) {
+          const seedItem = INITIAL_MENU_ITEMS.find(m => m.id === item.menuItem?.id || m.name.toLowerCase() === item.menuItem?.name?.toLowerCase());
+          if (seedItem && seedItem.recipe) {
+            recipe = seedItem.recipe;
+          }
+        }
+
+        if (recipe && Array.isArray(recipe) && recipe.length > 0) {
+          for (const rec of recipe) {
+            const invItem = inventoryItems.find(i => i.id === rec.inventoryItemId);
+            if (invItem) {
+              const amountToReduce = parseFloat((rec.amount * sizeMultiplier * qtyOrdered).toFixed(2));
+              const newQty = Math.max(0, parseFloat((invItem.quantity - amountToReduce).toFixed(2)));
+              let newStatus: 'NORMAL' | 'LOW STOCK' | 'OUT OF STOCK' = 'NORMAL';
+              if (newQty === 0) {
+                newStatus = 'OUT OF STOCK';
+              } else if (newQty <= invItem.lowLimit) {
+                newStatus = 'LOW STOCK';
+              }
+
+              await updateInventoryItem(invItem.id, {
+                quantity: newQty,
+                status: newStatus
+              });
+
+              await addStockTransaction({
+                id: 'tx_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                itemId: invItem.id,
+                itemName: invItem.name,
+                type: 'OUT',
+                quantity: amountToReduce,
+                prevQuantity: invItem.quantity,
+                newQuantity: newQty,
+                reason: `Order #${ord.orderNumber} placed (${item.menuItem?.name} ${item.size || 'Full'} x${qtyOrdered})`,
+                timestamp: Date.now()
+              });
+
+              if (newStatus === 'LOW STOCK' || newStatus === 'OUT OF STOCK') {
+                toast.error(`⚠️ Low Stock Alert: ${invItem.name} has only ${newQty} ${invItem.unit} remaining!`, {
+                  duration: 5000,
+                  icon: '⚠️'
+                });
+              }
+            }
+          }
+        } else {
+          // Direct item depletion fallback if single inventory product
+          const itemName = (item.productName || item.menuItem?.name || '').toLowerCase();
+          const directMatch = inventoryItems.find(i => 
+            i.id === item.menuItem?.id || 
+            i.name.toLowerCase() === itemName ||
+            itemName.includes(i.name.toLowerCase())
+          );
+          if (directMatch) {
+            const amountToReduce = qtyOrdered;
+            const newQty = Math.max(0, parseFloat((directMatch.quantity - amountToReduce).toFixed(2)));
+            let newStatus: 'NORMAL' | 'LOW STOCK' | 'OUT OF STOCK' = 'NORMAL';
+            if (newQty === 0) {
+              newStatus = 'OUT OF STOCK';
+            } else if (newQty <= directMatch.lowLimit) {
+              newStatus = 'LOW STOCK';
+            }
+
+            await updateInventoryItem(directMatch.id, {
+              quantity: newQty,
+              status: newStatus
+            });
+
+            await addStockTransaction({
+              id: 'tx_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+              itemId: directMatch.id,
+              itemName: directMatch.name,
+              type: 'OUT',
+              quantity: amountToReduce,
+              prevQuantity: directMatch.quantity,
+              newQuantity: newQty,
+              reason: `Order #${ord.orderNumber} placed (${item.menuItem?.name || item.productName} x${qtyOrdered})`,
+              timestamp: Date.now()
+            });
+
+            if (newStatus === 'LOW STOCK' || newStatus === 'OUT OF STOCK') {
+              toast.error(`⚠️ Low Stock Alert: ${directMatch.name} has only ${newQty} ${directMatch.unit} remaining!`, {
+                duration: 5000,
+                icon: '⚠️'
+              });
+            }
+          }
+        }
+      }
+    } catch (invErr) {
+      console.warn('Inventory deduction notice:', invErr);
+    }
+  };
+
   const handleAddNewOrder = async (ord: Order) => {
     // 1. Add order to firestore using the live hooks
     await addOrder(ord);
@@ -481,61 +585,7 @@ export default function App() {
     });
 
     // 4. Reduce stock based on ingredients dynamically
-    for (const item of ord.items) {
-      const qtyOrdered = item.quantity;
-      const isHalf = item.size === 'Half';
-      const sizeMultiplier = isHalf ? 0.5 : 1.0;
-
-      let recipe = item.menuItem.recipe;
-      if (!recipe || recipe.length === 0) {
-        // Fallback to seeds mapping
-        const seedItem = INITIAL_MENU_ITEMS.find(m => m.id === item.menuItem.id || m.name.toLowerCase() === item.menuItem.name.toLowerCase());
-        if (seedItem && seedItem.recipe) {
-          recipe = seedItem.recipe;
-        }
-      }
-
-      if (recipe && Array.isArray(recipe)) {
-        for (const rec of recipe) {
-          const invItem = inventoryItems.find(i => i.id === rec.inventoryItemId);
-          if (invItem) {
-            const amountToReduce = parseFloat((rec.amount * sizeMultiplier * qtyOrdered).toFixed(2));
-            const newQty = Math.max(0, parseFloat((invItem.quantity - amountToReduce).toFixed(2)));
-            let newStatus: 'NORMAL' | 'LOW STOCK' | 'OUT OF STOCK' = 'NORMAL';
-            if (newQty === 0) {
-              newStatus = 'OUT OF STOCK';
-            } else if (newQty <= invItem.lowLimit) {
-              newStatus = 'LOW STOCK';
-            }
-
-            await updateInventoryItem(invItem.id, {
-              quantity: newQty,
-              status: newStatus
-            });
-
-            // Log stock out transaction
-            await addStockTransaction({
-              id: 'tx_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-              itemId: invItem.id,
-              itemName: invItem.name,
-              type: 'OUT',
-              quantity: amountToReduce,
-              prevQuantity: invItem.quantity,
-              newQuantity: newQty,
-              reason: `Order #${ord.orderNumber} placed (${item.menuItem.name} ${item.size || 'Full'} x${qtyOrdered})`,
-              timestamp: Date.now()
-            });
-
-            if (newStatus === 'LOW STOCK' || newStatus === 'OUT OF STOCK') {
-              toast.error(`⚠️ Low Stock Alert: ${invItem.name} has only ${newQty} ${invItem.unit} remaining!`, {
-                duration: 6000,
-                icon: '⚠️'
-              });
-            }
-          }
-        }
-      }
-    }
+    await deductInventoryForOrder(ord);
   };
 
   const subInfo = settingsData?.subscription || {
@@ -570,6 +620,7 @@ export default function App() {
       case 'Dashboard':
         return <Dashboard orders={orders} menuItems={menuItems} inventoryItems={inventoryItems} onNavigateToTab={setActiveTab} restaurantName={settingsData.restaurantInfo.name} settings={settingsData as any} />;
       case 'Orders':
+
         return <Orders menuItems={menuItems} inventoryItems={inventoryItems} orders={orders} onNavigateToTab={setActiveTab} onAddOrderToKitchen={async (orderPartial: any) => { 
           const ord: Order = {
             id: generateOrderId(),
