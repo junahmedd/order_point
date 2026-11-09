@@ -31,6 +31,12 @@ import { useLiveAppData } from './hooks/useLiveAppData';
 import { useSettings } from './hooks/useSettings';
 import { Order, MenuItem, InventoryItem, StaffMember, Customer } from './types';
 import { INITIAL_MENU_ITEMS } from './data';
+import { 
+  getNextOrderNumber, 
+  getNextTokenNumber, 
+  formatTokenDisplay, 
+  formatOrderNumberDisplay 
+} from './lib/orderSeriesUtils';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
@@ -438,7 +444,8 @@ export default function App() {
   };
 
   const generateOrderId = () => `o${Date.now()}`;
-  const generateOrderNumber = () => `OP-${Math.floor(1000 + Math.random() * 9000)}`;
+  const generateOrderNumber = () => getNextOrderNumber(orders);
+  const generateTokenNumber = () => getNextTokenNumber(orders);
 
 
   // Centralized Inventory Auto-Depletion Engine
@@ -622,9 +629,12 @@ export default function App() {
       case 'Orders':
 
         return <Orders menuItems={menuItems} inventoryItems={inventoryItems} orders={orders} onNavigateToTab={setActiveTab} onAddOrderToKitchen={async (orderPartial: any) => { 
+          const ordNum = orderPartial.orderNumber || generateOrderNumber();
+          const tkNum = orderPartial.orderToken || orderPartial.token || generateTokenNumber();
           const ord: Order = {
             id: generateOrderId(),
-            orderNumber: generateOrderNumber(),
+            orderNumber: ordNum,
+            orderToken: tkNum,
             status: 'New',
             createdAt: new Date().toISOString(),
             timestamp: Date.now(),
@@ -763,7 +773,7 @@ export default function App() {
                     billingStatus: (target as any).isPaid ? 'Paid' : 'Pending',
                     paymentStatus: (target as any).paymentStatus || ((target as any).isPaid ? 'Paid' : 'Pending'),
                     paymentMethod: (target as any).paymentMethod || 'QR Order',
-                    orderToken: (target as any).orderToken || (target as any).token || `A${Math.floor(100 + Math.random() * 900)}`,
+                    orderToken: (target as any).orderToken || (target as any).token || generateTokenNumber(),
                     orderSource: 'QR',
                     preparedAt: 0,
                     servedAt: 0,

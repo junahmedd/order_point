@@ -21,6 +21,7 @@ import { INITIAL_MENU_ITEMS } from '../data';
 import toast, { Toaster } from 'react-hot-toast';
 import { isDishStockAvailable } from './Orders';
 import { soundAlert } from '../lib/soundAlert';
+import { formatTokenDisplay, formatOrderNumberDisplay } from '../lib/orderSeriesUtils';
 
 interface CustomerQrOrderProps {
   restaurantId: string;
@@ -318,14 +319,14 @@ export default function CustomerQrOrder({ restaurantId, tableId }: CustomerQrOrd
       const snap = await getDocs(ordersQuery);
       const seq = snap.size + 1;
       return {
-        token: `A${String(seq).padStart(3, '0')}`,
-        orderNumber: `OP-${1000 + seq}`
+        token: `TK-${String(seq).padStart(2, '0')}`,
+        orderNumber: `OP-${String(seq).padStart(3, '0')}`
       };
     } catch {
-      const randomSeq = Math.floor(10 + Math.random() * 89);
+      const randomSeq = Math.floor(1 + Math.random() * 9);
       return {
-        token: `A${String(randomSeq).padStart(3, '0')}`,
-        orderNumber: `OP-${1000 + randomSeq}`
+        token: `TK-${String(randomSeq).padStart(2, '0')}`,
+        orderNumber: `OP-${String(randomSeq).padStart(3, '0')}`
       };
     }
   };
@@ -421,8 +422,8 @@ export default function CustomerQrOrder({ restaurantId, tableId }: CustomerQrOrd
   ) => {
     try {
       let orderId = 'ord_' + Date.now();
-      let token = 'A001';
-      let orderNum = 'OP-1001';
+      let token = 'TK-01';
+      let orderNum = 'OP-001';
 
       // 1. Try server verification endpoint first
       let serverSaved = false;
@@ -688,8 +689,8 @@ export default function CustomerQrOrder({ restaurantId, tableId }: CustomerQrOrd
               className="mx-3 mt-3 p-3 bg-blue-50 border border-blue-200 rounded-2xl flex items-center justify-between cursor-pointer shadow-2xs hover:bg-blue-100/60 transition-colors"
             >
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs">
-                  {liveOrder.orderNumber ? liveOrder.orderNumber.replace(/\D/g, '').slice(-3) : 'ORD'}
+                <div className="px-2 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xs font-mono">
+                  {formatTokenDisplay((liveOrder as any).orderToken || liveOrder.orderNumber)}
                 </div>
                 <div>
                   <span className="text-xs font-bold text-blue-900 block leading-tight">
@@ -1147,9 +1148,9 @@ export default function CustomerQrOrder({ restaurantId, tableId }: CustomerQrOrd
               </span>
               <div className="text-4xl font-black tracking-tight font-mono text-white">
                 {liveOrder?.orderNumber ? (
-                  (liveOrder as any).orderToken || `A${liveOrder.orderNumber.replace(/\D/g, '').slice(-3) || '027'}`
+                  formatTokenDisplay((liveOrder as any).orderToken || liveOrder.orderNumber)
                 ) : (
-                  'A027'
+                  'TK-01'
                 )}
               </div>
               <span className="text-[10px] text-blue-200 block font-semibold">

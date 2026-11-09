@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from 'react';
 import PageLayout from './PageLayout';
 import { ChefHat, Flame, CheckCircle, Clock, Play, Sparkles, Star, Truck, ShieldAlert, XCircle, Volume2 } from 'lucide-react';
 import { Order } from '../types';
+import { formatTokenDisplay, formatOrderNumberDisplay } from '../lib/orderSeriesUtils';
 import { soundAlert } from '../lib/soundAlert';
 
 interface KitchenProps {
@@ -184,7 +185,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {currentDisplayOrders.map(order => {
+          {currentDisplayOrders.map((order, idx) => {
             const isNew = order.status === 'New';
             const isPreparing = order.status === 'Preparing';
             const isReady = order.status === 'Ready';
@@ -271,15 +272,9 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                       <h3 className="font-black text-sm text-gray-950 truncate tracking-tight">
                         {order.orderSource && order.orderSource !== 'QR' ? `${order.orderSource}` : (order.tableNo ? (order.tableNo.trim().toLowerCase().startsWith('table') ? order.tableNo.trim() : `Table ${order.tableNo.trim()}`) : order.type)}
                       </h3>
-                      {(order as any).orderToken ? (
-                        <span className="text-[10px] font-black bg-black text-white px-2 py-0.5 rounded-full font-mono shrink-0 shadow-2xs">
-                          Token #{(order as any).orderToken}
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-black bg-gray-100 text-gray-800 px-2 py-0.5 rounded-full font-mono shrink-0">
-                          Tk: #{order.orderNumber.replace(/\D/g, '') || order.orderNumber}
-                        </span>
-                      )}
+                      <span className="text-[10px] font-black bg-black text-white px-2 py-0.5 rounded-full font-mono shrink-0 shadow-2xs">
+                        {formatTokenDisplay((order as any).orderToken || order.orderNumber, idx + 1)}
+                      </span>
                       
                       {/* Priority indicator icons */}
                       <div className="flex items-center gap-1 shrink-0">
@@ -306,7 +301,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                   {/* ORDER IDENTIFIER BASE INFO & PAYMENT STATUS */}
                   <div className="flex justify-between items-center text-[10px] font-medium text-gray-500 select-none bg-gray-50/80 px-2.5 py-1 rounded-lg mt-2 shrink-0 border border-gray-100">
                     <div className="flex items-center gap-1.5 truncate">
-                      <span className="font-mono font-bold text-gray-700">#{order.orderNumber.replace(/^#?OP-OP-/, 'OP-').replace(/^#/, '')}</span>
+                      <span className="font-mono font-bold text-gray-700">{formatOrderNumberDisplay(order.orderNumber, idx + 1)}</span>
                       <span>•</span>
                       <span>{getFormattedTime(order.timestamp)}</span>
                       <span>•</span>
@@ -512,7 +507,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                             className="h-9 text-[11px] font-bold tracking-wider uppercase rounded-xl bg-black hover:bg-neutral-800 active:scale-[0.99] text-white flex items-center justify-center gap-1.5 cursor-pointer w-full border-none shadow-xs transition-all"
                           >
                             <CheckCircle size={13} />
-                            <span>Serve / Complete</span>
+                            <span>COMPLETE</span>
                           </button>
                         )}
                       </div>
