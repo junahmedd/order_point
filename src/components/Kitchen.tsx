@@ -488,13 +488,13 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                           <button
                             id={`btn_ready_${order.id}`}
                             onClick={() => {
-                              onUpdateOrderStatus(order.id, 'Ready', { preparedAt: Date.now() });
-                              onShowToast(`Order #${order.orderNumber} Ready`);
+                              onUpdateOrderStatus(order.id, 'Ready', { preparedAt: Date.now(), kitchenStatus: 'Completed', billingStatus: 'Ready for Billing' });
+                              onShowToast(`Order #${order.orderNumber} Completed`);
                             }}
                             className="h-9 text-[11px] font-bold tracking-wider uppercase rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white flex items-center justify-center gap-1.5 cursor-pointer w-full border-none shadow-xs transition-all font-black"
                           >
-                            <ChefHat size={13} />
-                            <span>Mark Ready</span>
+                            <CheckCircle size={13} />
+                            <span>COMPLETE</span>
                           </button>
                         )}
                         {order.status === 'Ready' && (

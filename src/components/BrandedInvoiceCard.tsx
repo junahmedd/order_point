@@ -86,13 +86,10 @@ export default function BrandedInvoiceCard({
           <p className="text-xs text-gray-400 font-medium mt-1">Thank you for your order.</p>
         </div>
         
-        {/* INV and TK pill box */}
+        {/* INV pill box */}
         <div className="bg-[#eaf7ee] border border-[#cbebd3] px-5 py-2 rounded-2xl text-center shadow-2xs shrink-0">
           <span className="text-base font-black text-gray-950 block leading-tight tracking-tight">
             {invNumber}
-          </span>
-          <span className="text-xs font-bold text-gray-700 block mt-0.5 leading-tight tracking-wide font-mono">
-            {tkNumber}
           </span>
         </div>
       </div>
