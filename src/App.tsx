@@ -163,8 +163,8 @@ export default function App() {
     }
 
     const invId = params.get('invoice');
-    const invStore = params.get('store');
-    if (invId && invStore) {
+    const invStore = params.get('store') || params.get('restaurantId') || localStorage.getItem('orderpoint_user_id') || 'default_restaurant';
+    if (invId) {
       setInvoiceIdParam(invId);
       setInvoiceStoreId(invStore);
     }

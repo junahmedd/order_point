@@ -530,8 +530,8 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
         }
       `}>
         {/* Top Header Box (Full solid black box) */}
-        <div className={isMobileCartOpen ? 'p-3.5 pb-2 shrink-0 bg-white border-b border-gray-100' : ''}>
-          <div className="bg-black text-white rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm select-none">
+        <div className={isMobileCartOpen ? 'p-3.5 pb-0 shrink-0 bg-white' : ''}>
+          <div className="w-full bg-black text-white rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm select-none">
             <div className="flex items-center gap-2.5">
               <button
                 type="button"
@@ -541,10 +541,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
               >
                 <ArrowLeft size={16} className="stroke-[2.5] text-white" />
               </button>
-              <div className="flex items-center gap-2">
-                <ShoppingBag size={17} className="text-white stroke-[2.5]" />
-                <h2 className="text-sm font-black text-white uppercase tracking-wider">CURRENT ORDER</h2>
-              </div>
+              <h2 className="text-sm font-black text-white uppercase tracking-wider">CURRENT ORDER</h2>
             </div>
             {cartValues.itemsArray.length > 0 && (
               <button
@@ -560,7 +557,7 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
         </div>
 
         {/* Scrollable Content Area */}
-        <div className={isMobileCartOpen ? 'flex-1 overflow-y-auto p-3.5 space-y-3' : 'space-y-3'}>
+        <div className={isMobileCartOpen ? 'flex-1 overflow-y-auto p-3.5 pt-3 space-y-3' : 'space-y-3'}>
           {/* Service Selector: Dine In vs Takeaway (Delivery removed) */}
           <div className="bg-gray-100 p-1 rounded-xl grid grid-cols-2 text-center select-none">
             {(['Dine-In', 'Takeaway'] as const).map(type => (

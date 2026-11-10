@@ -252,10 +252,50 @@ export default function Billing({
         customerName: activeOrderObj.type === 'Takeaway' ? 'Takeaway' : 'Dine In'
       });
 
-      // 2. Persist Dedicated Sequential Invoice Record in Firestore
+      // 2. Generate Branded PDF Invoice Data URI using jsPDF
+      let generatedPdfDataUri = '';
       try {
-        const invoiceDocRef = doc(db, `restaurants/${restId}/invoices/${assignedInvoiceNo}`);
-        await setDoc(invoiceDocRef, {
+        const doc = new jsPDF({ unit: 'mm', format: [80, 200] });
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text(settings?.restaurantInfo?.name || 'The Royal Feast', 40, 10, { align: 'center' });
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text(settings?.restaurantInfo?.address || '123 Royal Palace Avenue, India', 40, 15, { align: 'center' });
+        
+        doc.setFont('helvetica', 'bold');
+        doc.text(`INVOICE: ${assignedInvoiceNo}`, 40, 22, { align: 'center' });
+        doc.line(5, 25, 75, 25);
+
+        let y = 30;
+        doc.setFontSize(8);
+        calculatedItems.forEach(it => {
+          doc.text(`${it.name} x${it.quantity}`, 5, y);
+          doc.text(`Rs. ${it.amount.toFixed(2)}`, 75, y, { align: 'right' });
+          y += 5;
+        });
+
+        doc.line(5, y, 75, y);
+        y += 5;
+        doc.text(`Subtotal:`, 5, y);
+        doc.text(`Rs. ${subtotal.toFixed(2)}`, 75, y, { align: 'right' });
+        y += 4;
+        doc.text(`GST (${gstPercentage}%):`, 5, y);
+        doc.text(`Rs. ${taxAmount.toFixed(2)}`, 75, y, { align: 'right' });
+        y += 5;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text(`TOTAL:`, 5, y);
+        doc.text(`Rs. ${totalAmountVal.toFixed(2)}`, 75, y, { align: 'right' });
+
+        generatedPdfDataUri = doc.output('datauristring');
+      } catch (pdfGenErr) {
+        console.warn('PDF generation error in confirm payment:', pdfGenErr);
+      }
+
+      // 3. Persist Dedicated Sequential Invoice Record in Firestore
+      try {
+        const invoicePayload = {
           invoiceNumber: assignedInvoiceNo,
           invoiceNo: assignedInvoiceNo,
           orderNumber: formatOrderNumberDisplay(activeOrderObj.orderNumber),
@@ -274,14 +314,21 @@ export default function Billing({
           paymentMethod: selectedMethod.toUpperCase(),
           paymentStatus: 'Paid',
           isPaid: true,
+          pdfDataUri: generatedPdfDataUri || null,
           timestamp: activeOrderObj.timestamp || Date.now(),
           paymentAt: Date.now()
-        }, { merge: true });
+        };
+
+        const invoiceDocRef = doc(db, `restaurants/${restId}/invoices/${assignedInvoiceNo}`);
+        await setDoc(invoiceDocRef, invoicePayload, { merge: true });
+
+        const invoiceRecordRef = doc(db, `restaurants/${restId}/invoiceRecords/${assignedInvoiceNo}`);
+        await setDoc(invoiceRecordRef, invoicePayload, { merge: true });
       } catch (invSaveErr) {
-        console.warn('Could not write invoice subcollection:', invSaveErr);
+        console.warn('Could not write invoice subcollections:', invSaveErr);
       }
 
-      // 3. Automatically Open WhatsApp with Customer's Mobile Number
+      // 4. Automatically Open WhatsApp with Customer's Mobile Number and PDF link
       const publicInvoiceLink = `${window.location.origin}/?invoice=${assignedInvoiceNo}&store=${restId}`;
       const whatsappMessage = `Hi! Thank you for dining with us. 😊\n\nYour invoice is ready. View or download your bill here:\n\n📄 "View Invoice PDF" (${publicInvoiceLink})\n\nThank you for choosing us! ❤️`;
 
@@ -291,13 +338,13 @@ export default function Billing({
         window.open(waUrl, '_blank');
       }
 
-      onShowToast(`Bill confirmed • ${assignedInvoiceNo}`);
+      onShowToast(`Payment confirmed • ${assignedInvoiceNo}`);
 
-      // 4. Open Invoice Modal / View for instant Cashier confirmation
+      // 5. Open Invoice Modal / View for instant Cashier confirmation
       setViewInvoiceModal(true);
     } catch (err: any) {
-      console.error('Confirm billing error:', err);
-      onShowToast('Error confirming bill. Please retry.');
+      console.error('Confirm payment error:', err);
+      onShowToast('Error confirming payment. Please retry.');
     } finally {
       setIsProcessing(false);
     }
@@ -330,74 +377,48 @@ export default function Billing({
                 </h3>
               </div>
             ) : (
-              <div className="space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {readyOrders.map((ord) => {
-                    const isTakeaway = ord.type === 'Takeaway' || !ord.tableNo;
-                    const tableName = isTakeaway 
-                      ? 'Takeaway' 
-                      : (ord.tableNo.toLowerCase().startsWith('table') ? ord.tableNo : `Table ${ord.tableNo}`);
+              <div className="space-y-2.5 max-w-xl mx-auto">
+                {readyOrders.map((ord) => {
+                  const isTakeaway = ord.type === 'Takeaway' || !ord.tableNo;
+                  let formattedTableName = 'Takeaway';
+                  if (!isTakeaway) {
+                    const match = ord.tableNo.match(/\d+/);
+                    if (match) {
+                      const num = parseInt(match[0], 10);
+                      formattedTableName = `Table ${num < 10 ? '0' + num : num}`;
+                    } else {
+                      formattedTableName = ord.tableNo;
+                    }
+                  }
 
-                    // Clean items preview from actual order data
-                    const itemsSummary = ord.items.map(i => `${i.productName || i.menuItem?.name} (x${i.quantity})`).join(', ');
+                  return (
+                    <div
+                      key={ord.id}
+                      onClick={() => {
+                        setSelectedOrderId(ord.id);
+                        setViewInvoiceModal(false);
+                      }}
+                      className="w-full bg-white border border-gray-200 hover:border-[#046c38] rounded-xl px-4 py-3 flex items-center justify-between shadow-2xs hover:shadow-xs transition-all select-none cursor-pointer"
+                    >
+                      <span className="font-black text-sm text-gray-900 tracking-tight">
+                        {formattedTableName}
+                      </span>
 
-                    return (
-                      <div
-                        key={ord.id}
-                        className="bg-white border border-gray-200 hover:border-emerald-600 rounded-2xl p-4 shadow-xs transition-all space-y-3 flex flex-col justify-between"
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedOrderId(ord.id);
+                          setViewInvoiceModal(false);
+                        }}
+                        className="h-8 px-4 bg-[#046c38] hover:bg-[#03542b] active:scale-[0.98] text-white text-xs font-black uppercase tracking-wider rounded-lg shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer border-none"
                       >
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              {isTakeaway ? (
-                                <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
-                                  <ShoppingBag size={16} />
-                                </div>
-                              ) : (
-                                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#046c38] flex items-center justify-center shrink-0">
-                                  <Armchair size={16} />
-                                </div>
-                              )}
-                              <div>
-                                <h4 className="font-black text-sm text-gray-950 leading-tight">
-                                  {tableName}
-                                </h4>
-                                <span className="text-[11px] text-gray-500 block font-medium">
-                                  {isTakeaway ? 'Takeaway' : 'Dine In'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Ordered items preview */}
-                          <p className="text-xs text-gray-600 font-medium line-clamp-2 leading-relaxed bg-gray-50 p-2 rounded-xl">
-                            {itemsSummary || 'Food items'}
-                          </p>
-                        </div>
-
-                        {/* Amount and BILL NOW button */}
-                        <div className="pt-2 border-t border-gray-100 flex items-center justify-between gap-3">
-                          <span className="text-base sm:text-lg font-black text-gray-950 font-mono leading-none">
-                            {currencySymbol}{ord.totalAmount}
-                          </span>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedOrderId(ord.id);
-                              setViewInvoiceModal(false);
-                            }}
-                            className="h-10 px-5 bg-[#046c38] hover:bg-[#03542b] active:scale-[0.98] text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer border-none"
-                          >
-                            <span>BILL NOW</span>
-                            <ArrowRight size={13} />
-                          </button>
-                        </div>
-
-                      </div>
-                    );
-                  })}
-                </div>
+                        <span>BILL NOW</span>
+                        <ArrowRight size={12} />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -667,7 +688,7 @@ export default function Billing({
                 </p>
               </div>
 
-              {/* 7. CONFIRM BILLING BUTTON */}
+              {/* 7. CONFIRM PAYMENT BUTTON */}
               <div className="pt-1">
                 <button
                   type="button"
@@ -676,7 +697,7 @@ export default function Billing({
                   onClick={handleConfirmBilling}
                   className="w-full h-12 sm:h-13 bg-[#046c38] hover:bg-[#03542b] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl text-sm sm:text-base font-black tracking-wider uppercase shadow-md hover:shadow-lg transition-all active:scale-[0.99] cursor-pointer border-none flex items-center justify-center gap-2"
                 >
-                  <span>{isProcessing ? 'Confirming...' : 'Confirm Billing'}</span>
+                  <span>{isProcessing ? 'Confirming...' : 'Confirm Payment'}</span>
                 </button>
               </div>
 

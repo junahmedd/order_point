@@ -4,7 +4,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
+import { signInAnonymously } from 'firebase/auth';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { Loader2, FileText, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -29,6 +30,15 @@ export default function LiveInvoiceViewer({ invoiceId, restaurantId, onClose }: 
         setLoading(true);
         setError(null);
 
+        // Ensure user is signed in (anonymously for customers accessing via public WhatsApp link)
+        if (!auth.currentUser) {
+          try {
+            await signInAnonymously(auth);
+          } catch (authErr) {
+            console.warn('Anonymous sign-in for invoice viewer:', authErr);
+          }
+        }
+
         let restName = 'The Royal Feast';
         let restAddr = '123 Royal Palace Avenue, India';
 
@@ -47,7 +57,7 @@ export default function LiveInvoiceViewer({ invoiceId, restaurantId, onClose }: 
           console.warn('Settings load warning:', err);
         }
 
-        // 2. Fetch Invoice Document directly from invoices subcollection
+        // 2. Fetch Invoice Document directly from invoices or invoiceRecords subcollections
         let rawInvoice: any = null;
         try {
           const invoiceRef = doc(db, `restaurants/${restaurantId}/invoices/${invoiceId}`);
@@ -57,6 +67,18 @@ export default function LiveInvoiceViewer({ invoiceId, restaurantId, onClose }: 
           }
         } catch (e) {
           console.warn('Direct invoice fetch warning:', e);
+        }
+
+        if (!rawInvoice) {
+          try {
+            const invoiceRecordRef = doc(db, `restaurants/${restaurantId}/invoiceRecords/${invoiceId}`);
+            const invoiceRecordSnap = await getDoc(invoiceRecordRef);
+            if (invoiceRecordSnap.exists()) {
+              rawInvoice = invoiceRecordSnap.data();
+            }
+          } catch (e2) {
+            console.warn('Direct invoiceRecords fetch warning:', e2);
+          }
         }
 
         // 3. Fallback: Search in orders collection if not found in invoices

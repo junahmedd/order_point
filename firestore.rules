@@ -97,6 +97,11 @@ service cloud.firestore {
         allow read: if isAuthenticated();
         allow write: if isStaffOrOwner(restaurantId);
       }
+
+      match /invoices/{invId} {
+        allow read: if isAuthenticated();
+        allow write: if isStaffOrOwner(restaurantId);
+      }
       
       match /staffMembers/{staffId} {
         allow read: if isAuthenticated();
