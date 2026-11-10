@@ -335,15 +335,16 @@ export default function Billing({
       if (cleanPhone.length >= 10) {
         const formattedPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
         const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(whatsappMessage)}`;
-        const win = window.open(waUrl, '_blank');
-        if (!win || win.closed || typeof win.closed === 'undefined') {
-          const link = document.createElement('a');
-          link.href = waUrl;
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+        
+        // On mobile devices, window.location.href triggers WhatsApp app directly
+        const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobileDevice) {
+          window.location.href = waUrl;
+        } else {
+          const win = window.open(waUrl, '_blank');
+          if (!win || win.closed || typeof win.closed === 'undefined') {
+            window.location.href = waUrl;
+          }
         }
       }
 
@@ -372,9 +373,9 @@ export default function Billing({
       <div className="w-full font-sans select-none pt-0 pb-8">
 
         {/* ============================================================== */}
-        {/* VIEW 1: ELIGIBLE BILLS LIST (When no order is selected) */}
+        {/* VIEW 1: ELIGIBLE BILLS LIST (When no unpaid order is selected) */}
         {/* ============================================================== */}
-        {!activeOrderObj ? (
+        {!activeOrderObj || activeOrderObj.isPaid ? (
           <div className="max-w-2xl mx-auto space-y-3 animate-fade-in pt-1">
             
             {readyOrders.length === 0 ? (
@@ -433,49 +434,6 @@ export default function Billing({
             )}
 
           </div>
-        ) : viewInvoiceModal || activeOrderObj.isPaid ? (
-          
-          /* VIEW FINAL INVOICE (With Print & Download actions) */
-          <div className="max-w-md mx-auto space-y-3 animate-fade-in pt-1">
-            <div className="flex items-center justify-between pb-2 border-b border-gray-150 print:hidden">
-              <button
-                type="button"
-                onClick={() => { setSelectedOrderId(''); setViewInvoiceModal(false); }}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg text-xs font-bold transition-colors cursor-pointer border-none"
-              >
-                <ArrowLeft size={13} />
-                <span>Back</span>
-              </button>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handlePrintInvoice}
-                  className="h-8 px-2.5 rounded-lg bg-white border border-gray-300 text-gray-800 text-xs font-bold uppercase tracking-wider flex items-center gap-1 hover:bg-gray-50 cursor-pointer"
-                >
-                  <Printer size={12} />
-                  <span>Print</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDownloadPDF}
-                  className="h-8 px-2.5 rounded-lg bg-black text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1 hover:bg-neutral-800 cursor-pointer border-none"
-                >
-                  <Download size={12} />
-                  <span>PDF</span>
-                </button>
-              </div>
-            </div>
-
-            {brandedInvoiceData && (
-              <BrandedInvoiceCard
-                data={brandedInvoiceData}
-                onPrint={handlePrintInvoice}
-                onDownloadPDF={handleDownloadPDF}
-                showActions={false}
-              />
-            )}
-          </div>
-
         ) : (
 
           /* ============================================================== */

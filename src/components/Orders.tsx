@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { MenuItem, Order, OrderType, Category, InventoryItem } from '../types';
 import { INITIAL_MENU_ITEMS } from '../data';
+import { formatOrderNumberDisplay } from '../lib/orderSeriesUtils';
 
 interface OrdersProps {
   menuItems: MenuItem[];
@@ -221,15 +222,47 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
     setSelectedTable(val);
   };
 
+  // Instant Matching Orders Lookup based on Order Number, Table Number, or Customer Mobile
+  const matchingOrders = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return [];
+    const cleanNum = q.replace(/\D/g, '');
+    return orders.filter(ord => {
+      // Order number: OP-001, 001
+      const ordNum = String(ord.orderNumber || '').toLowerCase();
+      const ordNumMatch = ordNum.includes(q) || (cleanNum.length > 0 && ordNum.replace(/\D/g, '').includes(cleanNum));
+
+      // Table number: Table 1, 1, T-1
+      const tbl = String(ord.tableNo || '').toLowerCase();
+      const tableMatch = tbl.includes(q) || (cleanNum.length > 0 && tbl.replace(/\D/g, '') === cleanNum);
+
+      // Customer phone: 10-digit number or partial
+      const ph = String(ord.customerPhone || '').replace(/\D/g, '');
+      const phoneMatch = cleanNum.length > 0 ? ph.includes(cleanNum) : false;
+
+      // Customer name
+      const nameMatch = ord.customerName && ord.customerName.toLowerCase().includes(q);
+
+      // Token
+      const tk = String((ord as any).orderToken || (ord as any).tokenNumber || '').toLowerCase();
+      const tokenMatch = tk.includes(q) || (cleanNum.length > 0 && tk.replace(/\D/g, '') === cleanNum);
+
+      return ordNumMatch || tableMatch || phoneMatch || nameMatch || tokenMatch;
+    });
+  }, [orders, searchQuery]);
+
   // Filtered Menu Cards based on horizontal controls and dynamic stock
   const filteredMenuItems = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
     return menuItems.filter(item => {
       // Hide if marked unavailable in menu catalogue
       const available = item.isAvailableForOrder !== undefined ? item.isAvailableForOrder : item.isAvailable;
       if (available === false) return false;
 
-      const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                            item.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = !q ||
+                            item.name.toLowerCase().includes(q) ||
+                            (item.description && item.description.toLowerCase().includes(q)) ||
+                            (item.category && item.category.toLowerCase().includes(q));
       
       const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
 
@@ -378,26 +411,102 @@ export default function Orders({ menuItems, inventoryItems, orders, onAddOrderTo
       <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 p-3 sm:p-6 items-start">
         
         {/* LEFT COLUMN: Menu Browsing Area (70% space) */}
-        <div className="flex-1 flex flex-col space-y-6">
+        <div className="flex-1 flex flex-col space-y-4">
           
-          {/* Category Filter Pills (Reduced pill size, search bar removed) */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            {CATEGORY_CHIPS.map(chip => (
-              <button
-                id={`btn_cat_filter_${chip.value}`}
-                key={chip.value}
-                onClick={() => setSelectedCategory(chip.value)}
-                className={`px-3 h-8 rounded-full text-xs font-bold tracking-wide transition-all duration-150 flex items-center gap-1.5 border select-none cursor-pointer ${
-                  selectedCategory === chip.value
-                    ? 'bg-[#111111] text-white border-[#111111] shadow-xs font-black'
-                    : 'bg-white border-gray-200 text-gray-600 hover:text-[#111111] hover:bg-gray-50 hover:border-gray-300'
-                }`}
-              >
-                <span className="text-[9px]">{chip.dot}</span>
-                <span>{chip.label}</span>
-              </button>
-            ))}
+          {/* Top Controls: Compact Horizontal Search Bar & Category Filter Pills */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            {/* Search Bar: Compact, horizontal, responsive */}
+            <div className="relative w-full sm:w-72 md:w-80 shrink-0">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search order #, table, mobile..."
+                className="w-full h-8 sm:h-8.5 pl-8.5 pr-7 bg-white border border-gray-200 rounded-xl text-xs font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all shadow-2xs"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 text-xs font-bold p-1 cursor-pointer border-none bg-transparent"
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Category Filter Pills (Compact horizontal chips) */}
+            <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
+              {CATEGORY_CHIPS.map(chip => (
+                <button
+                  id={`btn_cat_filter_${chip.value}`}
+                  key={chip.value}
+                  onClick={() => setSelectedCategory(chip.value)}
+                  className={`px-3 h-7.5 sm:h-8 rounded-full text-xs font-bold tracking-wide transition-all duration-150 flex items-center gap-1.5 border select-none cursor-pointer shrink-0 ${
+                    selectedCategory === chip.value
+                      ? 'bg-[#111111] text-white border-[#111111] shadow-xs font-black'
+                      : 'bg-white border-gray-200 text-gray-600 hover:text-[#111111] hover:bg-gray-50 hover:border-gray-300'
+                  }`}
+                >
+                  <span className="text-[9px]">{chip.dot}</span>
+                  <span>{chip.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* Instant Matching Orders Results (when search matches orders) */}
+          {searchQuery.trim() && matchingOrders.length > 0 && (
+            <div className="bg-white border border-gray-200 rounded-2xl p-3 shadow-2xs space-y-2 animate-fade-in">
+              <div className="flex items-center justify-between text-xs font-bold text-gray-700 px-1">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
+                  Matching Active Orders ({matchingOrders.length})
+                </span>
+                <span className="text-[10px] text-gray-400 font-medium">Click order to view in Billing</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                {matchingOrders.slice(0, 6).map((ord) => (
+                  <div
+                    key={ord.id}
+                    onClick={() => onNavigateToTab?.('Billing')}
+                    className="bg-gray-50 hover:bg-emerald-50/50 border border-gray-200 hover:border-[#046c38] rounded-xl p-2.5 transition-all cursor-pointer space-y-1 select-none"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-black text-xs text-gray-950 font-mono">
+                        {formatOrderNumberDisplay(ord.orderNumber)}
+                      </span>
+                      <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-wider ${
+                        ord.isPaid || ord.status === 'Completed'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {ord.isPaid ? 'PAID' : (ord.status || 'Active')}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-gray-700">
+                      <span className="font-bold text-gray-900">{ord.tableNo || ord.type}</span>
+                      {ord.customerPhone && (
+                        <span className="font-mono text-[10px] text-gray-500 font-medium">
+                          {ord.customerPhone}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-gray-400 pt-1 border-t border-gray-200/60">
+                      <span className="truncate max-w-[150px] text-gray-600 font-medium">
+                        {ord.items?.map(i => `${i.productName || i.menuItem?.name} (x${i.quantity})`).join(', ') || 'Items'}
+                      </span>
+                      <span className="font-black text-gray-950 font-mono">
+                        {currencySymbol}{ord.totalAmount}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
         {/* Grid of Dishes Menu Cards */}
         {filteredMenuItems.length === 0 ? (
