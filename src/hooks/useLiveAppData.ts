@@ -187,8 +187,10 @@ export function useLiveAppData() {
           if (change.type === 'added') {
             soundAlert.playNewOrderBell();
             const ord = change.doc.data() as Order;
-            const tokenStr = (ord as any).orderToken ? ` [Token: ${(ord as any).orderToken}]` : '';
-            toast.success(`🔔 New Order! ${ord.tableNo || 'Counter'}${tokenStr}`, { duration: 4000 });
+            const rawToken = (ord as any).orderToken || (ord as any).tokenNumber;
+            const cleanToken = rawToken ? String(rawToken).replace(/^#+/, '') : '';
+            const tokenStr = cleanToken ? ` • Token ${cleanToken}` : '';
+            toast.success(`New Order: ${ord.tableNo || 'Counter'}${tokenStr}`, { duration: 3000 });
           }
         });
       }

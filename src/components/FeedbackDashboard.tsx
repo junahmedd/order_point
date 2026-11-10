@@ -553,7 +553,7 @@ export default function FeedbackDashboard() {
             <div className="bg-gray-50 px-6 py-4 border-b border-gray-150 flex justify-between items-center">
               <div>
                 <h3 className="text-sm font-black text-gray-900 tracking-tight">Customer Feedback Inspector</h3>
-                <span className="text-[10px] text-gray-400 font-bold uppercase">Invoice #{selectedFeedback.invoiceNo || selectedFeedback.invoiceId}</span>
+                <span className="text-[10px] text-gray-400 font-bold uppercase">Invoice {selectedFeedback.invoiceNo || selectedFeedback.invoiceId}</span>
               </div>
               <button
                 onClick={() => setSelectedFeedback(null)}

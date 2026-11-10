@@ -223,7 +223,7 @@ export default function Billing({
       doc.text(`Rs. ${brandedInvoiceData.totalPaid.toFixed(2)}`, 75, y, { align: 'right' });
 
       doc.save(`Invoice_${brandedInvoiceData.invoiceNumber}.pdf`);
-      onShowToast(`PDF saved • ${brandedInvoiceData.invoiceNumber}`);
+      onShowToast(`Invoice ${brandedInvoiceData.invoiceNumber} PDF saved`);
     } catch (e) {
       console.error(e);
       onShowToast('Could not compile PDF.');
@@ -335,16 +335,26 @@ export default function Billing({
       if (cleanPhone.length >= 10) {
         const formattedPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
         const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(whatsappMessage)}`;
-        window.open(waUrl, '_blank');
+        const win = window.open(waUrl, '_blank');
+        if (!win || win.closed || typeof win.closed === 'undefined') {
+          const link = document.createElement('a');
+          link.href = waUrl;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
       }
 
-      onShowToast(`Payment confirmed • ${assignedInvoiceNo}`);
+      onShowToast(`Invoice ${assignedInvoiceNo} confirmed`);
 
-      // 5. Open Invoice Modal / View for instant Cashier confirmation
-      setViewInvoiceModal(true);
+      // 5. Do not display completed invoice again on billing page - return to pending list
+      setSelectedOrderId('');
+      setViewInvoiceModal(false);
     } catch (err: any) {
-      console.error('Confirm payment error:', err);
-      onShowToast('Error confirming payment. Please retry.');
+      console.error('Confirm billing error:', err);
+      onShowToast('Error confirming billing. Please retry.');
     } finally {
       setIsProcessing(false);
     }
@@ -688,7 +698,7 @@ export default function Billing({
                 </p>
               </div>
 
-              {/* 7. CONFIRM PAYMENT BUTTON */}
+              {/* 7. CONFIRM BILLING BUTTON */}
               <div className="pt-1">
                 <button
                   type="button"
@@ -697,7 +707,7 @@ export default function Billing({
                   onClick={handleConfirmBilling}
                   className="w-full h-12 sm:h-13 bg-[#046c38] hover:bg-[#03542b] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl text-sm sm:text-base font-black tracking-wider uppercase shadow-md hover:shadow-lg transition-all active:scale-[0.99] cursor-pointer border-none flex items-center justify-center gap-2"
                 >
-                  <span>{isProcessing ? 'Confirming...' : 'Confirm Payment'}</span>
+                  <span>{isProcessing ? 'Confirming...' : 'Confirm Billing'}</span>
                 </button>
               </div>
 

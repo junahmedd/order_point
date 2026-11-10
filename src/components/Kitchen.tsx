@@ -121,17 +121,17 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
   // Status transitions
   const handleStartPreparing = (orderId: string, orderNum: string) => {
     onUpdateOrderStatus(orderId, 'Preparing', { startedAt: Date.now() });
-    onShowToast(`Order #${orderNum} status changed to PREPARING`);
+    onShowToast(`Order ${String(orderNum).replace(/^#+/, '')} Preparing`);
   };
 
   const handleMarkAsReady = (orderId: string, orderNum: string) => {
     onUpdateOrderStatus(orderId, 'Ready');
-    onShowToast(`Order #${orderNum} status changed to READY`);
+    onShowToast(`Order ${String(orderNum).replace(/^#+/, '')} Ready`);
   };
 
   const handleMarkAsServed = (orderId: string, orderNum: string) => {
     onUpdateOrderStatus(orderId, 'Completed');
-    onShowToast(`Order #${orderNum} status changed to SERVED`);
+    onShowToast(`Order ${String(orderNum).replace(/^#+/, '')} Served`);
   };
 
   // Filter Order list: Always shows Active orders in the kitchen
@@ -272,9 +272,6 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                       <h3 className="font-black text-sm text-gray-950 truncate tracking-tight">
                         {order.orderSource && order.orderSource !== 'QR' ? `${order.orderSource}` : (order.tableNo ? (order.tableNo.trim().toLowerCase().startsWith('table') ? order.tableNo.trim() : `Table ${order.tableNo.trim()}`) : order.type)}
                       </h3>
-                      <span className="text-[10px] font-black bg-black text-white px-2 py-0.5 rounded-full font-mono shrink-0 shadow-2xs">
-                        {formatTokenDisplay((order as any).orderToken || order.orderNumber, idx + 1)}
-                      </span>
                       
                       {/* Priority indicator icons */}
                       <div className="flex items-center gap-1 shrink-0">
@@ -463,7 +460,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                             id={`btn_accept_${order.id}`}
                             onClick={() => {
                               onUpdateOrderStatus(order.id, 'Accepted');
-                              onShowToast(`Order #${order.orderNumber} Accepted`);
+                              onShowToast(`Order ${formatOrderNumberDisplay(order.orderNumber, idx + 1)} Accepted`);
                             }}
                             className="h-9 text-[11px] font-bold tracking-wider uppercase rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white flex items-center justify-center gap-1.5 cursor-pointer w-full border-none shadow-xs transition-all"
                           >
@@ -476,7 +473,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                             id={`btn_start_${order.id}`}
                             onClick={() => {
                               onUpdateOrderStatus(order.id, 'Preparing', { startedAt: Date.now() });
-                              onShowToast(`Order #${order.orderNumber} Preparing`);
+                              onShowToast(`Order ${formatOrderNumberDisplay(order.orderNumber, idx + 1)} Preparing`);
                             }}
                             className="h-9 text-[11px] font-bold tracking-wider uppercase rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-[0.99] text-white flex items-center justify-center gap-1.5 cursor-pointer w-full border-none shadow-xs transition-all"
                           >
@@ -489,7 +486,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                             id={`btn_ready_${order.id}`}
                             onClick={() => {
                               onUpdateOrderStatus(order.id, 'Ready', { preparedAt: Date.now(), kitchenStatus: 'Completed', billingStatus: 'Ready for Billing' });
-                              onShowToast(`Order #${order.orderNumber} Completed`);
+                              onShowToast(`Order ${formatOrderNumberDisplay(order.orderNumber, idx + 1)} Completed`);
                             }}
                             className="h-9 text-[11px] font-bold tracking-wider uppercase rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white flex items-center justify-center gap-1.5 cursor-pointer w-full border-none shadow-xs transition-all font-black"
                           >
@@ -502,7 +499,7 @@ export default function Kitchen({ orders, onUpdateOrderStatus, onShowToast, onNa
                             id={`btn_served_${order.id}`}
                             onClick={() => {
                               onUpdateOrderStatus(order.id, 'Completed', { servedAt: Date.now() });
-                              onShowToast(`Order #${order.orderNumber} Completed`);
+                              onShowToast(`Order ${formatOrderNumberDisplay(order.orderNumber, idx + 1)} Completed`);
                             }}
                             className="h-9 text-[11px] font-bold tracking-wider uppercase rounded-xl bg-black hover:bg-neutral-800 active:scale-[0.99] text-white flex items-center justify-center gap-1.5 cursor-pointer w-full border-none shadow-xs transition-all"
                           >

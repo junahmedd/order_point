@@ -502,7 +502,7 @@ Thank you for choosing OrderPoint Pro. We look forward to serving you again!`;
         setCustCart({});
         setActiveOrderTrackId(newId);
         setCustomerScreen('tracking');
-        onShowToast(`🚀 Cash Order #${newNum} sent to Kitchen & Billing Desk!`);
+        onShowToast(`Order ${newNum} sent to Kitchen & Billing Desk!`);
       });
     }
   };
@@ -1080,7 +1080,7 @@ Thank you for choosing OrderPoint Pro. We look forward to serving you again!`;
                         setCustCart({});
                         setActiveOrderTrackId(newId);
                         setCustomerScreen('tracking');
-                        onShowToast(`🚀 Cash Order #${newNum} sent to Kitchen & Billing Desk!`);
+                        onShowToast(`Order ${newNum} sent to Kitchen & Billing Desk!`);
                       });
                     }
                   }}
@@ -1386,7 +1386,7 @@ Thank you!`;
             setIsPaymentModalOpen(false);
             setActiveOrderTrackId(matchId);
             setCustomerScreen('tracking');
-            onShowToast(`🚀 Payment confirmed! Order #${matchNum} dispatched straight to chef display!`);
+            onShowToast(`Payment confirmed! Order ${matchNum} dispatched to kitchen`);
           }}
           orderId={tempOrderId}
           orderNumber={tempOrderNumber}

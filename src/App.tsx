@@ -822,7 +822,7 @@ export default function App() {
   if (feedbackInvoice && feedbackStoreId) {
     return (
       <>
-        <Toaster 
+        <Toaster gutter={8} 
         position="top-center"
         containerStyle={{ top: 16 }}
         toastOptions={{
@@ -860,7 +860,7 @@ export default function App() {
   if (invoiceIdParam && invoiceStoreId) {
     return (
       <>
-        <Toaster 
+        <Toaster gutter={8} 
         position="top-center"
         containerStyle={{ top: 16 }}
         toastOptions={{
@@ -899,7 +899,7 @@ export default function App() {
     const activeRestId = scanStoreId || (userStores && userStores[0]?.storeId) || 'demo_store';
     return (
       <>
-        <Toaster 
+        <Toaster gutter={8} 
         position="top-center"
         containerStyle={{ top: 16 }}
         toastOptions={{
@@ -981,7 +981,7 @@ export default function App() {
   if (!currentUser) {
     return (
       <>
-        <Toaster 
+        <Toaster gutter={8} 
         position="top-center"
         containerStyle={{ top: 16 }}
         toastOptions={{
@@ -1019,7 +1019,7 @@ export default function App() {
   if (showStoreSelector) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-sans text-white">
-        <Toaster 
+        <Toaster gutter={8} 
         position="top-center"
         containerStyle={{ top: 16 }}
         toastOptions={{
@@ -1224,7 +1224,7 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#f9fafb] font-sans overflow-hidden">
-      <Toaster 
+      <Toaster gutter={8} 
         position="top-center"
         containerStyle={{ top: 16 }}
         toastOptions={{
