@@ -13,6 +13,7 @@ import { MenuItem, Order, InventoryItem } from '../types';
 import { auth } from '../firebase';
 import { isDishStockAvailable } from './Orders';
 import PaymentModal from './PaymentModal';
+import { dispatchWhatsAppMessage } from '../lib/whatsappService';
 
 interface DinerSimulatorProps {
   selectedTable: string;
@@ -1377,8 +1378,10 @@ ${invoiceLink}
 
 Thank you!`;
 
-              const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
-              window.open(waUrl, '_blank');
+              dispatchWhatsAppMessage({
+                phone: formattedPhone,
+                message
+              });
             }
 
             // Reset cart & transition
@@ -2264,8 +2267,10 @@ ${payMethodLabel === 'Cash' ? 'Your payment has been received successfully.' : '
 
 Thank you for choosing us!`;
                             
-                            const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
-                            window.open(waUrl, '_blank');
+                            dispatchWhatsAppMessage({
+                              phone: formattedPhone,
+                              message
+                            });
                             onShowToast('📲 Receipt shared on WhatsApp!');
                           } else {
                             onShowToast('⚠️ Please enter a 10-digit phone number first!');

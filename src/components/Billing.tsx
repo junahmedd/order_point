@@ -31,6 +31,7 @@ import {
   formatInvoiceNumberDisplay, 
   formatOrderNumberDisplay 
 } from '../lib/orderSeriesUtils';
+import { buildRestaurantBillingMessage, dispatchWhatsAppMessage } from '../lib/whatsappService';
 import BrandedInvoiceCard, { BrandedInvoiceData } from './BrandedInvoiceCard';
 
 interface BillingProps {
@@ -330,22 +331,19 @@ export default function Billing({
 
       // 4. Automatically Open WhatsApp with Customer's Mobile Number and PDF link
       const publicInvoiceLink = `${window.location.origin}/?invoice=${assignedInvoiceNo}&store=${restId}`;
-      const whatsappMessage = `Hi! Thank you for dining with us. 😊\n\nYour invoice is ready. View or download your bill here:\n\n📄 "View Invoice PDF" (${publicInvoiceLink})\n\nThank you for choosing us! ❤️`;
+      const whatsappMessage = buildRestaurantBillingMessage({
+        customerName: activeOrderObj.customerName || (activeOrderObj.type === 'Takeaway' ? 'Guest' : undefined),
+        restaurantName: settings?.restaurantInfo?.name || 'OrderPoint Pro',
+        totalAmount: totalAmountVal,
+        invoiceNumber: assignedInvoiceNo,
+        invoicePdfLink: publicInvoiceLink
+      });
 
       if (cleanPhone.length >= 10) {
-        const formattedPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
-        const waUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(whatsappMessage)}`;
-        
-        // On mobile devices, window.location.href triggers WhatsApp app directly
-        const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        if (isMobileDevice) {
-          window.location.href = waUrl;
-        } else {
-          const win = window.open(waUrl, '_blank');
-          if (!win || win.closed || typeof win.closed === 'undefined') {
-            window.location.href = waUrl;
-          }
-        }
+        dispatchWhatsAppMessage({
+          phone: cleanPhone,
+          message: whatsappMessage
+        });
       }
 
       onShowToast(`Invoice ${assignedInvoiceNo} confirmed`);
